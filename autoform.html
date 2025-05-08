@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Formatador e Editor Básico de Petições</title>
+    <style>
+        /* --- CSS GERAL --- */
+        body {
+            font-family: Verdana, sans-serif;
+            line-height: 1.5;
+            margin: 2cm;
+            font-size: 12pt;
+            text-align: left;
+            font-weight: normal;
+            background-color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .controls, .editing-controls {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .editing-controls button {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        #peticaoFormatada[contenteditable="true"] {
+            outline: 1px solid #b0b0b0; 
+            cursor: text;
+            padding: 15px; 
+            min-height: 200px; 
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: Verdana, sans-serif; 
+            font-size: 12pt; 
+            box-sizing: border-box;
+            text-align: left;
+            font-weight: normal;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 8px 12px; 
+            margin-right: 10px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .peticao-container {
+            border: 1px solid #ccc;
+            margin-top: 10px; 
+            background-color: white; 
+            white-space: pre-wrap;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        /* --- ESTILOS ESPECÍFICOS DA PETIÇÃO --- */
+        .cabecalho-processo, .paragrafo, .item-lista, .titulo-secao, .assinatura, .rodape-cidade, .advogado-info {
+            page-break-inside: avoid !important; 
+        }
+
+        .cabecalho-processo { 
+            font-weight: bold;
+            margin-bottom: 1.5em;
+            text-align: justify; 
+        }
+
+        .titulo-peticao {
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 2em 0;
+        }
+
+        .titulo-secao {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 1.5em 0 0.5em 0;
+            text-align: left; 
+        }
+
+        .advogado-info { 
+            text-align: center;
+            font-weight: bold; 
+            margin-top: 0.25em;
+            margin-bottom: 0.25em;
+        }
+
+        .paragrafo {
+            text-indent: 4em; 
+            margin: 0.5em 0;
+            text-align: justify; 
+        }
+
+        .item-lista {
+            margin-left: 4em; 
+            margin-bottom: 0.5em;
+            text-align: justify; 
+        }
+
+        .assinatura { 
+            text-indent: 4em; 
+            margin-top: 2em;
+            margin-bottom: 1em;
+            text-align: left; 
+        }
+        
+        .rodape-cidade {
+            margin-top: 2em;
+            text-indent: 4em; 
+            text-align: left; 
+        }
+        
+        /* --- ESTILOS DE IMPRESSÃO --- */
+        @media print {
+             /* ... (Seção @media print como na resposta anterior) ... */
+            .controls, .editing-controls, textarea, h2, .container > h2 { display: none; }
+            body { margin: 3cm 2cm 2cm 3cm; font-size: 12pt; font-family: Verdana, sans-serif; font-weight: normal; border: none; background-color: white; }
+            .container { max-width: none; margin: 0; padding: 0; border: none;}
+            .peticao-container, #peticaoFormatada { border: none !important; padding: 0 !important; margin-top: 0 !important; background-color: white !important; white-space: pre-wrap !important; outline: none !important; }
+            .advogado-info { text-align: center !important; font-weight: bold !important; }
+            .cabecalho-processo, .paragrafo, .item-lista { text-align: justify !important; }
+            .paragrafo { text-indent: 4em !important; }
+            .rodape-cidade { text-indent: 4em !important; text-align: left !important; }
+            .titulo-secao { text-align: left !important; }
+            .cabecalho-processo, .paragrafo, .item-lista, .titulo-secao, .assinatura, .rodape-cidade, .advogado-info { page-break-inside: avoid !important; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Formatador e Editor Básico de Petições</h2>
+        
+        <div class="controls">
+            <textarea id="inputText" placeholder="Cole sua petição aqui..."></textarea>
+            <button onclick="formatarPeticao()">Formatar Petição Inicial</button>
+            <button class="btn-pdf" onclick="gerarPDF()">Salvar em PDF com Logo</button>
+        </div>
+
+        <div class="editing-controls">
+            <p><strong>Controles de Edição (BÁSICOS - Selecione o texto e aplique):</strong></p>
+            <button onclick="aplicarComando('bold')"><strong>N</strong></button>
+            <button onclick="aplicarComando('italic')"><em>I</em></button>
+            <button onclick="aplicarComando('underline')"><u>S</u></button>
+            <button onclick="aplicarComando('justifyLeft')">Alinhar Esq.</button>
+            <button onclick="aplicarComando('justifyCenter')">Centralizar</button>
+            <button onclick="aplicarComando('justifyRight')">Alinhar Dir.</button>
+            <button onclick="aplicarComando('justifyFull')">Justificar</button>
+            <button onclick="aplicarComando('indent')">Aumentar Recuo</button>
+            <button onclick="aplicarComando('outdent')">Diminuir Recuo</button>
+        </div>
+        
+        <div id="peticaoFormatada" class="peticao-container" contenteditable="true">
+            </div>
+    </div>
+
+    <script>
+        function aplicarComando(comando, valor = null) {
+            document.getElementById('peticaoFormatada').focus();
+            document.execCommand(comando, false, valor);
+        }
+
+        function formatarTextoMaiusculo(textoOriginal) {
+            if (!textoOriginal) return '';
+            const regexPalavrasMaiusculas = /\b([A-ZÁÀÂÃÉÈÊÍÌÎÓÒÔÕÚÙÛÇ]{2,})\b/g;
+            return textoOriginal.replace(regexPalavrasMaiusculas, '<strong>$1</strong>');
+        }
+
+        function formatarPeticao() {
+            const input = document.getElementById('inputText').value;
+            const output = document.getElementById('peticaoFormatada');
+            const linhas = input.split('\n'); 
+            let formattedHtml = '';
+            
+            for (let i = 0; i < linhas.length; i++) {
+                let linha = linhas[i].trim();
+                let linhaProcessada;
+
+                if (!linha) {
+                    formattedHtml += '<br>'; 
+                    continue;
+                }
+                
+                const proximaLinhaEhOAB = (i + 1 < linhas.length &&
+                                        linhas[i+1].trim().toUpperCase().startsWith('OAB/'));
+
+                if (linha.toUpperCase() === linha && linha.length > 3 && proximaLinhaEhOAB) {
+                    formattedHtml += `<div class="advogado-info">${linha}</div>`; 
+                    continue;
+                }
+                
+                const oabRegex = /^\s*OAB\/\w{2}\s*\d{1,}(\.\d{3})*([-/]\w{1,2})?/i; 
+                if (oabRegex.test(linha)) {
+                    formattedHtml += `<div class="advogado-info">${linha}</div>`;
+                    continue;
+                }
+                
+                linhaProcessada = formatarTextoMaiusculo(linha);
+
+                const cidadeDataRegex = /^[A-Za-zÀ-ú\s]+,\s*\d{1,2}\s*de\s*[A-Za-zÀ-ú]+\s*de\s*\d{4}\.?$/i;
+                if (cidadeDataRegex.test(linha)) { 
+                    formattedHtml += `<div class="rodape-cidade">${linhaProcessada}</div>`;
+                    continue;
+                }
+                
+                if (linha.toUpperCase().startsWith('EXCELENTÍSSIMO')) { 
+                    formattedHtml += `<div class="cabecalho-processo">${linhaProcessada}</div>`;
+                    continue;
+                }
+                
+                const tituloRegex = /^(\d+\.\s*\d*\s+.*)|^([IVXLCDM]+\.\s+.*)|^(DOS FATOS|DO DIREITO|DOS PEDIDOS|DA TUTELA DE URGÊNCIA|DA CONCLUSÃO|PRELIMINARMENTE|DAS PROVAS|DO MÉRITO|AO JUÍZO|À VARA|AO TRIBUNAL).*/i;
+                if (tituloRegex.test(linha)) {
+                    formattedHtml += `<div class="titulo-secao">${formatarTextoMaiusculo(linha.toUpperCase())}</div>`;
+                    continue;
+                }
+                
+                const itemListaRegex = /^(●|•|-|-|\*|\d+[.)]\s+)/;
+                if (itemListaRegex.test(linha)) {
+                    let marcador = linha.match(itemListaRegex)[0];
+                    let conteudoItem = linha.substring(marcador.length).trim();
+                    formattedHtml += `<div class="item-lista">${marcador}${formatarTextoMaiusculo(conteudoItem)}</div>`;
+                    continue;
+                }
+                
+                const termosFinaisRegex = /^(NESTES TERMOS|TERMOS EM QUE|PEDE DEFERIMENTO|REQUER DEFERIMENTO)/i;
+                if (termosFinaisRegex.test(linha.toUpperCase())) { 
+                    formattedHtml += `<div class="assinatura">${linhaProcessada}</div>`;
+                    continue;
+                }
+                
+                formattedHtml += `<div class="paragrafo">${linhaProcessada}</div>`;
+            }
+            
+            output.innerHTML = formattedHtml;
+            output.focus(); 
+        }
+        
+        function gerarPDF() {
+            const element = document.getElementById('peticaoFormatada');
+            
+            console.log("--- HTML da petição (element.innerHTML) ANTES de qualquer coisa (inicio) ---");
+            console.log(element.innerHTML); 
+            console.log("--- HTML da petição (element.innerHTML) ANTES de qualquer coisa (fim) ---");
+
+            const tempDivVerificacao = document.createElement('div');
+            tempDivVerificacao.innerHTML = element.innerHTML;
+            if (tempDivVerificacao.textContent.trim() === '') {
+                 alert('Por favor, formate ou insira conteúdo na petição antes de gerar o PDF.');
+                 return;
+            }
+
+            const logoUrl = 'https://raw.githubusercontent.com/JpMedeiros1183/Documentos/2e4681fe152b54cec992f4f422720f97879160c7/Screenshot_20250508_083432_Photos.jpg';
+            
+            const img = new Image();
+            img.crossOrigin = "anonymous"; 
+
+            img.onload = function() {
+                const pdfContentContainer = document.createElement('div');
+
+                const logoContainer = document.createElement('div');
+                logoContainer.classList.add('logo-container-for-pdf'); 
+                logoContainer.style.textAlign = 'center';
+                logoContainer.style.marginBottom = '20px'; 
+                logoContainer.innerHTML = `<img src="${this.src}" style="max-width: 140px; max-height: 70px; display: block; margin-left: auto; margin-right: auto;" crossorigin="anonymous">`;
+                pdfContentContainer.appendChild(logoContainer);
+
+                const peticaoConteudoDiv = document.createElement('div');
+                peticaoConteudoDiv.innerHTML = element.innerHTML; 
+                pdfContentContainer.appendChild(peticaoConteudoDiv);
+
+                // ***** ESPAÇADOR DE DEPURAÇÃO REMOVIDO *****
+                // const espacadorFinal = document.createElement('div');
+                // ... (código do espaçador removido) ...
+                // pdfContentContainer.appendChild(espacadorFinal); 
+                // ***** FIM DA REMOÇÃO DO ESPAÇADOR *****
+                
+                console.log("--- HTML combinado (logo CARREGADO + petição) para PDF (inicio) ---");
+                console.log(pdfContentContainer.innerHTML);
+                console.log("--- HTML combinado (logo CARREGADO + petição) para PDF (fim) ---");
+                
+                const opt = {
+                    margin:       [20, 20, 25, 20], // Margem inferior um pouco maior (25mm)
+                    filename:     'peticao_formatada_com_logo.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true, 
+                        scrollY: 0,
+                        dpi: 192, 
+                        windowHeight: 0, 
+                        logging: true 
+                    },
+                    jsPDF:        { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        precision: 16 
+                    },
+                    pagebreak:    { 
+                        mode: ['css', 'legacy', 'avoid-all'], 
+                        avoid: ['.logo-container-for-pdf', '.advogado-info'] 
+                    } 
+                };
+                
+                html2pdf().from(pdfContentContainer).set(opt).save();
+            };
+
+            img.onerror = function() {
+                alert("Erro ao carregar a imagem do logotipo. O PDF será gerado sem o logo.");
+                const pdfContentContainer = document.createElement('div'); // Recria para o caso de erro
+                const peticaoConteudoDiv = document.createElement('div');
+                peticaoConteudoDiv.innerHTML = element.innerHTML;
+                pdfContentContainer.appendChild(peticaoConteudoDiv);
+                // ***** ESPAÇADOR DE DEPURAÇÃO REMOVIDO TAMBÉM DO CASO DE ERRO *****
+                const opt = { /* ... mesmas opções de antes ... */ }; // Redefinir opt aqui
+                html2pdf().from(pdfContentContainer).set(opt).save();
+            };
+
+            img.src = logoUrl; 
+        }
+    </script>
+</body>
+</html>
