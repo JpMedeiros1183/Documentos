@@ -15,8 +15,6 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background: -o-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -26,17 +24,12 @@
             margin: 0 auto;
             background: white;
             border-radius: 15px;
-            -webkit-border-radius: 15px;
-            -o-border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            -webkit-box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #2c3e50, #34495e);
-            background: -webkit-linear-gradient(135deg, #2c3e50, #34495e);
-            background: -o-linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
             padding: 25px;
             text-align: center;
@@ -58,59 +51,51 @@
             padding: 15px;
             border-bottom: 2px solid #e9ecef;
             display: flex;
-            display: -webkit-flex;
             flex-wrap: wrap;
-            -webkit-flex-wrap: wrap;
             gap: 10px;
             align-items: center;
-            -webkit-align-items: center;
         }
 
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
-            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
-            background: -o-linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 8px;
-            -webkit-border-radius: 8px;
-            -o-border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
-            -webkit-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
             font-size: 14px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            -webkit-transform: translateY(-2px);
-            -o-transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .btn.special {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            background: -webkit-linear-gradient(135deg, #ff6b6b, #ee5a24);
-            background: -o-linear-gradient(135deg, #ff6b6b, #ee5a24);
             font-size: 16px;
             padding: 12px 20px;
         }
 
         .btn.save {
             background: linear-gradient(135deg, #10ac84, #1dd1a1);
-            background: -webkit-linear-gradient(135deg, #10ac84, #1dd1a1);
-            background: -o-linear-gradient(135deg, #10ac84, #1dd1a1);
             font-size: 16px;
             padding: 12px 20px;
         }
 
+        .separator {
+            width: 2px;
+            height: 30px;
+            background: #dee2e6;
+            margin: 0 5px;
+        }
+
         .editor-container {
             padding: 20px;
-            position: relative;
+            position: relative; /* Necessário para o posicionamento absoluto da paleta */
         }
 
         #editor {
@@ -118,8 +103,6 @@
             min-height: 600px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            -webkit-border-radius: 10px;
-            -o-border-radius: 10px;
             padding: 20px;
             font-family: 'Times New Roman', serif;
             font-size: 16px;
@@ -127,15 +110,26 @@
             resize: vertical;
             outline: none;
             transition: border-color 0.3s ease;
-            -webkit-transition: border-color 0.3s ease;
-            -o-transition: border-color 0.3s ease;
+            -webkit-user-select: text; /* Permitir seleção de texto */
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         #editor:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            -webkit-box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
+        .highlight {
+            background-color: yellow;
+        }
+
+        /* Classes de alinhamento (podem ser aplicadas dinamicamente) */
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-justify { text-align: justify; }
 
         .loading {
             display: none;
@@ -143,248 +137,122 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            -webkit-transform: translate(-50%, -50%);
-            -o-transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.8);
             color: white;
             padding: 20px;
             border-radius: 10px;
-            -webkit-border-radius: 10px;
-            -o-border-radius: 10px;
-            z-index: 1000;
+            z-index: 10000; /* Alto z-index para sobrepor tudo */
         }
 
-        /* Botão Flutuante - Compatibilidade Opera */
-        .floating-button {
-            position: fixed;
-            right: 30px;
-            top: 50%;
-            width: 60px;
-            height: 60px;
-            /* Fallbacks para Opera */
-            background-color: #667eea;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
-            background: -o-linear-gradient(135deg, #667eea, #764ba2);
-            border: 2px solid #667eea;
-            border-radius: 50%;
-            -webkit-border-radius: 50%;
-            -o-border-radius: 50%;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            -webkit-box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            -webkit-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
-            display: block;
-            color: white;
-            font-size: 24px;
-            text-align: center;
-            line-height: 56px;
-            text-decoration: none;
-            /* Transformação separada para melhor compatibilidade */
-            margin-top: -30px;
-        }
-
-        .floating-button:hover {
-            background-color: #5a67d8;
-            transform: scale(1.1);
-            -webkit-transform: scale(1.1);
-            -o-transform: scale(1.1);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-            -webkit-box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-        }
-
-        .floating-button.active {
-            background-color: #e74c3c;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            background: -webkit-linear-gradient(135deg, #e74c3c, #c0392b);
-            background: -o-linear-gradient(135deg, #e74c3c, #c0392b);
-            border-color: #e74c3c;
-        }
-
-        /* Menu Lateral - Melhor compatibilidade */
-        .floating-menu {
-            position: fixed;
-            right: -350px;
-            top: 50%;
-            width: 320px;
-            background-color: #2c3e50;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            background: -webkit-linear-gradient(135deg, #2c3e50, #34495e);
-            background: -o-linear-gradient(135deg, #2c3e50, #34495e);
-            border-radius: 20px 0 0 20px;
-            -webkit-border-radius: 20px 0 0 20px;
-            -o-border-radius: 20px 0 0 20px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
-            -webkit-box-shadow: -10px 0 30px rgba(0,0,0,0.3);
-            z-index: 999;
-            transition: right 0.4s ease;
-            -webkit-transition: right 0.4s ease;
-            -o-transition: right 0.4s ease;
-            overflow: hidden;
-            /* Transformação separada */
-            margin-top: -200px;
-        }
-
-        .floating-menu.open {
-            right: 0;
-        }
-
-        .menu-header {
-            background-color: #667eea;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
-            background: -o-linear-gradient(135deg, #667eea, #764ba2);
-            padding: 20px;
-            color: white;
-            text-align: center;
-            position: relative;
-        }
-
-        .menu-header h3 {
-            font-size: 1.4em;
-            margin: 0;
-        }
-
-        .close-menu {
+        /* Paleta Flutuante */
+        .floating-palette {
             position: absolute;
-            right: 15px;
-            top: 50%;
-            margin-top: -15px;
-            background: rgba(255,255,255,0.2);
-            background-color: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            -webkit-border-radius: 50%;
-            -o-border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            text-align: center;
-            line-height: 28px;
-            transition: all 0.3s ease;
-            -webkit-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 10px;
+            display: none; /* Inicialmente oculta */
+            z-index: 1000; /* Sobrepor conteúdo do editor */
+            min-width: 300px;
+            border: 2px solid #667eea;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .close-menu:hover {
-            background-color: rgba(255,255,255,0.3);
-            transform: rotate(90deg);
-            -webkit-transform: rotate(90deg);
-            -o-transform: rotate(90deg);
-        }
-
-        .menu-content {
-            padding: 20px;
-        }
-
-        .menu-section {
-            margin-bottom: 25px;
-        }
-
-        .menu-section h4 {
-            color: #ecf0f1;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .menu-buttons {
+        .floating-palette .palette-header {
             display: flex;
-            display: -webkit-flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .floating-palette .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .floating-palette .close-btn:hover {
+            background: #c0392b;
+        }
+
+        .floating-palette .palette-content {
+            display: flex;
             flex-wrap: wrap;
-            -webkit-flex-wrap: wrap;
             gap: 8px;
         }
 
-        .menu-btn {
-            background: rgba(255,255,255,0.1);
-            background-color: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 15px;
-            border-radius: 8px;
-            -webkit-border-radius: 8px;
-            -o-border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            -webkit-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
-            font-size: 13px;
-            flex: 1;
-            -webkit-flex: 1;
-            min-width: 60px;
-            text-align: center;
+        .floating-palette .btn { /* Estilo específico para botões dentro da paleta */
+            padding: 8px 12px;
+            font-size: 12px;
+            margin: 0; /* Resetar margem se houver alguma global */
         }
 
-        .menu-btn:hover {
-            background-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            -webkit-transform: translateY(-2px);
-            -o-transform: translateY(-2px);
+        .floating-palette .separator { /* Separador dentro da paleta */
+            width: 1px;
+            height: 20px;
+            background: #667eea;
+            margin: 0 3px;
         }
 
-        .menu-btn.icon {
-            font-size: 16px;
-            padding: 12px;
-            min-width: 45px;
+        /* Animação da paleta */
+        .floating-palette.show {
+            display: block !important; /* Garante que a paleta seja exibida */
+            animation: fadeInUp 0.3s ease;
         }
 
-        .separator-line {
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 15px 0;
-        }
-
-        /* Overlay */
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            z-index: 998;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            -webkit-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
-        }
-
-        .menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Responsivo */
-        @media screen and (max-width: 768px) {
-            .floating-button {
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-                line-height: 46px;
-                margin-top: -25px;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
-
-            .floating-menu {
-                width: 280px;
-                right: -280px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
+        
+        /* Melhorar seleção e visualização em mobile */
+        @media (max-width: 768px) {
+            .floating-palette {
+                min-width: 280px; /* Ajuste para telas menores */
+                max-width: 90vw; /* Não ocupar toda a largura */
+            }
+            
+            .floating-palette .btn {
+                padding: 12px; /* Botões maiores para toque */
+                min-width: 40px; /* Largura mínima para facilitar o toque */
+            }
 
-        /* Garantir visibilidade no Opera */
-        .floating-button,
-        .floating-menu {
-            display: block !important;
-            visibility: visible !important;
+            .header h1 {
+                font-size: 2em;
+            }
+            .header p {
+                font-size: 1em;
+            }
+            .toolbar {
+                padding: 10px;
+                gap: 8px;
+            }
+            .btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+             .btn.special, .btn.save {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+
         }
     </style>
 </head>
@@ -398,74 +266,33 @@
         <div class="toolbar">
             <button class="btn special" onclick="autoFormat()">🔥 Auto Formatar</button>
             <button class="btn save" onclick="saveAsPDF()">💾 Salvar PDF</button>
-        </div>
+            </div>
 
         <div class="editor-container">
             <div id="editor" contenteditable="true" placeholder="Cole aqui o texto da sua petição jurídica...">
-                <p>Cole aqui o texto da sua petição jurídica e use o botão flutuante lateral para acessar as ferramentas de formatação!</p>
+                <p>Cole aqui o texto da sua petição jurídica e selecione qualquer texto para abrir a paleta de edição flutuante!</p>
             </div>
-        </div>
-    </div>
 
-    <!-- Botão Flutuante com melhor compatibilidade -->
-    <div class="floating-button" id="floatingBtn" onclick="toggleMenu()">
-        ✏️
-    </div>
-
-    <!-- Overlay -->
-    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
-
-    <!-- Menu Lateral -->
-    <div class="floating-menu" id="floatingMenu">
-        <div class="menu-header">
-            <h3>🎨 Ferramentas de Edição</h3>
-            <button class="close-menu" onclick="closeMenu()">×</button>
-        </div>
-        
-        <div class="menu-content">
-            <!-- Formatação Básica -->
-            <div class="menu-section">
-                <h4>📝 Formatação</h4>
-                <div class="menu-buttons">
-                    <button class="menu-btn icon" onclick="formatText('bold')" title="Negrito"><b>B</b></button>
-                    <button class="menu-btn icon" onclick="formatText('italic')" title="Itálico"><i>I</i></button>
-                    <button class="menu-btn icon" onclick="formatText('underline')" title="Sublinhado"><u>U</u></button>
-                    <button class="menu-btn" onclick="highlightText()" title="Realçar">📝 Realçar</button>
+            <div id="floatingPalette" class="floating-palette">
+                <div class="palette-header">
+                    <span>📝 Edição Rápida</span>
+                    <button class="close-btn" onclick="closePalette()">×</button>
                 </div>
-            </div>
-
-            <div class="separator-line"></div>
-
-            <!-- Alinhamento -->
-            <div class="menu-section">
-                <h4>📐 Alinhamento</h4>
-                <div class="menu-buttons">
-                    <button class="menu-btn icon" onclick="alignText('left')" title="Esquerda">⬅️</button>
-                    <button class="menu-btn icon" onclick="alignText('center')" title="Centro">↔️</button>
-                    <button class="menu-btn icon" onclick="alignText('right')" title="Direita">➡️</button>
-                    <button class="menu-btn icon" onclick="alignText('justify')" title="Justificado">📄</button>
-                </div>
-            </div>
-
-            <div class="separator-line"></div>
-
-            <!-- Recuo -->
-            <div class="menu-section">
-                <h4>📏 Recuo</h4>
-                <div class="menu-buttons">
-                    <button class="menu-btn" onclick="changeIndent('outdent')">◀️ Diminuir</button>
-                    <button class="menu-btn" onclick="changeIndent('indent')">▶️ Aumentar</button>
-                </div>
-            </div>
-
-            <div class="separator-line"></div>
-
-            <!-- Ações Especiais -->
-            <div class="menu-section">
-                <h4>⚡ Ações Rápidas</h4>
-                <div class="menu-buttons">
-                    <button class="menu-btn" onclick="autoFormat(); closeMenu();" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24); background-color: #ff6b6b;">🔥 Auto Formatar</button>
-                    <button class="menu-btn" onclick="saveAsPDF(); closeMenu();" style="background: linear-gradient(135deg, #10ac84, #1dd1a1); background-color: #10ac84;">💾 Salvar PDF</button>
+                <div class="palette-content">
+                    <button class="btn" onclick="formatText('bold')"><b>B</b></button>
+                    <button class="btn" onclick="formatText('italic')"><i>I</i></button>
+                    <button class="btn" onclick="formatText('underline')"><u>U</u></button>
+                    <button class="btn" onclick="highlightText()">🎨</button> <div class="separator"></div>
+                    
+                    <button class="btn" onclick="alignText('left')">⬅️</button>
+                    <button class="btn" onclick="alignText('center')">↔️</button>
+                    <button class="btn" onclick="alignText('right')">➡️</button>
+                    <button class="btn" onclick="alignText('justify')">📄</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button class="btn" onclick="changeIndent('outdent')">◀️</button>
+                    <button class="btn" onclick="changeIndent('indent')">▶️</button>
                 </div>
             </div>
         </div>
@@ -476,176 +303,315 @@
     </div>
 
     <script>
-        let menuOpen = false;
+        // Cache de elementos DOM frequentemente usados
+        const editor = document.getElementById('editor');
+        const floatingPalette = document.getElementById('floatingPalette');
+        const editorContainer = document.querySelector('.editor-container');
+        const loadingIndicator = document.getElementById('loading');
 
-        // Garantir que o botão seja visível no Opera
-        window.addEventListener('load', function() {
-            const floatingBtn = document.getElementById('floatingBtn');
-            const floatingMenu = document.getElementById('floatingMenu');
-            
-            // Forçar visibilidade no Opera
-            if (floatingBtn) {
-                floatingBtn.style.display = 'block';
-                floatingBtn.style.visibility = 'visible';
+        let currentSelection = null;
+        let selectionTimeout = null;
+
+        function detectSelection(e) {
+            if (selectionTimeout) {
+                clearTimeout(selectionTimeout);
             }
-            if (floatingMenu) {
-                floatingMenu.style.display = 'block';
-                floatingMenu.style.visibility = 'visible';
+            
+            selectionTimeout = setTimeout(() => {
+                const selection = window.getSelection();
+                const selectedText = selection.toString().trim();
+                
+                if (selectedText.length > 0) {
+                    try {
+                        // Tenta obter o range da seleção. Essencial para restaurar depois.
+                        if (selection.rangeCount > 0) {
+                            currentSelection = selection.getRangeAt(0).cloneRange();
+                        } else {
+                            console.warn('Nenhum range na seleção, não foi possível armazenar.');
+                            closePalette(); // Se não puder obter o range, melhor não mostrar
+                            return;
+                        }
+                        
+                        let x, y;
+                        // Verifica se o evento é de toque e se changedTouches existe
+                        if (e.type === 'touchend' && e.changedTouches && e.changedTouches.length > 0) {
+                            const touch = e.changedTouches[0];
+                            x = touch.pageX;
+                            y = touch.pageY;
+                        } else {
+                            x = e.pageX;
+                            y = e.pageY;
+                        }
+                        
+                        showPalette(x, y);
+                        console.log('Seleção detectada:', selectedText);
+                    } catch (error) {
+                        console.warn('Erro ao capturar seleção:', error);
+                        closePalette(); // Fecha a paleta se houver erro
+                    }
+                } else {
+                    closePalette();
+                }
+            }, 150); // Timeout para estabilizar a seleção
+        }
+
+        editor.addEventListener('mouseup', detectSelection);
+        editor.addEventListener('touchend', detectSelection);
+        
+        // Listener de fallback para mudanças de seleção
+        document.addEventListener('selectionchange', function() {
+            const selection = window.getSelection();
+            if (!selection) return; // Adiciona verificação para selection
+            
+            const selectedText = selection.toString().trim();
+            
+            if (selectedText.length > 0 && selection.anchorNode && selection.rangeCount > 0) {
+                if (editor.contains(selection.anchorNode)) {
+                    try {
+                        currentSelection = selection.getRangeAt(0).cloneRange();
+                        
+                        // Se a paleta não estiver visível, mostra no centro do editor como fallback
+                        if (!floatingPalette.classList.contains('show')) {
+                            console.log('Selectionchange fallback: mostrando paleta.');
+                            const rect = editor.getBoundingClientRect();
+                            // Posição relativa à viewport, precisa ser convertida se editorContainer não for a viewport
+                            // Para simplificar, vamos usar as coordenadas do editor relativas à viewport e depois ajustar no showPalette
+                            showPalette(rect.left + rect.width / 2 + window.scrollX, rect.top + rect.height / 2 + window.scrollY);
+                        }
+                    } catch (error) {
+                        console.warn('Erro ao obter range em selectionchange:', error);
+                        closePalette(); 
+                    }
+                }
+            } else if (floatingPalette.classList.contains('show') && selectedText.length === 0) {
+                 // Se a paleta estiver aberta e a seleção for perdida, fechar.
+                // Mas cuidado para não interferir com o clique nos botões da paleta.
+                // A lógica de clique fora já deve cuidar disso de forma mais eficaz.
             }
         });
 
-        // Toggle do menu
-        function toggleMenu() {
-            if (menuOpen) {
-                closeMenu();
-            } else {
-                openMenu();
+        function showPalette(pageX, pageY) {
+            const containerRect = editorContainer.getBoundingClientRect();
+            
+            // Converte coordenadas da página para relativas ao editorContainer
+            // Adiciona scrollX/Y para coordenadas relativas à viewport (getBoundingClientRect)
+            let relativeX = pageX - (containerRect.left + window.scrollX);
+            let relativeY = pageY - (containerRect.top + window.scrollY) + 20; // +20 para posicionar abaixo do cursor/toque
+            
+            const paletteWidth = floatingPalette.offsetWidth || 300; // Usa offsetWidth ou um fallback
+            const paletteHeight = floatingPalette.offsetHeight || 100;
+            
+            // Garantir que a paleta não saia do editorContainer
+            if (relativeX + paletteWidth > editorContainer.clientWidth) {
+                relativeX = editorContainer.clientWidth - paletteWidth - 10;
             }
+            if (relativeX < 10) {
+                relativeX = 10;
+            }
+            if (relativeY + paletteHeight > editorContainer.clientHeight) {
+                // Tenta posicionar acima do cursor se não couber abaixo
+                relativeY = pageY - (containerRect.top + window.scrollY) - paletteHeight - 10; 
+            }
+            if (relativeY < 10) {
+                relativeY = 10;
+            }
+            
+            floatingPalette.style.left = Math.max(0, relativeX) + 'px'; // Garante não ser negativo
+            floatingPalette.style.top = Math.max(0, relativeY) + 'px';
+            
+            floatingPalette.style.display = 'block'; // Força display antes de adicionar classe para animação
+            floatingPalette.classList.add('show');
+            
+            console.log('Paleta mostrada em (relativo ao container):', relativeX, relativeY);
         }
 
-        // Abrir menu
-        function openMenu() {
-            const menu = document.getElementById('floatingMenu');
-            const overlay = document.getElementById('menuOverlay');
-            const btn = document.getElementById('floatingBtn');
-            
-            menu.classList.add('open');
-            overlay.classList.add('active');
-            btn.classList.add('active');
-            btn.innerHTML = '×';
-            
-            menuOpen = true;
+        function closePalette() {
+            floatingPalette.classList.remove('show');
+            floatingPalette.style.display = 'none'; // Garante que está oculta
+            // Não limpar currentSelection aqui, pois pode ser necessário para aplicar formato
+            // após um clique rápido em um botão da paleta. Limpar currentSelection só se a intenção for realmente descartá-la.
+            // A lógica de seleção irá definir um novo currentSelection ou nenhum.
+            console.log('Paleta fechada');
         }
 
-        // Fechar menu
-        function closeMenu() {
-            const menu = document.getElementById('floatingMenu');
-            const overlay = document.getElementById('menuOverlay');
-            const btn = document.getElementById('floatingBtn');
-            
-            menu.classList.remove('open');
-            overlay.classList.remove('active');
-            btn.classList.remove('active');
-            btn.innerHTML = '✏️';
-            
-            menuOpen = false;
+        // Fechar paleta ao clicar fora dela e fora do editor
+        document.addEventListener('click', function(e) {
+            if (!floatingPalette.contains(e.target) && !editor.contains(e.target) && floatingPalette.classList.contains('show')) {
+                closePalette();
+                currentSelection = null; // Aqui sim, limpar a seleção se o clique foi fora de tudo
+            }
+        });
+        
+        // Fechar paleta com a tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && floatingPalette.classList.contains('show')) {
+                closePalette();
+                currentSelection = null; // Limpar seleção
+            }
+        });
+
+        function restoreSelection() {
+            if (currentSelection) {
+                try {
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(currentSelection);
+                    return true;
+                } catch (error) {
+                    console.warn('Erro ao restaurar seleção:', error);
+                    return false;
+                }
+            }
+            return false;
         }
 
-        // Funções de formatação
         function formatText(command) {
-            document.execCommand(command, false, null);
-            document.getElementById('editor').focus();
+            if (restoreSelection()) { // Tenta restaurar a seleção antes de aplicar o comando
+                document.execCommand(command, false, null);
+                editor.focus(); // Devolve o foco ao editor
+                // Opcional: após formatação, a seleção pode ser perdida ou alterada.
+                // Poderia tentar salvar o estado da seleção novamente, mas pode ser complexo.
+                // Para simplicidade, a paleta pode fechar ou o usuário pode precisar re-selecionar.
+                // closePalette(); // Descomente se quiser que a paleta feche após uma ação
+            } else {
+                console.warn('Não foi possível aplicar formatação: seleção inválida ou não restaurada.');
+            }
         }
 
         function highlightText() {
-            document.execCommand('hiliteColor', false, 'yellow');
-            document.getElementById('editor').focus();
+            if (restoreSelection()) {
+                document.execCommand('hiliteColor', false, 'yellow');
+                editor.focus();
+            } else {
+                 console.warn('Não foi possível aplicar highlight: seleção inválida ou não restaurada.');
+            }
         }
 
         function alignText(alignment) {
-            const alignCommands = {
-                'left': 'justifyLeft',
-                'center': 'justifyCenter',
-                'right': 'justifyRight',
-                'justify': 'justifyFull'
-            };
-            document.execCommand(alignCommands[alignment], false, null);
-            document.getElementById('editor').focus();
+            if (restoreSelection()) {
+                const alignCommands = {
+                    'left': 'justifyLeft',
+                    'center': 'justifyCenter',
+                    'right': 'justifyRight',
+                    'justify': 'justifyFull'
+                };
+                document.execCommand(alignCommands[alignment], false, null);
+                editor.focus();
+            } else {
+                console.warn('Não foi possível alinhar texto: seleção inválida ou não restaurada.');
+            }
         }
 
         function changeIndent(type) {
-            document.execCommand(type, false, null);
-            document.getElementById('editor').focus();
+            if (restoreSelection()) {
+                document.execCommand(type, false, null);
+                editor.focus();
+            } else {
+                 console.warn('Não foi possível alterar indentação: seleção inválida ou não restaurada.');
+            }
         }
 
-        // Função de auto formatação
         function autoFormat() {
-            const editor = document.getElementById('editor');
             let content = editor.innerHTML;
 
             // Justificar todos os parágrafos
-            content = content.replace(/<p([^>]*)>/gi, '<p$1 style="text-align: justify;">');
+            // Esta abordagem com replace pode ser frágil com HTML complexo.
+            // Para maior robustez, seria melhor iterar sobre os elementos.
+            content = content.replace(/<p(?:\s+style="[^"]*text-align:[^;"]+;?[^"]*")?([^>]*)>/gi, (match, p1) => {
+                if (p1 && p1.includes('style=')) {
+                    return match.replace(/style="([^"]*)"/i, (styleMatch, styleAttrs) => {
+                        let newStyleAttrs = styleAttrs.replace(/text-align:[^;]+;?/i, '').trim();
+                        if (newStyleAttrs.length > 0 && !newStyleAttrs.endsWith(';')) newStyleAttrs += '; ';
+                        return `style="${newStyleAttrs}text-align: justify;"`;
+                    });
+                }
+                return `<p style="text-align: justify;"${p1}>`;
+            });
             
-            // Se não houver parágrafos, envolver texto em parágrafos justificados
-            if (!content.includes('<p')) {
-                const lines = content.split('<br>');
+            if (!content.includes('<p') && content.trim().length > 0) {
+                const lines = content.split(/<br\s*\/?>/i); // Trata <br> e <br/>
                 const justifiedLines = lines.map(line => {
-                    if (line.trim()) {
-                        return `<p style="text-align: justify;">${line}</p>`;
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        // Evitar tags HTML dentro da linha de serem quebradas incorretamente
+                        if (trimmedLine.startsWith('<') && trimmedLine.endsWith('>')) {
+                            return trimmedLine; // Manter tags intactas se a linha for só uma tag
+                        }
+                        return `<p style="text-align: justify;">${trimmedLine}</p>`;
                     }
-                    return line;
+                    return ''; // Linhas vazias ou só com <br> são removidas ou se tornam <p></p>
                 });
                 content = justifiedLines.join('');
             }
-
-            // Aplicar justificação em divs também
-            content = content.replace(/<div([^>]*)>/gi, function(match, attrs) {
-                if (!attrs.includes('text-align')) {
-                    return `<div${attrs} style="text-align: justify;">`;
+            
+            // Aplicar justificação em divs também (com mais cuidado para não sobrescrever)
+            content = content.replace(/<div(?:\s+style="[^"]*text-align:[^;"]+;?[^"]*")?([^>]*)>/gi, (match, divAttrs) => {
+                if (divAttrs && divAttrs.toLowerCase().includes('style=')) {
+                     if (divAttrs.toLowerCase().includes('text-align:')) return match; // Já tem text-align, não mexe
+                     return match.replace(/style="([^"]*)"/i, `style="$1 text-align: justify;"`);
                 }
-                return match;
+                return `<div style="text-align: justify;"${divAttrs}>`;
             });
 
             editor.innerHTML = content;
-            
-            // Feedback visual
-            alert('Auto formatação concluída! Todos os parágrafos estão justificados. ✅');
+            alert('Auto formatação concluída! Verifique o resultado. ✅');
         }
 
-        // Função para salvar como PDF
         async function saveAsPDF() {
-            const loading = document.getElementById('loading');
-            loading.style.display = 'block';
+            loadingIndicator.style.display = 'block';
 
             try {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                // Adicionar logo
                 const logoUrl = 'https://raw.githubusercontent.com/JpMedeiros1183/Documentos/refs/heads/main/Screenshot_20250508_083432_Photos.jpg';
                 
                 try {
                     const img = new Image();
-                    img.crossOrigin = 'anonymous';
+                    img.crossOrigin = 'Anonymous'; // Essencial para carregar imagens de outros domínios em canvas/pdf
                     
+                    // Usar uma Promise para aguardar o carregamento da imagem
                     await new Promise((resolve, reject) => {
                         img.onload = resolve;
-                        img.onerror = reject;
+                        img.onerror = (err) => {
+                            console.error('Erro ao carregar imagem do logo:', err);
+                            reject(new Error('Falha ao carregar logo. Verifique o CORS e a URL.'));
+                        };
                         img.src = logoUrl;
                     });
 
                     const logoWidth = 50;
                     const logoHeight = (img.height / img.width) * logoWidth;
-                    const logoX = (210 - logoWidth) / 2;
+                    const logoX = (pdf.internal.pageSize.getWidth() - logoWidth) / 2;
                     
                     pdf.addImage(img, 'JPEG', logoX, 10, logoWidth, logoHeight);
                     
                 } catch (error) {
-                    console.log('Erro ao carregar logo, continuando sem ele:', error);
+                    console.warn('Não foi possível carregar o logo, PDF será gerado sem ele:', error.message);
+                    // Continuar sem o logo se houver erro
                 }
 
-                const editor = document.getElementById('editor');
-                const textContent = editor.innerText || editor.textContent;
+                // Usar innerText para obter uma representação textual mais limpa
+                const textContent = editor.innerText || editor.textContent || "";
                 
                 pdf.setFont('times', 'normal');
                 pdf.setFontSize(12);
                 
-                const startY = 60;
+                const startY = (pdf.internal.pageSize.getHeight() > 70) ? 60 : 20; // Posição Y inicial (após o logo ou no topo)
                 const margin = 20;
-                const pageWidth = 210 - (margin * 2);
+                const pageWidth = pdf.internal.pageSize.getWidth() - (margin * 2);
                 
                 const lines = pdf.splitTextToSize(textContent, pageWidth);
                 
                 let currentY = startY;
-                const lineHeight = 7;
-                const pageHeight = 297 - 20;
+                const lineHeight = 7; // Aproximadamente 12pt (1pt = 0.35mm, 12pt = 4.2mm, mas jsPDF usa unidades diferentes)
+                const pageHeight = pdf.internal.pageSize.getHeight() - margin; // Margem inferior
                 
-                lines.forEach((line, index) => {
+                lines.forEach((line) => {
                     if (currentY > pageHeight) {
                         pdf.addPage();
-                        currentY = 20;
+                        currentY = margin; // Margem superior na nova página
                     }
-                    
                     pdf.text(line, margin, currentY);
                     currentY += lineHeight;
                 });
@@ -657,47 +623,65 @@
                 
             } catch (error) {
                 console.error('Erro ao gerar PDF:', error);
-                alert('Erro ao gerar PDF. Tente novamente.');
+                alert(`Erro ao gerar PDF: ${error.message}. Tente novamente.`);
             } finally {
-                loading.style.display = 'none';
+                loadingIndicator.style.display = 'none';
             }
         }
 
-        // Configurar placeholder behavior
-        document.getElementById('editor').addEventListener('focus', function() {
-            if (this.innerHTML.includes('Cole aqui o texto')) {
-                this.innerHTML = '';
+        // Comportamento do placeholder
+        const placeholderText = "Cole aqui o texto da sua petição jurídica...";
+        if(editor.innerHTML.trim() === "" || editor.innerHTML.includes("Cole aqui o texto da sua petição jurídica e selecione qualquer texto para abrir a paleta de edição flutuante!")){
+            editor.innerHTML = `<p>${placeholderText}</p>`;
+        }
+
+        editor.addEventListener('focus', function() {
+            if (this.textContent.trim() === placeholderText) {
+                // Salva a seleção atual (deve ser o placeholder)
+                const sel = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(this);
+                range.collapse(true); // Colapsa para o início
+                sel.removeAllRanges();
+                sel.addRange(range);
+                this.innerHTML = '<p><br></p>'; // Coloca um parágrafo com quebra de linha para iniciar a digitação
+                // Reposiciona o cursor no início do parágrafo
+                const newRange = document.createRange();
+                newRange.setStart(this.firstChild.firstChild, 0); // this.firstChild (p) .firstChild (br ou textnode)
+                newRange.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(newRange);
             }
         });
 
-        // Permitir atalhos de teclado
-        document.getElementById('editor').addEventListener('keydown', function(e) {
-            if (e.ctrlKey) {
-                switch(e.key) {
+        editor.addEventListener('blur', function() {
+            if (this.textContent.trim() === "") {
+                this.innerHTML = `<p>${placeholderText}</p>`;
+            }
+        });
+
+
+        // Atalhos de teclado
+        editor.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) { // metaKey para MacOS
+                let preventDefault = true;
+                switch(e.key.toLowerCase()) { // toLowerCase para consistência
                     case 'b':
-                        e.preventDefault();
                         formatText('bold');
                         break;
                     case 'i':
-                        e.preventDefault();
                         formatText('italic');
                         break;
                     case 'u':
-                        e.preventDefault();
                         formatText('underline');
                         break;
                     case 's':
-                        e.preventDefault();
                         saveAsPDF();
                         break;
+                    default:
+                        preventDefault = false; // Não previne outros atalhos Ctrl/Cmd
                 }
-            }
-        });
-
-        // Fechar menu com ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && menuOpen) {
-                closeMenu();
+                if(preventDefault) e.preventDefault();
             }
         });
     </script>
