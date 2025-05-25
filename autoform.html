@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Petições Jurídicas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .toolbar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn.special {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+
+        .btn.save {
+            background: linear-gradient(135deg, #10ac84, #1dd1a1);
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+
+        .separator {
+            width: 2px;
+            height: 30px;
+            background: #dee2e6;
+            margin: 0 5px;
+        }
+
+        .editor-container {
+            padding: 20px;
+            position: relative;
+        }
+
+        #editor {
+            width: 100%;
+            min-height: 600px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Times New Roman', serif;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #editor:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .highlight {
+            background-color: yellow;
+        }
+
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-justify { text-align: justify; }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        /* Paleta Flutuante */
+        .floating-palette {
+            position: absolute;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+            min-width: 300px;
+            border: 2px solid #667eea;
+        }
+
+        .floating-palette .palette-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .floating-palette .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-palette .close-btn:hover {
+            background: #c0392b;
+        }
+
+        .floating-palette .palette-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .floating-palette .btn {
+            padding: 8px 12px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .floating-palette .separator {
+            width: 1px;
+            height: 20px;
+            background: #667eea;
+            margin: 0 3px;
+        }
+
+        /* Animação da paleta */
+        .floating-palette.show {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚖️ Editor de Petições Jurídicas</h1>
+            <p>Ferramenta profissional para formatação e edição de documentos jurídicos</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn special" onclick="autoFormat()">🔥 Auto Formatar</button>
+            <button class="btn save" onclick="saveAsPDF()">💾 Salvar PDF</button>
+        </div>
+
+        <div class="editor-container">
+            <div id="editor" contenteditable="true" placeholder="Cole aqui o texto da sua petição jurídica...">
+                <p>Cole aqui o texto da sua petição jurídica e selecione qualquer texto para abrir a paleta de edição flutuante!</p>
+            </div>
+
+            <!-- Paleta Flutuante -->
+            <div id="floatingPalette" class="floating-palette">
+                <div class="palette-header">
+                    <span>📝 Edição Rápida</span>
+                    <button class="close-btn" onclick="closePalette()">×</button>
+                </div>
+                <div class="palette-content">
+                    <button class="btn" onclick="formatText('bold')"><b>B</b></button>
+                    <button class="btn" onclick="formatText('italic')"><i>I</i></button>
+                    <button class="btn" onclick="formatText('underline')"><u>U</u></button>
+                    <button class="btn" onclick="highlightText()">📝</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button class="btn" onclick="alignText('left')">⬅️</button>
+                    <button class="btn" onclick="alignText('center')">↔️</button>
+                    <button class="btn" onclick="alignText('right')">➡️</button>
+                    <button class="btn" onclick="alignText('justify')">📄</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button class="btn" onclick="changeIndent('outdent')">◀️</button>
+                    <button class="btn" onclick="changeIndent('indent')">▶️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <p>Gerando PDF... Aguarde!</p>
+    </div>
+
+    <script>
+        let currentSelection = null;
+
+        // Detectar seleção de texto e mostrar paleta
+        document.getElementById('editor').addEventListener('mouseup', function(e) {
+            const selection = window.getSelection();
+            if (selection.toString().length > 0) {
+                currentSelection = selection.getRangeAt(0);
+                showPalette(e.pageX, e.pageY);
+            }
+        });
+
+        // Mostrar paleta flutuante
+        function showPalette(x, y) {
+            const palette = document.getElementById('floatingPalette');
+            const editorContainer = document.querySelector('.editor-container');
+            const containerRect = editorContainer.getBoundingClientRect();
+            
+            // Calcular posição relativa ao container
+            const relativeX = x - containerRect.left;
+            const relativeY = y - containerRect.top;
+            
+            palette.style.left = relativeX + 'px';
+            palette.style.top = (relativeY + 20) + 'px';
+            palette.classList.add('show');
+        }
+
+        // Fechar paleta
+        function closePalette() {
+            const palette = document.getElementById('floatingPalette');
+            palette.classList.remove('show');
+            currentSelection = null;
+        }
+
+        // Fechar paleta ao clicar fora
+        document.addEventListener('click', function(e) {
+            const palette = document.getElementById('floatingPalette');
+            const editor = document.getElementById('editor');
+            
+            if (!palette.contains(e.target) && !editor.contains(e.target)) {
+                closePalette();
+            }
+        });
+
+        // Restaurar seleção antes de formatar
+        function restoreSelection() {
+            if (currentSelection) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(currentSelection);
+            }
+        }
+
+        // Funções de formatação
+        function formatText(command) {
+            restoreSelection();
+            document.execCommand(command, false, null);
+            document.getElementById('editor').focus();
+        }
+
+        function highlightText() {
+            restoreSelection();
+            document.execCommand('hiliteColor', false, 'yellow');
+            document.getElementById('editor').focus();
+        }
+
+        function alignText(alignment) {
+            restoreSelection();
+            const alignCommands = {
+                'left': 'justifyLeft',
+                'center': 'justifyCenter',
+                'right': 'justifyRight',
+                'justify': 'justifyFull'
+            };
+            document.execCommand(alignCommands[alignment], false, null);
+            document.getElementById('editor').focus();
+        }
+
+        function changeIndent(type) {
+            restoreSelection();
+            document.execCommand(type, false, null);
+            document.getElementById('editor').focus();
+        }
+
+        // Função de auto formatação MODIFICADA
+        function autoFormat() {
+            const editor = document.getElementById('editor');
+            let content = editor.innerHTML;
+
+            // Justificar todos os parágrafos
+            content = content.replace(/<p([^>]*)>/gi, '<p$1 style="text-align: justify;">');
+            
+            // Se não houver parágrafos, envolver texto em parágrafos justificados
+            if (!content.includes('<p')) {
+                const lines = content.split('<br>');
+                const justifiedLines = lines.map(line => {
+                    if (line.trim()) {
+                        return `<p style="text-align: justify;">${line}</p>`;
+                    }
+                    return line;
+                });
+                content = justifiedLines.join('');
+            }
+
+            // Aplicar justificação em divs também
+            content = content.replace(/<div([^>]*)>/gi, function(match, attrs) {
+                if (!attrs.includes('text-align')) {
+                    return `<div${attrs} style="text-align: justify;">`;
+                }
+                return match;
+            });
+
+            editor.innerHTML = content;
+            
+            // Feedback visual
+            alert('Auto formatação concluída! Todos os parágrafos estão justificados. ✅');
+        }
+
+        // Função para salvar como PDF
+        async function saveAsPDF() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Adicionar logo
+                const logoUrl = 'https://raw.githubusercontent.com/JpMedeiros1183/Documentos/refs/heads/main/Screenshot_20250508_083432_Photos.jpg';
+                
+                try {
+                    // Criar uma imagem e carregar o logo
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        img.src = logoUrl;
+                    });
+
+                    // Adicionar logo no PDF (centralizado, 50mm de largura)
+                    const logoWidth = 50;
+                    const logoHeight = (img.height / img.width) * logoWidth;
+                    const logoX = (210 - logoWidth) / 2; // Centralizar na página A4
+                    
+                    pdf.addImage(img, 'JPEG', logoX, 10, logoWidth, logoHeight);
+                    
+                } catch (error) {
+                    console.log('Erro ao carregar logo, continuando sem ele:', error);
+                }
+
+                // Obter texto do editor e limpar HTML
+                const editor = document.getElementById('editor');
+                const textContent = editor.innerText || editor.textContent;
+                
+                // Configurar fonte e posição inicial
+                pdf.setFont('times', 'normal');
+                pdf.setFontSize(12);
+                
+                const startY = 60; // Posição Y inicial (após o logo)
+                const margin = 20;
+                const pageWidth = 210 - (margin * 2);
+                
+                // Dividir texto em linhas que cabem na página
+                const lines = pdf.splitTextToSize(textContent, pageWidth);
+                
+                let currentY = startY;
+                const lineHeight = 7;
+                const pageHeight = 297 - 20; // A4 height menos margem inferior
+                
+                lines.forEach((line, index) => {
+                    if (currentY > pageHeight) {
+                        pdf.addPage();
+                        currentY = 20;
+                    }
+                    
+                    pdf.text(line, margin, currentY);
+                    currentY += lineHeight;
+                });
+
+                // Salvar o PDF
+                const fileName = `Peticao_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
+                pdf.save(fileName);
+                
+                alert('PDF salvo com sucesso! 🎉');
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Erro ao gerar PDF. Tente novamente.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Configurar placeholder behavior
+        document.getElementById('editor').addEventListener('focus', function() {
+            if (this.innerHTML.includes('Cole aqui o texto')) {
+                this.innerHTML = '';
+            }
+        });
+
+        // Permitir atalhos de teclado
+        document.getElementById('editor').addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 'b':
+                        e.preventDefault();
+                        formatText('bold');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        formatText('italic');
+                        break;
+                    case 'u':
+                        e.preventDefault();
+                        formatText('underline');
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        saveAsPDF();
+                        break;
+                }
+            }
+        });
+
+        // Fechar paleta com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePalette();
+            }
+        });
+    </script>
+</body>
+</html>
