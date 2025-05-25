@@ -15,6 +15,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: -o-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,12 +26,17 @@
             margin: 0 auto;
             background: white;
             border-radius: 15px;
+            -webkit-border-radius: 15px;
+            -o-border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            -webkit-box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: -webkit-linear-gradient(135deg, #2c3e50, #34495e);
+            background: -o-linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
             padding: 25px;
             text-align: center;
@@ -51,45 +58,54 @@
             padding: 15px;
             border-bottom: 2px solid #e9ecef;
             display: flex;
+            display: -webkit-flex;
             flex-wrap: wrap;
+            -webkit-flex-wrap: wrap;
             gap: 10px;
             align-items: center;
+            -webkit-align-items: center;
         }
 
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
+            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
+            background: -o-linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 8px;
+            -webkit-border-radius: 8px;
+            -o-border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            -webkit-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
             font-size: 14px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            -webkit-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .btn.special {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: -webkit-linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: -o-linear-gradient(135deg, #ff6b6b, #ee5a24);
             font-size: 16px;
             padding: 12px 20px;
         }
 
         .btn.save {
             background: linear-gradient(135deg, #10ac84, #1dd1a1);
+            background: -webkit-linear-gradient(135deg, #10ac84, #1dd1a1);
+            background: -o-linear-gradient(135deg, #10ac84, #1dd1a1);
             font-size: 16px;
             padding: 12px 20px;
-        }
-
-        .separator {
-            width: 2px;
-            height: 30px;
-            background: #dee2e6;
-            margin: 0 5px;
         }
 
         .editor-container {
@@ -102,6 +118,8 @@
             min-height: 600px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
+            -webkit-border-radius: 10px;
+            -o-border-radius: 10px;
             padding: 20px;
             font-family: 'Times New Roman', serif;
             font-size: 16px;
@@ -109,21 +127,15 @@
             resize: vertical;
             outline: none;
             transition: border-color 0.3s ease;
+            -webkit-transition: border-color 0.3s ease;
+            -o-transition: border-color 0.3s ease;
         }
 
         #editor:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            -webkit-box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
-        .highlight {
-            background-color: yellow;
-        }
-
-        .text-left { text-align: left; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-justify { text-align: justify; }
 
         .loading {
             display: none;
@@ -131,87 +143,248 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.8);
             color: white;
             padding: 20px;
             border-radius: 10px;
+            -webkit-border-radius: 10px;
+            -o-border-radius: 10px;
             z-index: 1000;
         }
 
-        /* Paleta Flutuante */
-        .floating-palette {
-            position: absolute;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            padding: 10px;
-            display: none;
-            z-index: 1000;
-            min-width: 300px;
+        /* Botão Flutuante - Compatibilidade Opera */
+        .floating-button {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            width: 60px;
+            height: 60px;
+            /* Fallbacks para Opera */
+            background-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
+            background: -o-linear-gradient(135deg, #667eea, #764ba2);
             border: 2px solid #667eea;
-        }
-
-        .floating-palette .palette-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .floating-palette .close-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            -webkit-border-radius: 50%;
+            -o-border-radius: 50%;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            -webkit-box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            -webkit-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            display: block;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            line-height: 56px;
+            text-decoration: none;
+            /* Transformação separada para melhor compatibilidade */
+            margin-top: -30px;
         }
 
-        .floating-palette .close-btn:hover {
-            background: #c0392b;
+        .floating-button:hover {
+            background-color: #5a67d8;
+            transform: scale(1.1);
+            -webkit-transform: scale(1.1);
+            -o-transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+            -webkit-box-shadow: 0 12px 35px rgba(0,0,0,0.4);
         }
 
-        .floating-palette .palette-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+        .floating-button.active {
+            background-color: #e74c3c;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: -webkit-linear-gradient(135deg, #e74c3c, #c0392b);
+            background: -o-linear-gradient(135deg, #e74c3c, #c0392b);
+            border-color: #e74c3c;
         }
 
-        .floating-palette .btn {
-            padding: 8px 12px;
-            font-size: 12px;
+        /* Menu Lateral - Melhor compatibilidade */
+        .floating-menu {
+            position: fixed;
+            right: -350px;
+            top: 50%;
+            width: 320px;
+            background-color: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: -webkit-linear-gradient(135deg, #2c3e50, #34495e);
+            background: -o-linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 20px 0 0 20px;
+            -webkit-border-radius: 20px 0 0 20px;
+            -o-border-radius: 20px 0 0 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+            -webkit-box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+            z-index: 999;
+            transition: right 0.4s ease;
+            -webkit-transition: right 0.4s ease;
+            -o-transition: right 0.4s ease;
+            overflow: hidden;
+            /* Transformação separada */
+            margin-top: -200px;
+        }
+
+        .floating-menu.open {
+            right: 0;
+        }
+
+        .menu-header {
+            background-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: -webkit-linear-gradient(135deg, #667eea, #764ba2);
+            background: -o-linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .menu-header h3 {
+            font-size: 1.4em;
             margin: 0;
         }
 
-        .floating-palette .separator {
-            width: 1px;
-            height: 20px;
-            background: #667eea;
-            margin: 0 3px;
+        .close-menu {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            margin-top: -15px;
+            background: rgba(255,255,255,0.2);
+            background-color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            -webkit-border-radius: 50%;
+            -o-border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            line-height: 28px;
+            transition: all 0.3s ease;
+            -webkit-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
         }
 
-        /* Animação da paleta */
-        .floating-palette.show {
-            display: block;
-            animation: fadeInUp 0.3s ease;
+        .close-menu:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+            -webkit-transform: rotate(90deg);
+            -o-transform: rotate(90deg);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+        .menu-content {
+            padding: 20px;
+        }
+
+        .menu-section {
+            margin-bottom: 25px;
+        }
+
+        .menu-section h4 {
+            color: #ecf0f1;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            display: -webkit-flex;
+            flex-wrap: wrap;
+            -webkit-flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255,255,255,0.1);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            -webkit-border-radius: 8px;
+            -o-border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            -webkit-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            font-size: 13px;
+            flex: 1;
+            -webkit-flex: 1;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .menu-btn:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            -webkit-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
+        }
+
+        .menu-btn.icon {
+            font-size: 16px;
+            padding: 12px;
+            min-width: 45px;
+        }
+
+        .separator-line {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 15px 0;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            -webkit-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsivo */
+        @media screen and (max-width: 768px) {
+            .floating-button {
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                line-height: 46px;
+                margin-top: -25px;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            .floating-menu {
+                width: 280px;
+                right: -280px;
             }
+        }
+
+        /* Garantir visibilidade no Opera */
+        .floating-button,
+        .floating-menu {
+            display: block !important;
+            visibility: visible !important;
         }
     </style>
 </head>
@@ -229,32 +402,70 @@
 
         <div class="editor-container">
             <div id="editor" contenteditable="true" placeholder="Cole aqui o texto da sua petição jurídica...">
-                <p>Cole aqui o texto da sua petição jurídica e selecione qualquer texto para abrir a paleta de edição flutuante!</p>
+                <p>Cole aqui o texto da sua petição jurídica e use o botão flutuante lateral para acessar as ferramentas de formatação!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante com melhor compatibilidade -->
+    <div class="floating-button" id="floatingBtn" onclick="toggleMenu()">
+        ✏️
+    </div>
+
+    <!-- Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+
+    <!-- Menu Lateral -->
+    <div class="floating-menu" id="floatingMenu">
+        <div class="menu-header">
+            <h3>🎨 Ferramentas de Edição</h3>
+            <button class="close-menu" onclick="closeMenu()">×</button>
+        </div>
+        
+        <div class="menu-content">
+            <!-- Formatação Básica -->
+            <div class="menu-section">
+                <h4>📝 Formatação</h4>
+                <div class="menu-buttons">
+                    <button class="menu-btn icon" onclick="formatText('bold')" title="Negrito"><b>B</b></button>
+                    <button class="menu-btn icon" onclick="formatText('italic')" title="Itálico"><i>I</i></button>
+                    <button class="menu-btn icon" onclick="formatText('underline')" title="Sublinhado"><u>U</u></button>
+                    <button class="menu-btn" onclick="highlightText()" title="Realçar">📝 Realçar</button>
+                </div>
             </div>
 
-            <!-- Paleta Flutuante -->
-            <div id="floatingPalette" class="floating-palette">
-                <div class="palette-header">
-                    <span>📝 Edição Rápida</span>
-                    <button class="close-btn" onclick="closePalette()">×</button>
+            <div class="separator-line"></div>
+
+            <!-- Alinhamento -->
+            <div class="menu-section">
+                <h4>📐 Alinhamento</h4>
+                <div class="menu-buttons">
+                    <button class="menu-btn icon" onclick="alignText('left')" title="Esquerda">⬅️</button>
+                    <button class="menu-btn icon" onclick="alignText('center')" title="Centro">↔️</button>
+                    <button class="menu-btn icon" onclick="alignText('right')" title="Direita">➡️</button>
+                    <button class="menu-btn icon" onclick="alignText('justify')" title="Justificado">📄</button>
                 </div>
-                <div class="palette-content">
-                    <button class="btn" onclick="formatText('bold')"><b>B</b></button>
-                    <button class="btn" onclick="formatText('italic')"><i>I</i></button>
-                    <button class="btn" onclick="formatText('underline')"><u>U</u></button>
-                    <button class="btn" onclick="highlightText()">📝</button>
-                    
-                    <div class="separator"></div>
-                    
-                    <button class="btn" onclick="alignText('left')">⬅️</button>
-                    <button class="btn" onclick="alignText('center')">↔️</button>
-                    <button class="btn" onclick="alignText('right')">➡️</button>
-                    <button class="btn" onclick="alignText('justify')">📄</button>
-                    
-                    <div class="separator"></div>
-                    
-                    <button class="btn" onclick="changeIndent('outdent')">◀️</button>
-                    <button class="btn" onclick="changeIndent('indent')">▶️</button>
+            </div>
+
+            <div class="separator-line"></div>
+
+            <!-- Recuo -->
+            <div class="menu-section">
+                <h4>📏 Recuo</h4>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="changeIndent('outdent')">◀️ Diminuir</button>
+                    <button class="menu-btn" onclick="changeIndent('indent')">▶️ Aumentar</button>
+                </div>
+            </div>
+
+            <div class="separator-line"></div>
+
+            <!-- Ações Especiais -->
+            <div class="menu-section">
+                <h4>⚡ Ações Rápidas</h4>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="autoFormat(); closeMenu();" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24); background-color: #ff6b6b;">🔥 Auto Formatar</button>
+                    <button class="menu-btn" onclick="saveAsPDF(); closeMenu();" style="background: linear-gradient(135deg, #10ac84, #1dd1a1); background-color: #10ac84;">💾 Salvar PDF</button>
                 </div>
             </div>
         </div>
@@ -265,73 +476,73 @@
     </div>
 
     <script>
-        let currentSelection = null;
+        let menuOpen = false;
 
-        // Detectar seleção de texto e mostrar paleta
-        document.getElementById('editor').addEventListener('mouseup', function(e) {
-            const selection = window.getSelection();
-            if (selection.toString().length > 0) {
-                currentSelection = selection.getRangeAt(0);
-                showPalette(e.pageX, e.pageY);
+        // Garantir que o botão seja visível no Opera
+        window.addEventListener('load', function() {
+            const floatingBtn = document.getElementById('floatingBtn');
+            const floatingMenu = document.getElementById('floatingMenu');
+            
+            // Forçar visibilidade no Opera
+            if (floatingBtn) {
+                floatingBtn.style.display = 'block';
+                floatingBtn.style.visibility = 'visible';
+            }
+            if (floatingMenu) {
+                floatingMenu.style.display = 'block';
+                floatingMenu.style.visibility = 'visible';
             }
         });
 
-        // Mostrar paleta flutuante
-        function showPalette(x, y) {
-            const palette = document.getElementById('floatingPalette');
-            const editorContainer = document.querySelector('.editor-container');
-            const containerRect = editorContainer.getBoundingClientRect();
-            
-            // Calcular posição relativa ao container
-            const relativeX = x - containerRect.left;
-            const relativeY = y - containerRect.top;
-            
-            palette.style.left = relativeX + 'px';
-            palette.style.top = (relativeY + 20) + 'px';
-            palette.classList.add('show');
+        // Toggle do menu
+        function toggleMenu() {
+            if (menuOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         }
 
-        // Fechar paleta
-        function closePalette() {
-            const palette = document.getElementById('floatingPalette');
-            palette.classList.remove('show');
-            currentSelection = null;
+        // Abrir menu
+        function openMenu() {
+            const menu = document.getElementById('floatingMenu');
+            const overlay = document.getElementById('menuOverlay');
+            const btn = document.getElementById('floatingBtn');
+            
+            menu.classList.add('open');
+            overlay.classList.add('active');
+            btn.classList.add('active');
+            btn.innerHTML = '×';
+            
+            menuOpen = true;
         }
 
-        // Fechar paleta ao clicar fora
-        document.addEventListener('click', function(e) {
-            const palette = document.getElementById('floatingPalette');
-            const editor = document.getElementById('editor');
+        // Fechar menu
+        function closeMenu() {
+            const menu = document.getElementById('floatingMenu');
+            const overlay = document.getElementById('menuOverlay');
+            const btn = document.getElementById('floatingBtn');
             
-            if (!palette.contains(e.target) && !editor.contains(e.target)) {
-                closePalette();
-            }
-        });
-
-        // Restaurar seleção antes de formatar
-        function restoreSelection() {
-            if (currentSelection) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(currentSelection);
-            }
+            menu.classList.remove('open');
+            overlay.classList.remove('active');
+            btn.classList.remove('active');
+            btn.innerHTML = '✏️';
+            
+            menuOpen = false;
         }
 
         // Funções de formatação
         function formatText(command) {
-            restoreSelection();
             document.execCommand(command, false, null);
             document.getElementById('editor').focus();
         }
 
         function highlightText() {
-            restoreSelection();
             document.execCommand('hiliteColor', false, 'yellow');
             document.getElementById('editor').focus();
         }
 
         function alignText(alignment) {
-            restoreSelection();
             const alignCommands = {
                 'left': 'justifyLeft',
                 'center': 'justifyCenter',
@@ -343,12 +554,11 @@
         }
 
         function changeIndent(type) {
-            restoreSelection();
             document.execCommand(type, false, null);
             document.getElementById('editor').focus();
         }
 
-        // Função de auto formatação MODIFICADA
+        // Função de auto formatação
         function autoFormat() {
             const editor = document.getElementById('editor');
             let content = editor.innerHTML;
@@ -395,7 +605,6 @@
                 const logoUrl = 'https://raw.githubusercontent.com/JpMedeiros1183/Documentos/refs/heads/main/Screenshot_20250508_083432_Photos.jpg';
                 
                 try {
-                    // Criar uma imagem e carregar o logo
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
                     
@@ -405,10 +614,9 @@
                         img.src = logoUrl;
                     });
 
-                    // Adicionar logo no PDF (centralizado, 50mm de largura)
                     const logoWidth = 50;
                     const logoHeight = (img.height / img.width) * logoWidth;
-                    const logoX = (210 - logoWidth) / 2; // Centralizar na página A4
+                    const logoX = (210 - logoWidth) / 2;
                     
                     pdf.addImage(img, 'JPEG', logoX, 10, logoWidth, logoHeight);
                     
@@ -416,24 +624,21 @@
                     console.log('Erro ao carregar logo, continuando sem ele:', error);
                 }
 
-                // Obter texto do editor e limpar HTML
                 const editor = document.getElementById('editor');
                 const textContent = editor.innerText || editor.textContent;
                 
-                // Configurar fonte e posição inicial
                 pdf.setFont('times', 'normal');
                 pdf.setFontSize(12);
                 
-                const startY = 60; // Posição Y inicial (após o logo)
+                const startY = 60;
                 const margin = 20;
                 const pageWidth = 210 - (margin * 2);
                 
-                // Dividir texto em linhas que cabem na página
                 const lines = pdf.splitTextToSize(textContent, pageWidth);
                 
                 let currentY = startY;
                 const lineHeight = 7;
-                const pageHeight = 297 - 20; // A4 height menos margem inferior
+                const pageHeight = 297 - 20;
                 
                 lines.forEach((line, index) => {
                     if (currentY > pageHeight) {
@@ -445,7 +650,6 @@
                     currentY += lineHeight;
                 });
 
-                // Salvar o PDF
                 const fileName = `Peticao_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
                 pdf.save(fileName);
                 
@@ -490,10 +694,10 @@
             }
         });
 
-        // Fechar paleta com ESC
+        // Fechar menu com ESC
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePalette();
+            if (e.key === 'Escape' && menuOpen) {
+                closeMenu();
             }
         });
     </script>
