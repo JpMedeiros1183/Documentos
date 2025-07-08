@@ -78,6 +78,7 @@
         .action-buttons-container {
             text-align: center;
             margin-top: 30px;
+            min-height: 60px; /* Para evitar salto quando o botão aparece */
         }
         .action-button {
             background-color: #007bff;
@@ -92,6 +93,13 @@
         }
         .action-button:hover {
             background-color: #0056b3;
+        }
+        #emailButton {
+            background-color: #28a745; /* Verde para o botão de e-mail */
+            display: none; /* Escondido por padrão */
+        }
+        #emailButton:hover {
+            background-color: #218838;
         }
         .instructions-box {
             background-color: #e2f0ff;
@@ -124,6 +132,14 @@
         }
         .html2pdf_show_on_pdf {
             display: block !important;
+        }
+        /* Mensagem de sucesso */
+        #successMessage {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+            display: none; /* Escondida por padrão */
         }
         /* Estilos para impressão do navegador */
         @media print {
@@ -160,8 +176,8 @@
             .notes {
                 color: #555;
             }
-            .action-buttons-container, .instructions-box {
-                display: none; /* Oculta botões e instruções na impressão do navegador */
+            .action-buttons-container, .instructions-box, #successMessage {
+                display: none; /* Oculta botões, instruções e mensagem na impressão do navegador */
             }
         }
     </style>
@@ -170,7 +186,7 @@
     <div class="container">
         <div id="pdfContent"> <div class="html2pdf_hide_on_pdf"> <h1>Questionário para Análise de Ação Trabalhista</h1>
                 <h2>Preencha os campos abaixo com as informações solicitadas para que possamos analisar sua situação e quantificar seus direitos trabalhistas.</h2>
-                <p style="text-align: center; font-style: italic; color: #666;">Após preencher, clique em "Gerar PDF e Abrir E-mail" e siga as instruções para enviar.</p>
+                <p style="text-align: center; font-style: italic; color: #666;">Ao finalizar, siga as instruções abaixo para gerar o PDF e enviar por e-mail.</p>
             </div>
 
             <form id="questionarioForm">
@@ -190,8 +206,7 @@
                     <textarea id="endereco" name="Endereço Completo"></textarea>
                     <label for="telefone">Telefone:</label>
                     <input type="tel" id="telefone" name="Telefone" required>
-                    <label for="email">E-mail:</label>
-                    <input type="email" id="email" name="Email do Cliente" required>
+                    <label for="email_cliente">E-mail:</label> <input type="email" id="email_cliente" name="Email do Cliente" required>
                     <div class="notes html2pdf_hide_on_pdf">Para qualificação da ação e contato.</div>
                 </div>
 
@@ -389,50 +404,66 @@
                 </div>
 
             </form>
-        </div> <div class="action-buttons-container"> <button type="button" class="action-button" onclick="generatePdfAndOpenEmail()">Gerar PDF e Abrir E-mail</button>
+        </div> <div class="action-buttons-container"> <button type="button" class="action-button" id="generatePdfButton" onclick="generatePdf()">1. Gerar e Baixar PDF</button>
+            <button type="button" class="action-button" id="emailButton" onclick="openEmailClient()">2. Abrir E-mail para Envio</button>
         </div>
 
+        <p id="successMessage" style="display: none;">PDF gerado e baixado com sucesso! Agora clique no botão verde para abrir seu programa de e-mail.</p>
+
         <div class="instructions-box">
-            <h4>Instruções para Envio:</h4>
+            <h4>Instruções Detalhadas para Envio:</h4>
             <ol>
-                <li>Após preencher todo o formulário, clique no botão **"Gerar PDF e Abrir E-mail"**.</li>
-                <li>Um arquivo PDF com suas respostas será **automaticamente baixado** para a pasta "Downloads" do seu computador.</li>
-                <li>Seu programa de e-mail padrão será aberto automaticamente com nosso endereço e assunto pré-preenchidos.</li>
-                <li>No seu programa de e-mail, **ANEXE o arquivo PDF** que você acabou de baixar (ele geralmente se chama "Questionario_Trabalhista_SeuNome.pdf" e estará na sua pasta "Downloads").</li>
+                <li>Preencha cuidadosamente todo o formulário com as informações solicitadas.</li>
+                <li>Clique no botão **"<span style="color: #007bff; font-weight: bold;">1. Gerar e Baixar PDF</span>"**. Um arquivo PDF com suas respostas será **automaticamente baixado** para a pasta "Downloads" do seu computador.</li>
+                <li>**Aguarde o download do PDF ser concluído.** Você verá uma notificação do seu navegador e a mensagem "PDF gerado e baixado com sucesso!" aparecerá.</li>
+                <li>Em seguida, clique no botão **"<span style="color: #28a745; font-weight: bold;">2. Abrir E-mail para Envio</span>"**. Isso abrirá seu programa de e-mail padrão.</li>
+                <li>No seu programa de e-mail, **ANEXE o arquivo PDF** que você acabou de baixar. Ele geralmente se chama "Questionario_Trabalhista_SeuNome.pdf" e estará na sua pasta "Downloads".</li>
                 <li>Confirme que o e-mail está com o destinatário (`jp1183@gmail.com`) e o assunto corretos.</li>
                 <li>Clique em "Enviar".</li>
             </ol>
-            <p><strong>Dica:</strong> Em caso de dificuldades com o envio do PDF por e-mail, você pode salvar esta página inteira como PDF usando a função de impressão do seu navegador (Ctrl+P ou Cmd+P).</p>
+            <p><strong>Dica:</strong> Em caso de dificuldades com o envio do PDF por e-mail, você pode salvar esta página inteira como PDF usando a função de impressão do seu navegador (Ctrl+P ou Cmd+P) e enviar manualmente.</p>
         </div>
     </div>
 
     <script>
-        function generatePdfAndOpenEmail() {
+        function generatePdf() {
             const element = document.getElementById('pdfContent');
             const nomeCliente = document.getElementById('nome_completo').value || 'Cliente';
 
-            // Configurações para a geração do PDF
+            // Esconde os botões e instruções antes de gerar o PDF para que não apareçam no PDF
+            document.getElementById('generatePdfButton').style.display = 'none';
+            document.getElementById('emailButton').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none'; // Esconde se estiver visível
+            document.querySelector('.instructions-box').style.display = 'none';
+
             const opt = {
                 margin: 10,
-                filename: `Questionario_Trabalhista_${nomeCliente.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`, // Nome do arquivo PDF
+                filename: `Questionario_Trabalhista_${nomeCliente.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Tenta evitar quebras de página no meio de seções
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            // Gera e salva o PDF
             html2pdf().set(opt).from(element).save().then(function() {
-                // Após o PDF ser gerado e o download iniciado, abre o cliente de e-mail
-                const subject = encodeURIComponent(`Questionário Trabalhista Preenchido - ${nomeCliente}`);
-                const body = encodeURIComponent(`Prezado(a) Advogado(a),\n\nEnvio o questionário trabalhista preenchido em anexo (arquivo PDF).\n\nAtenciosamente,\n${nomeCliente}`);
-                const mailtoLink = `mailto:jp1183@gmail.com?subject=${subject}&body=${body}`;
+                // Reexibe os elementos após a geração do PDF
+                document.getElementById('generatePdfButton').style.display = 'block'; // Ou 'inline-block' dependendo do estilo
+                document.getElementById('emailButton').style.display = 'block'; // Exibe o botão de e-mail
+                document.getElementById('successMessage').style.display = 'block'; // Exibe a mensagem de sucesso
+                document.querySelector('.instructions-box').style.display = 'block'; // Reexibe as instruções
 
-                // Usa um pequeno atraso para dar tempo ao navegador de iniciar o download do PDF
-                setTimeout(() => {
-                    window.location.href = mailtoLink;
-                }, 500); // 500ms de atraso
+                // Rola para a área dos botões para que o usuário veja o próximo passo
+                document.getElementById('emailButton').scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
+        }
+
+        function openEmailClient() {
+            const nomeCliente = document.getElementById('nome_completo').value || 'Cliente';
+            const subject = encodeURIComponent(`Questionário Trabalhista Preenchido - ${nomeCliente}`);
+            const body = encodeURIComponent(`Prezado(a) Advogado(a),\n\nEnvio o questionário trabalhista preenchido em anexo (arquivo PDF).\n\nAtenciosamente,\n${nomeCliente}`);
+            const mailtoLink = `mailto:jp1183@gmail.com?subject=${subject}&body=${body}`;
+
+            window.location.href = mailtoLink;
         }
     </script>
 </body>
