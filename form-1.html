@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-M">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Questionário para Análise de Ação Trabalhista</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -170,6 +170,10 @@
             .action-buttons-container, .instructions-box, #successMessage {
                 display: none; /* Oculta botões, instruções e mensagem na impressão do navegador */
             }
+        }
+        /* Classe para esconder elementos ao clonar para PDF */
+        .hide-for-capture {
+            display: none !important;
         }
     </style>
 </head>
@@ -419,89 +423,73 @@
 
     <script>
         function generatePdf() {
-            const element = document.getElementById('pdfContent');
+            const originalPdfContent = document.getElementById('pdfContent');
             const nomeCliente = document.getElementById('nome_completo').value || 'Cliente';
 
             document.getElementById('successMessage').style.display = 'none';
 
-            // Array para armazenar os elementos de formulário originais para reversão
-            const formElementsToRestore = [];
+            // CLONA O CONTEÚDO PARA EVITAR AFETAR O FORMULÁRIO VISÍVEL
+            const clonedContent = originalPdfContent.cloneNode(true); // Clonar profundamente
 
-            // Preparar os campos do formulário para a captura
-            const formInputs = element.querySelectorAll('#questionarioForm input, #questionarioForm textarea');
-
-            formInputs.forEach(input => {
-                // Para inputs, defina como 'readonly' e desative a borda e background
-                if (input.tagName === 'INPUT') {
-                    input.setAttribute('readonly', 'readonly');
-                    input.style.border = 'none';
-                    input.style.backgroundColor = 'transparent';
-                    input.style.color = '#333'; // Para garantir a cor do texto
-                    // Se houver um placeholder e o campo estiver vazio, use o placeholder como valor visível
-                    if (input.value === '' && input.placeholder) {
-                        input.value = `(${input.placeholder})`; // Exibe placeholder no campo para o PDF
-                        input.style.fontStyle = 'italic';
-                        input.style.color = '#777';
-                    }
-                }
-                // Para textareas, defina como 'disabled' e desative a borda e background
-                else if (input.tagName === 'TEXTAREA') {
-                    input.setAttribute('disabled', 'disabled');
-                    input.style.border = 'none';
-                    input.style.backgroundColor = 'transparent';
-                    input.style.color = '#333'; // Para garantir a cor do texto
-                    // Se houver um placeholder e o campo estiver vazio, use o placeholder como valor visível
-                    if (input.value === '' && input.placeholder) {
-                        input.value = `(${input.placeholder})`; // Exibe placeholder no campo para o PDF
-                        input.style.fontStyle = 'italic';
-                        input.style.color = '#777';
-                    }
-                }
-                formElementsToRestore.push(input); // Adiciona para restauração futura
+            // Remover elementos de UI que não devem aparecer no PDF do CLONE
+            clonedContent.querySelectorAll('.html2pdf_hide_on_pdf').forEach(el => {
+                el.remove(); // Remove completamente do DOM clonado
             });
 
-            // Temporariamente oculta o container de botões e a caixa de instruções na versão que vai para o PDF
-            const buttonsContainer = document.querySelector('.action-buttons-container');
-            const instructionsBox = document.querySelector('.instructions-box');
-            buttonsContainer.classList.add('html2pdf_hide_on_pdf');
-            instructionsBox.classList.add('html2pdf_hide_on_pdf');
+            // Preparar os campos do formulário no CLONE para a captura
+            const formInputsInClone = clonedContent.querySelectorAll('input, textarea');
+
+            formInputsInClone.forEach(input => {
+                // Manter o tipo "text" para inputs de data, email, tel no PDF para evitar problemas de renderização
+                if (input.tagName === 'INPUT' && (input.type === 'date' || input.type === 'email' || input.type === 'tel')) {
+                    input.setAttribute('type', 'text');
+                }
+
+                input.setAttribute('readonly', 'readonly'); // Deixa inputs apenas leitura
+                input.setAttribute('disabled', 'disabled'); // Deixa textareas desabilitadas
+                
+                // Estilos para fazer parecer texto comum no PDF
+                input.style.border = 'none';
+                input.style.backgroundColor = 'transparent';
+                input.style.color = '#333';
+                input.style.outline = 'none'; // Remover o outline de foco
+
+                // Se houver um placeholder e o campo estiver vazio, use o placeholder como valor visível
+                if (input.value.trim() === '' && input.placeholder) {
+                    input.value = `(${input.placeholder})`;
+                    input.style.fontStyle = 'italic';
+                    input.style.color = '#777';
+                }
+            });
+
+            // Adicionar o clone temporariamente ao body para que html2canvas possa vê-lo e calcular os estilos corretamente
+            // Tornar o clone invisível enquanto está no body
+            clonedContent.style.position = 'absolute';
+            clonedContent.style.left = '-9999px';
+            clonedContent.style.top = '-9999px';
+            clonedContent.style.width = originalPdfContent.offsetWidth + 'px'; // Garante que a largura seja a mesma
+            clonedContent.style.height = originalPdfContent.offsetHeight + 'px'; // Garante que a altura seja a mesma (importante para textareas)
+            document.body.appendChild(clonedContent);
 
             const opt = {
                 margin: 10,
                 filename: `Questionario_Trabalhista_${nomeCliente.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                html2canvas: {
+                    scale: 2,
+                    logging: true, // Mantenha isso para ver logs no console
+                    dpi: 192,
+                    letterRendering: true,
+                    useCORS: true,   // Tentar habilitar CORS
+                    allowTaint: true // Permitir que imagens poluam o canvas (se houver, e se estiverem causando problemas)
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(element).save().then(function() {
-                // Reverter as alterações nos campos do formulário
-                formElementsToRestore.forEach(input => {
-                    if (input.tagName === 'INPUT') {
-                        input.removeAttribute('readonly');
-                        input.style.border = ''; // Restaura a borda original (ou defina para a cor padrão)
-                        input.style.backgroundColor = ''; // Restaura o background
-                        input.style.color = ''; // Restaura a cor do texto
-                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
-                            input.value = ''; // Limpa o valor se era apenas o placeholder temporário
-                        }
-                        input.style.fontStyle = '';
-                    } else if (input.tagName === 'TEXTAREA') {
-                        input.removeAttribute('disabled');
-                        input.style.border = '';
-                        input.style.backgroundColor = '';
-                        input.style.color = '';
-                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
-                            input.value = ''; // Limpa o valor se era apenas o placeholder temporário
-                        }
-                        input.style.fontStyle = '';
-                    }
-                });
-
-                // Reexibe os elementos de UI após a geração do PDF
-                buttonsContainer.classList.remove('html2pdf_hide_on_pdf');
-                instructionsBox.classList.remove('html2pdf_hide_on_pdf');
+            html2pdf().set(opt).from(clonedContent).save().then(function() {
+                // Remover o clone do body após a geração do PDF
+                clonedContent.remove();
 
                 // Exibe a mensagem de sucesso
                 document.getElementById('successMessage').style.display = 'block';
@@ -511,30 +499,10 @@
             }).catch(error => {
                 console.error("Erro ao gerar PDF:", error);
                 alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente ou verifique o console para mais detalhes.");
-                // Garantir que os campos sejam restaurados mesmo em caso de erro
-                formElementsToRestore.forEach(input => {
-                    if (input.tagName === 'INPUT') {
-                        input.removeAttribute('readonly');
-                        input.style.border = '';
-                        input.style.backgroundColor = '';
-                        input.style.color = '';
-                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
-                            input.value = '';
-                        }
-                        input.style.fontStyle = '';
-                    } else if (input.tagName === 'TEXTAREA') {
-                        input.removeAttribute('disabled');
-                        input.style.border = '';
-                        input.style.backgroundColor = '';
-                        input.style.color = '';
-                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
-                            input.value = '';
-                        }
-                        input.style.fontStyle = '';
-                    }
-                });
-                buttonsContainer.classList.remove('html2pdf_hide_on_pdf');
-                instructionsBox.classList.remove('html2pdf_hide_on_pdf');
+                // Remover o clone do body em caso de erro também
+                if (clonedContent.parentNode === document.body) {
+                    clonedContent.remove();
+                }
             });
         }
     </script>
