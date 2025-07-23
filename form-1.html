@@ -171,6 +171,18 @@
                 display: none; /* Oculta botões, instruções e mensagem na impressão do navegador */
             }
         }
+        /* Estilos para o modo de visualização do PDF */
+        .pdf-view-field {
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            min-height: 1.2em; /* Garante que campos vazios tenham altura */
+        }
+        /* Esconde os inputs originais quando em modo de visualização para PDF */
+        .hide-on-pdf-capture {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -189,18 +201,25 @@
                     <strong>Dados do Trabalhador:</strong>
                     <label for="nome_completo">Nome completo:</label>
                     <input type="text" id="nome_completo" name="Nome Completo" required>
+                    <div class="pdf-placeholder" data-for="nome_completo"></div>
                     <label for="cpf">CPF:</label>
                     <input type="text" id="cpf" name="CPF" required>
+                    <div class="pdf-placeholder" data-for="cpf"></div>
                     <label for="rg">RG:</label>
                     <input type="text" id="rg" name="RG">
+                    <div class="pdf-placeholder" data-for="rg"></div>
                     <label for="data_nascimento">Data de Nascimento:</label>
                     <input type="date" id="data_nascimento" name="Data de Nascimento">
+                    <div class="pdf-placeholder" data-for="data_nascimento"></div>
                     <label for="endereco">Endereço completo (Rua, Número, Bairro, Cidade, Estado, CEP):</label>
                     <textarea id="endereco" name="Endereço Completo"></textarea>
+                    <div class="pdf-placeholder" data-for="endereco"></div>
                     <label for="telefone">Telefone:</label>
                     <input type="tel" id="telefone" name="Telefone" required>
+                    <div class="pdf-placeholder" data-for="telefone"></div>
                     <label for="email_cliente">E-mail:</label>
                     <input type="email" id="email_cliente" name="Email do Cliente" required>
+                    <div class="pdf-placeholder" data-for="email_cliente"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para qualificação da ação e contato.</div>
                 </div>
 
@@ -208,12 +227,16 @@
                     <strong>Dados da Empresa (Empregadora):</strong>
                     <label for="razao_social">Nome completo (razão social) da empresa:</label>
                     <input type="text" id="razao_social" name="Razão Social da Empresa" required>
+                    <div class="pdf-placeholder" data-for="razao_social"></div>
                     <label for="cnpj">CNPJ da empresa:</label>
                     <input type="text" id="cnpj" name="CNPJ da Empresa">
+                    <div class="pdf-placeholder" data-for="cnpj"></div>
                     <label for="endereco_empresa">Endereço completo da empresa:</label>
                     <textarea id="endereco_empresa" name="Endereço da Empresa"></textarea>
+                    <div class="pdf-placeholder" data-for="endereco_empresa"></div>
                     <label for="responsavel_empresa">Nome do responsável da empresa (RH/Sócio, se souber):</label>
                     <input type="text" id="responsavel_empresa" name="Responsável da Empresa">
+                    <div class="pdf-placeholder" data-for="responsavel_empresa"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para qualificação da ação e notificação.</div>
                 </div>
 
@@ -221,14 +244,19 @@
                     <strong>Contrato de Trabalho:</strong>
                     <label for="copia_contrato">Você possui cópia do contrato de trabalho (se houver)?</label>
                     <input type="text" id="copia_contrato" name="Cópia Contrato Trabalho" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="copia_contrato"></div>
                     <label for="data_inicio">Data de início da sua prestação de serviços (dia/mês/ano):</label>
                     <input type="date" id="data_inicio" name="Data de Início">
+                    <div class="pdf-placeholder" data-for="data_inicio"></div>
                     <label for="data_saida">Data de saída (se já ocorreu) (dia/mês/ano):</label>
                     <input type="date" id="data_saida" name="Data de Saída">
+                    <div class="pdf-placeholder" data-for="data_saida"></div>
                     <label for="cargo_funcao">Qual era seu cargo/função registrada no contrato de trabalho?</label>
                     <input type="text" id="cargo_funcao" name="Cargo/Função Contratada">
+                    <div class="pdf-placeholder" data-for="cargo_funcao"></div>
                     <label for="salario_inicial">Qual era o seu salário inicial e quais foram os últimos salários recebidos? Por favor, discrimine o valor nominal e o valor total com adicionais, se houver:</label>
                     <textarea id="salario_inicial" name="Salários Recebidos"></textarea>
+                    <div class="pdf-placeholder" data-for="salario_inicial"></div>
                     <div class="notes html2pdf_hide_on_pdf">Essencial para verificar a relação empregatícia, tempo de serviço e base de cálculo para verbas.</div>
                 </div>
 
@@ -236,6 +264,7 @@
                     <strong>Registro em CTPS (Carteira de Trabalho e Previdência Social):</strong>
                     <label for="copia_ctps">Você possui cópia da sua CTPS (página da foto, qualificação civil, contrato de trabalho, anotações de férias, aumentos salariais)?</label>
                     <input type="text" id="copia_ctps" name="Cópia CTPS" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="copia_ctps"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para comprovar o vínculo, data de início, função e salários. Verificar se há divergências.</div>
                 </div>
 
@@ -243,38 +272,45 @@
                 <div class="question-group">
                     <label for="carga_horaria_contratual">Qual a carga horária estabelecida no seu contrato de trabalho (ex: 8h/dia, 44h/semana)?</label>
                     <input type="text" id="carga_horaria_contratual" name="Carga Horária Contratual">
+                    <div class="pdf-placeholder" data-for="carga_horaria_contratual"></div>
                     <div class="notes html2pdf_hide_on_pdf">Base para identificar horas extras.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="jornada_praticada">Descreva detalhadamente a sua jornada de trabalho diária efetivamente praticada (horário de entrada, saída, tempo e horário de intervalo para almoço/descanso):</label>
                     <textarea id="jornada_praticada" name="Jornada Praticada" placeholder="Ex: De segunda a sexta, das 8h às 18h, com 30min de intervalo das 12h às 12h30. Sábados das 8h às 12h."></textarea>
+                    <div class="pdf-placeholder" data-for="jornada_praticada"></div>
                     <div class="notes html2pdf_hide_on_pdf">Essencial para calcular horas extras, intrajornada, etc.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="qtd_horas_extras">Quantas horas extras você estima ter feito por dia/semana/mês?</label>
                     <input type="text" id="qtd_horas_extras" name="Quantidade Horas Extras Estimada">
+                    <div class="pdf-placeholder" data-for="qtd_horas_extras"></div>
                     <label for="registro_ponto">A empresa mantinha registro de ponto (cartões de ponto, folha de ponto, sistema digital, etc.)? Se sim, você possui cópias?</label>
                     <input type="text" id="registro_ponto" name="Registro Ponto Existe?" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="registro_ponto"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para comprovar o labor extraordinário. Se não houver registro, outros meios de prova serão necessários (testemunhas, e-mails, mensagens).</div>
                 </div>
 
                 <div class="question-group">
                     <label for="pagamento_horas_extras">As horas extras eram pagas? Se sim, elas constavam no seu contracheque ou eram pagas "por fora"? Qual o valor pago (se souber)?</label>
                     <textarea id="pagamento_horas_extras" name="Pagamento Horas Extras"></textarea>
+                    <div class="pdf-placeholder" data-for="pagamento_horas_extras"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar a regularidade do pagamento e a existência de pagamento "por fora".</div>
                 </div>
 
                 <div class="question-group">
                     <label for="duracao_intervalo">Qual a duração do seu intervalo para almoço/descanso? Era gozado integralmente ou era interrompido/reduzido?</label>
                     <textarea id="duracao_intervalo" name="Duração Intervalo Intrajornada"></textarea>
+                    <div class="pdf-placeholder" data-for="duracao_intervalo"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar supressão ou concessão parcial do intervalo (art. 71, CLT).</div>
                 </div>
 
                 <div class="question-group">
                     <label for="dsr">Você tinha folga semanal (Descanso Semanal Remunerado - DSR)? Quantas por semana? Era sempre no mesmo dia? Houve trabalho em DSR ou feriados? Se sim, esses dias foram pagos em dobro?</label>
                     <textarea id="dsr" name="DSR e Feriados Trabalhados"></textarea>
+                    <div class="pdf-placeholder" data-for="dsr"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar o gozo do DSR e o pagamento correto de feriados trabalhados.</div>
                 </div>
 
@@ -282,36 +318,42 @@
                 <div class="question-group">
                     <label for="copia_contracheques">Você possui cópias de todos os seus contracheques/holerites desde o início do contrato?</label>
                     <input type="text" id="copia_contracheques" name="Cópia Contracheques" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="copia_contracheques"></div>
                     <div class="notes html2pdf_hide_on_pdf">Prova fundamental para comprovar salários pagos, descontos, adicionais e o não pagamento de verbas.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="adicionais">Você recebia algum adicional (noturno, periculosidade, insalubridade)? Se sim, era pago corretamente e em qual percentual?</label>
                     <textarea id="adicionais" name="Adicionais Recebidos"></textarea>
+                    <div class="pdf-placeholder" data-for="adicionais"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar o direito a adicionais e se o pagamento era devido e correto.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="desvio_funcao">Detalhe as funções para as quais você foi contratado e as funções que efetivamente exercia. Descreva as novas funções e quando elas começaram. (Ex: "Fui contratado como motorista de carro pequeno, mas desde [mês/ano] passei a dirigir ônibus grande sem alteração de contrato ou salário")</label>
                     <textarea id="desvio_funcao" name="Desvio/Acúmulo de Função" rows="6"></textarea>
+                    <div class="pdf-placeholder" data-for="desvio_funcao"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para comprovar o desvio ou acúmulo e fundamentar o pedido de diferenças salariais ou equiparação.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="reajustes_salariais">Houve reajustes salariais durante o contrato? Se sim, quais as datas e valores de cada reajuste?</label>
                     <textarea id="reajustes_salariais" name="Reajustes Salariais"></textarea>
+                    <div class="pdf-placeholder" data-for="reajustes_salariais"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar se os reajustes foram aplicados conforme a legislação ou acordos/convenções coletivas.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="beneficios">Quais benefícios a empresa oferecia (vale-transporte, vale-alimentação/refeição, plano de saúde, outros)? Como eles eram concedidos (pagos, descontados)? (Ex: "Recebia vale-alimentação, mas o valor era menor do que o prometido e era 'descontado como carro'")</label>
                     <textarea id="beneficios" name="Benefícios Recebidos"></textarea>
+                    <div class="pdf-placeholder" data-for="beneficios"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar a regularidade dos benefícios e possíveis irregularidades.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="fgts">Os depósitos de FGTS foram feitos regularmente? Você possui extrato do FGTS?</label>
                     <input type="text" id="fgts" name="Depósitos FGTS" placeholder="Sim / Não / Não sei / Parcialmente">
+                    <div class="pdf-placeholder" data-for="fgts"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar a regularidade dos depósitos.</div>
                 </div>
 
@@ -319,18 +361,21 @@
                 <div class="question-group">
                     <label for="tipo_rescisao">Se o contrato já foi encerrado, qual o tipo de rescisão (sem justa causa, com justa causa, pedido de demissão, fim de contrato por prazo determinado, etc.)?</label>
                     <input type="text" id="tipo_rescisao" name="Tipo de Rescisão">
+                    <div class="pdf-placeholder" data-for="tipo_rescisao"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para verificar as verbas rescisórias devidas.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="trct">Você possui cópia do Termo de Rescisão de Contrato de Trabalho (TRCT) e comprovante de pagamento das verbas rescisórias?</label>
                     <input type="text" id="trct" name="Cópia TRCT" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="trct"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para verificar o que foi pago na rescisão e o que ficou pendente.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="seguro_desemprego">A empresa forneceu a guia do seguro-desemprego?</label>
                     <input type="text" id="seguro_desemprego" name="Guia Seguro-Desemprego" placeholder="Sim / Não / Não tinha direito">
+                    <div class="pdf-placeholder" data-for="seguro_desemprego"></div>
                     <div class="notes html2pdf_hide_on_pdf">Verificar o direito e a habilitação ao seguro-desemprego.</div>
                 </div>
 
@@ -338,18 +383,21 @@
                 <div class="question-group">
                     <label for="detalhes_assedio">Descreva detalhadamente os episódios de perseguição/assédio: datas (mesmo que aproximadas), locais, quem estava envolvido (agressor e testemunhas), o que foi dito ou feito, e quais foram as consequências para você.</label>
                     <textarea id="detalhes_assedio" name="Detalhes Assédio/Perseguição" rows="8"></textarea>
+                    <div class="pdf-placeholder" data-for="detalhes_assedio"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para fundamentar o pedido de indenização por danos morais. Seja o mais específico possível.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="provas_assedio">Você possui provas desses incidentes (e-mails, mensagens, gravações, fotos, vídeos, atestados médicos, relatos de outras pessoas)? Por favor, liste quais.</label>
                     <textarea id="provas_assedio" name="Provas Assédio/Perseguição"></textarea>
+                    <div class="pdf-placeholder" data-for="provas_assedio"></div>
                     <div class="notes html2pdf_hide_on_pdf">Essencial para comprovar o assédio.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="impacto_saude">O assédio ou a situação no trabalho causou algum impacto na sua saúde física ou mental (estresse, ansiedade, depressão, etc.)? Você possui laudos médicos, atestados ou faz tratamento psicológico/psiquiátrico?</label>
                     <textarea id="impacto_saude" name="Impacto na Saúde (Assédio)"></textarea>
+                    <div class="pdf-placeholder" data-for="impacto_saude"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para corroborar o pedido de danos morais e, eventualmente, pensão por danos materiais (se houver afastamento).</div>
                 </div>
 
@@ -357,18 +405,21 @@
                 <div class="question-group">
                     <label for="documentos_gerais">Você possui qualquer outro documento que possa ser útil (comprovantes de pagamento diversos, avisos, comunicados da empresa, etc.)?</label>
                     <textarea id="documentos_gerais" name="Documentos Gerais Adicionais"></textarea>
+                    <div class="pdf-placeholder" data-for="documentos_gerais"></div>
                     <div class="notes html2pdf_hide_on_pdf">Qualquer documento pode ser útil, mesmo que pareça insignificante.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="testemunhas">Você tem nomes, contatos e breve descrição do que cada testemunha presenciou? (Pessoas que trabalharam com você e viram as situações, familiares, amigos, etc.)</label>
                     <textarea id="testemunhas" name="Testemunhas (Nomes e Contatos)" rows="6"></textarea>
+                    <div class="pdf-placeholder" data-for="testemunhas"></div>
                     <div class="notes html2pdf_hide_on_pdf">Essencial para comprovar fatos alegados, especialmente horas extras, desvio de função e assédio.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="conversas_prints">Você possui prints de conversas de WhatsApp, e-mails, SMS ou outros registros digitais que comprovem a situação (ex: cobrança excessiva, reclamação de horas, alteração de função, mensagens do RH)?</label>
                     <textarea id="conversas_prints" name="Conversas/Prints"></textarea>
+                    <div class="pdf-placeholder" data-for="conversas_prints"></div>
                     <div class="notes html2pdf_hide_on_pdf">Podem servir como indícios ou provas robustas.</div>
                 </div>
 
@@ -376,24 +427,28 @@
                 <div class="question-group">
                     <label for="situacao_atual_cliente">Você ainda está trabalhando na empresa? Se sim, como está a situação atualmente?</label>
                     <input type="text" id="situacao_atual_cliente" name="Situação Atual do Cliente">
+                    <div class="pdf-placeholder" data-for="situacao_atual_cliente"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para avaliar a urgência da medida ou se há risco de dispensa.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="reclamacoes_anteriores">Você já reclamou formalmente à empresa sobre essas questões (RH, gerente, superior)? Houve alguma reunião ou tentativa de solução interna?</label>
                     <textarea id="reclamacoes_anteriores" name="Reclamações Anteriores à Empresa"></textarea>
+                    <div class="pdf-placeholder" data-for="reclamacoes_anteriores"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para verificar se a empresa estava ciente e se houve inércia.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="conhecimento_empresa">O RH ou a gerência tinham conhecimento das irregularidades que você descreveu?</label>
                     <input type="text" id="conhecimento_empresa" name="Conhecimento Empresa Irregularidades" placeholder="Sim / Não / Parcialmente">
+                    <div class="pdf-placeholder" data-for="conhecimento_empresa"></div>
                     <div class="notes html2pdf_hide_on_pdf">Para verificar a responsabilidade da empresa.</div>
                 </div>
 
                 <div class="question-group">
                     <label for="sindicato">Você é filiado a algum sindicato? O sindicato foi procurado para mediação ou orientação?</label>
                     <input type="text" id="sindicato" name="Filiado Sindicato?" placeholder="Sim / Não / Não procurei">
+                    <div class="pdf-placeholder" data-for="sindicato"></div>
                     <div class="notes html2pdf_hide_on_pdf">O sindicato pode ter informações sobre acordos/convenções coletivas e auxiliar na mediação.</div>
                 </div>
 
@@ -425,6 +480,22 @@
             // Oculta a mensagem de sucesso antes de gerar um novo PDF
             document.getElementById('successMessage').style.display = 'none';
 
+            // 1. Oculta os inputs e textareas originais e preenche os placeholders
+            const inputs = element.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                const placeholder = document.querySelector(`.pdf-placeholder[data-for="${input.id}"]`);
+                if (placeholder) {
+                    placeholder.textContent = input.value; // Preenche o placeholder com o valor
+                    input.classList.add('hide-on-pdf-capture'); // Esconde o input original
+                }
+            });
+
+            // Temporariamente oculta o container de botões e a caixa de instruções na versão que vai para o PDF
+            const buttonsContainer = document.querySelector('.action-buttons-container');
+            const instructionsBox = document.querySelector('.instructions-box');
+            buttonsContainer.classList.add('html2pdf_hide_on_pdf');
+            instructionsBox.classList.add('html2pdf_hide_on_pdf');
+
             const opt = {
                 margin: 10,
                 filename: `Questionario_Trabalhista_${nomeCliente.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
@@ -434,14 +505,17 @@
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            // Temporariamente oculta o container de botões e a caixa de instruções na versão que vai para o PDF
-            const buttonsContainer = document.querySelector('.action-buttons-container');
-            const instructionsBox = document.querySelector('.instructions-box');
-            buttonsContainer.classList.add('html2pdf_hide_on_pdf');
-            instructionsBox.classList.add('html2pdf_hide_on_pdf');
-
             html2pdf().set(opt).from(element).save().then(function() {
-                // Reexibe os elementos após a geração do PDF
+                // 2. Reexibe os inputs e textareas originais após a geração do PDF
+                inputs.forEach(input => {
+                    const placeholder = document.querySelector(`.pdf-placeholder[data-for="${input.id}"]`);
+                    if (placeholder) {
+                        placeholder.textContent = ''; // Limpa o placeholder
+                        input.classList.remove('hide-on-pdf-capture'); // Reexibe o input original
+                    }
+                });
+
+                // Reexibe os elementos de UI após a geração do PDF
                 buttonsContainer.classList.remove('html2pdf_hide_on_pdf');
                 instructionsBox.classList.remove('html2pdf_hide_on_pdf');
 
