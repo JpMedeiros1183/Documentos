@@ -109,50 +109,45 @@
             text-align: center;
             display: none;
         }
-
-        /* Estilos para o PDF - ESTRUTURA ÚNICA SEM DUPLICAÇÃO */
-        .pdf-container {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 800px;
+        #pdfContent {
+            display: none;
             background: white;
             padding: 30px;
             font-family: Arial, sans-serif;
             line-height: 1.5;
             color: #333;
         }
-        .pdf-title {
+        #pdfContent h1 {
             color: #0056b3;
             text-align: center;
-            font-size: 22px;
-            font-weight: bold;
             margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
         }
-        .pdf-section {
-            margin-bottom: 25px;
-            page-break-inside: avoid;
-        }
-        .pdf-section h3 {
+        #pdfContent h3 {
             color: #0056b3;
             border-bottom: 2px solid #0056b3;
             padding-bottom: 5px;
             margin-bottom: 15px;
-            font-size: 18px;
+            margin-top: 25px;
         }
-        .pdf-question {
+        #pdfContent .question-group {
             margin-bottom: 15px;
             page-break-inside: avoid;
+            border: none;
+            background: none;
+            padding: 0;
         }
-        .pdf-question .question {
+        #pdfContent label {
             font-weight: bold;
             color: #004085;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
-        .pdf-question .answer {
+        #pdfContent .answer {
             border-bottom: 1px solid #ccc;
             padding: 5px 0;
             min-height: 20px;
+            margin-bottom: 15px;
             word-wrap: break-word;
         }
     </style>
@@ -164,30 +159,24 @@
         <p style="text-align: center; font-style: italic; color: #666;">Ao finalizar, clique no botão abaixo para gerar e baixar o PDF com suas respostas.</p>
 
         <form id="questionarioForm">
+
             <h3>I. Dados Pessoais e Contrato de Trabalho</h3>
             <div class="question-group">
                 <strong>Dados do Trabalhador:</strong>
                 <label for="nome_completo">Nome completo:</label>
                 <input type="text" id="nome_completo" name="Nome Completo" required>
-                
                 <label for="cpf">CPF:</label>
                 <input type="text" id="cpf" name="CPF" required>
-                
                 <label for="rg">RG:</label>
                 <input type="text" id="rg" name="RG">
-                
                 <label for="data_nascimento">Data de Nascimento:</label>
                 <input type="date" id="data_nascimento" name="Data de Nascimento">
-                
                 <label for="endereco">Endereço completo (Rua, Número, Bairro, Cidade, Estado, CEP):</label>
                 <textarea id="endereco" name="Endereço Completo"></textarea>
-                
                 <label for="telefone">Telefone:</label>
                 <input type="tel" id="telefone" name="Telefone" required>
-                
                 <label for="email_cliente">E-mail:</label>
                 <input type="email" id="email_cliente" name="Email do Cliente" required>
-                
                 <div class="notes">Para qualificação da ação e contato.</div>
             </div>
 
@@ -195,16 +184,12 @@
                 <strong>Dados da Empresa (Empregadora):</strong>
                 <label for="razao_social">Nome completo (razão social) da empresa:</label>
                 <input type="text" id="razao_social" name="Razão Social da Empresa" required>
-                
                 <label for="cnpj">CNPJ da empresa:</label>
                 <input type="text" id="cnpj" name="CNPJ da Empresa">
-                
                 <label for="endereco_empresa">Endereço completo da empresa:</label>
                 <textarea id="endereco_empresa" name="Endereço da Empresa"></textarea>
-                
                 <label for="responsavel_empresa">Nome do responsável da empresa (RH/Sócio, se souber):</label>
                 <input type="text" id="responsavel_empresa" name="Responsável da Empresa">
-                
                 <div class="notes">Para qualificação da ação e notificação.</div>
             </div>
 
@@ -212,19 +197,14 @@
                 <strong>Contrato de Trabalho:</strong>
                 <label for="copia_contrato">Você possui cópia do contrato de trabalho (se houver)?</label>
                 <input type="text" id="copia_contrato" name="Cópia Contrato Trabalho" placeholder="Sim / Não / Parcialmente">
-                
                 <label for="data_inicio">Data de início da sua prestação de serviços (dia/mês/ano):</label>
                 <input type="date" id="data_inicio" name="Data de Início">
-                
                 <label for="data_saida">Data de saída (se já ocorreu) (dia/mês/ano):</label>
                 <input type="date" id="data_saida" name="Data de Saída">
-                
                 <label for="cargo_funcao">Qual era seu cargo/função registrada no contrato de trabalho?</label>
                 <input type="text" id="cargo_funcao" name="Cargo/Função Contratada">
-                
                 <label for="salario_inicial">Qual era o seu salário inicial e quais foram os últimos salários recebidos? Por favor, discrimine o valor nominal e o valor total com adicionais, se houver:</label>
                 <textarea id="salario_inicial" name="Salários Recebidos"></textarea>
-                
                 <div class="notes">Essencial para verificar a relação empregatícia, tempo de serviço e base de cálculo para verbas.</div>
             </div>
 
@@ -232,7 +212,6 @@
                 <strong>Registro em CTPS (Carteira de Trabalho e Previdência Social):</strong>
                 <label for="copia_ctps">Você possui cópia da sua CTPS (página da foto, qualificação civil, contrato de trabalho, anotações de férias, aumentos salariais)?</label>
                 <input type="text" id="copia_ctps" name="Cópia CTPS" placeholder="Sim / Não / Parcialmente">
-                
                 <div class="notes">Para comprovar o vínculo, data de início, função e salários. Verificar se há divergências.</div>
             </div>
 
@@ -252,10 +231,8 @@
             <div class="question-group">
                 <label for="qtd_horas_extras">Quantas horas extras você estima ter feito por dia/semana/mês?</label>
                 <input type="text" id="qtd_horas_extras" name="Quantidade Horas Extras Estimada">
-                
                 <label for="registro_ponto">A empresa mantinha registro de ponto (cartões de ponto, folha de ponto, sistema digital, etc.)? Se sim, você possui cópias?</label>
                 <input type="text" id="registro_ponto" name="Registro Ponto Existe?" placeholder="Sim / Não / Parcialmente">
-                
                 <div class="notes">Para comprovar o labor extraordinário. Se não houver registro, outros meios de prova serão necessários (testemunhas, e-mails, mensagens).</div>
             </div>
 
@@ -395,149 +372,68 @@
                 <input type="text" id="sindicato" name="Filiado Sindicato?" placeholder="Sim / Não / Não procurei">
                 <div class="notes">O sindicato pode ter informações sobre acordos/convenções coletivas e auxiliar na mediação.</div>
             </div>
+
         </form>
 
         <div class="action-buttons-container">
-            <button type="button" class="action-button" onclick="generatePdf()">Gerar e Baixar PDF</button>
+            <button type="button" class="action-button" id="generatePdfButton" onclick="generatePdf()">Gerar e Baixar PDF</button>
         </div>
 
-        <p id="successMessage">PDF gerado e baixado com sucesso!</p>
+        <p id="successMessage" style="display: none;">PDF gerado e baixado com sucesso!</p>
 
         <div class="instructions-box">
             <h4>Instruções Detalhadas para Salvar o PDF:</h4>
             <ol>
                 <li>Preencha cuidadosamente todo o formulário com as informações solicitadas.</li>
-                <li>Clique no botão "Gerar e Baixar PDF".</li>
-                <li>Um arquivo PDF com suas respostas será automaticamente baixado.</li>
-                <li>Aguarde o download ser concluído.</li>
+                <li>Clique no botão **"Gerar e Baixar PDF"**.</li>
+                <li>Um arquivo PDF com suas respostas será **automaticamente baixado** para a pasta "Downloads" do seu dispositivo.</li>
+                <li>**Aguarde o download do PDF ser concluído.** Você verá uma notificação do seu navegador e a mensagem "PDF gerado e baixado com sucesso!" aparecerá.</li>
             </ol>
+            <p><strong>Importante:</strong> Este arquivo é uma cópia das suas respostas. Guarde-o em um local seguro.</p>
         </div>
     </div>
+
+    <div id="pdfContent"></div>
 
     <script>
         function generatePdf() {
             const nomeCliente = document.getElementById('nome_completo').value || 'Cliente';
             
-            // Criar estrutura limpa para PDF
-            const pdfContainer = document.createElement('div');
-            pdfContainer.className = 'pdf-container';
-            
-            // Título
-            const titulo = document.createElement('div');
-            titulo.className = 'pdf-title';
-            titulo.textContent = 'Questionário para Análise de Ação Trabalhista';
-            pdfContainer.appendChild(titulo);
+            // Ocultar a mensagem de sucesso
+            document.getElementById('successMessage').style.display = 'none';
 
-            // Definir todas as perguntas e campos
-            const perguntas = [
-                { secao: 'I. Dados Pessoais e Contrato de Trabalho', campos: [
-                    { id: 'nome_completo', label: 'Nome completo:' },
-                    { id: 'cpf', label: 'CPF:' },
-                    { id: 'rg', label: 'RG:' },
-                    { id: 'data_nascimento', label: 'Data de Nascimento:' },
-                    { id: 'endereco', label: 'Endereço completo:' },
-                    { id: 'telefone', label: 'Telefone:' },
-                    { id: 'email_cliente', label: 'E-mail:' },
-                    { id: 'razao_social', label: 'Nome completo (razão social) da empresa:' },
-                    { id: 'cnpj', label: 'CNPJ da empresa:' },
-                    { id: 'endereco_empresa', label: 'Endereço completo da empresa:' },
-                    { id: 'responsavel_empresa', label: 'Nome do responsável da empresa:' },
-                    { id: 'copia_contrato', label: 'Possui cópia do contrato de trabalho:' },
-                    { id: 'data_inicio', label: 'Data de início da prestação de serviços:' },
-                    { id: 'data_saida', label: 'Data de saída:' },
-                    { id: 'cargo_funcao', label: 'Cargo/função registrada no contrato:' },
-                    { id: 'salario_inicial', label: 'Salário inicial e últimos salários recebidos:' },
-                    { id: 'copia_ctps', label: 'Possui cópia da CTPS:' }
-                ]},
-                { secao: 'II. Jornada de Trabalho', campos: [
-                    { id: 'carga_horaria_contratual', label: 'Carga horária contratual:' },
-                    { id: 'jornada_praticada', label: 'Jornada de trabalho diária praticada:' },
-                    { id: 'qtd_horas_extras', label: 'Quantidade de horas extras estimada:' },
-                    { id: 'registro_ponto', label: 'Empresa mantinha registro de ponto:' },
-                    { id: 'pagamento_horas_extras', label: 'Pagamento de horas extras:' },
-                    { id: 'duracao_intervalo', label: 'Duração do intervalo para almoço:' },
-                    { id: 'dsr', label: 'Descanso Semanal Remunerado e feriados:' }
-                ]},
-                { secao: 'III. Salário e Verbas Trabalhistas', campos: [
-                    { id: 'copia_contracheques', label: 'Possui cópia dos contracheques:' },
-                    { id: 'adicionais', label: 'Adicionais recebidos:' },
-                    { id: 'desvio_funcao', label: 'Desvio/acúmulo de função:' },
-                    { id: 'reajustes_salariais', label: 'Reajustes salariais:' },
-                    { id: 'beneficios', label: 'Benefícios oferecidos pela empresa:' },
-                    { id: 'fgts', label: 'Depósitos de FGTS:' }
-                ]},
-                { secao: 'IV. Rescisão Contratual', campos: [
-                    { id: 'tipo_rescisao', label: 'Tipo de rescisão:' },
-                    { id: 'trct', label: 'Possui cópia do TRCT:' },
-                    { id: 'seguro_desemprego', label: 'Empresa forneceu guia do seguro-desemprego:' }
-                ]},
-                { secao: 'V. Assédio Moral/Perseguição', campos: [
-                    { id: 'detalhes_assedio', label: 'Detalhes dos episódios de assédio/perseguição:' },
-                    { id: 'provas_assedio', label: 'Provas dos incidentes:' },
-                    { id: 'impacto_saude', label: 'Impacto na saúde:' }
-                ]},
-                { secao: 'VI. Provas e Testemunhas', campos: [
-                    { id: 'documentos_gerais', label: 'Documentos gerais adicionais:' },
-                    { id: 'testemunhas', label: 'Testemunhas (nomes e contatos):' },
-                    { id: 'conversas_prints', label: 'Conversas/prints de WhatsApp, e-mails:' }
-                ]},
-                { secao: 'VII. Outras Informações Relevantes', campos: [
-                    { id: 'situacao_atual_cliente', label: 'Situação atual do cliente:' },
-                    { id: 'reclamacoes_anteriores', label: 'Reclamações anteriores à empresa:' },
-                    { id: 'conhecimento_empresa', label: 'Conhecimento da empresa sobre irregularidades:' },
-                    { id: 'sindicato', label: 'Filiado a sindicato:' }
-                ]}
-            ];
+            // Clonar o formulário
+            const form = document.getElementById('questionarioForm');
+            const clone = form.cloneNode(true);
 
-            // Construir o PDF
-            perguntas.forEach(secaoData => {
-                const secao = document.createElement('div');
-                secao.className = 'pdf-section';
+            // Remover elementos que não devem aparecer no PDF
+            clone.querySelectorAll('.notes').forEach(el => el.remove());
+            clone.querySelectorAll('button').forEach(el => el.remove());
+
+            // Substituir inputs e textareas pelos valores preenchidos
+            clone.querySelectorAll('input, textarea').forEach(el => {
+                let valor = el.value || '';
                 
-                const tituloSecao = document.createElement('h3');
-                tituloSecao.textContent = secaoData.secao;
-                secao.appendChild(tituloSecao);
-
-                secaoData.campos.forEach(campo => {
-                    const input = document.getElementById(campo.id);
-                    if (input) {
-                        let valor = input.value.trim();
-                        
-                        // Não usar placeholder se campo estiver vazio
-                        if (!valor) {
-                            valor = '';
-                        }
-                        
-                        // Converter data para formato brasileiro
-                        if (campo.id.includes('data_') && valor.includes('-')) {
-                            const partes = valor.split('-');
-                            if (partes.length === 3) {
-                                valor = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                            }
-                        }
-
-                        const perguntaDiv = document.createElement('div');
-                        perguntaDiv.className = 'pdf-question';
-
-                        const perguntaLabel = document.createElement('div');
-                        perguntaLabel.className = 'question';
-                        perguntaLabel.textContent = campo.label;
-                        perguntaDiv.appendChild(perguntaLabel);
-
-                        const respostaDiv = document.createElement('div');
-                        respostaDiv.className = 'answer';
-                        respostaDiv.textContent = valor;
-                        perguntaDiv.appendChild(respostaDiv);
-
-                        secao.appendChild(perguntaDiv);
+                // Converter datas para formato brasileiro
+                if (el.type === 'date' && valor) {
+                    const partes = valor.split('-');
+                    if (partes.length === 3) {
+                        valor = `${partes[2]}/${partes[1]}/${partes[0]}`;
                     }
-                });
+                }
 
-                pdfContainer.appendChild(secao);
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer';
+                answerDiv.textContent = valor;
+                
+                el.parentNode.replaceChild(answerDiv, el);
             });
 
-            // Adicionar ao DOM temporariamente
-            document.body.appendChild(pdfContainer);
+            // Preparar o container PDF
+            const pdfContainer = document.getElementById('pdfContent');
+            pdfContainer.innerHTML = '<h1>Questionário para Análise de Ação Trabalhista</h1>';
+            pdfContainer.appendChild(clone);
+            pdfContainer.style.display = 'block';
 
             // Configurações do PDF
             const opt = {
@@ -549,8 +445,7 @@
                     logging: false,
                     dpi: 300,
                     letterRendering: true,
-                    width: 800,
-                    height: pdfContainer.scrollHeight
+                    useCORS: true
                 },
                 jsPDF: { 
                     unit: 'mm', 
@@ -562,19 +457,20 @@
                 }
             };
 
-            // Gerar PDF
-            html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                // Remover elemento temporário
-                document.body.removeChild(pdfContainer);
+            // Gerar o PDF
+            html2pdf().set(opt).from(pdfContainer).save().then(function() {
+                // Ocultar o container PDF
+                pdfContainer.style.display = 'none';
                 
-                // Mostrar mensagem de sucesso
+                // Exibir mensagem de sucesso
                 document.getElementById('successMessage').style.display = 'block';
+                
+                // Rolar para o botão
+                document.getElementById('generatePdfButton').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }).catch(error => {
                 console.error("Erro ao gerar PDF:", error);
-                if (document.body.contains(pdfContainer)) {
-                    document.body.removeChild(pdfContainer);
-                }
-                alert("Erro ao gerar PDF. Tente novamente.");
+                pdfContainer.style.display = 'none';
+                alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.");
             });
         }
     </script>
