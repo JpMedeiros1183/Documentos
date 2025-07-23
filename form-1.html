@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-M">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Questionário para Análise de Ação Trabalhista</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -170,23 +170,6 @@
             .action-buttons-container, .instructions-box, #successMessage {
                 display: none; /* Oculta botões, instruções e mensagem na impressão do navegador */
             }
-        }
-        /* Estilo para esconder temporariamente os campos de formulário */
-        .hidden-for-pdf {
-            display: none !important;
-        }
-        /* Estilo para os elementos de texto temporários que substituirão os campos */
-        .pdf-text-representation {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            background-color: #f9f9f9; /* Um fundo suave para parecer um campo preenchido */
-            min-height: 40px; /* Altura mínima para inputs de linha única */
-            white-space: pre-wrap; /* Para textareas, preserva quebras de linha */
-            word-wrap: break-word;
         }
     </style>
 </head>
@@ -441,29 +424,40 @@
 
             document.getElementById('successMessage').style.display = 'none';
 
-            // Array para armazenar os elementos temporários criados
-            const temporaryElements = [];
+            // Array para armazenar os elementos de formulário originais para reversão
+            const formElementsToRestore = [];
 
-            // Iterar sobre todos os inputs e textareas dentro do formulário
+            // Preparar os campos do formulário para a captura
             const formInputs = element.querySelectorAll('#questionarioForm input, #questionarioForm textarea');
 
             formInputs.forEach(input => {
-                const tempSpan = document.createElement('span');
-                tempSpan.classList.add('pdf-text-representation'); // Aplica estilos para simular um campo preenchido
-                tempSpan.textContent = input.value || (input.placeholder && !input.value ? `(${input.placeholder})` : ''); // Adiciona valor ou placeholder se vazio
-
-                // Copia alguns estilos inline importantes para manter a aparência no PDF
-                // Pode ser necessário ajustar quais estilos são copiados dependendo da sua necessidade
-                tempSpan.style.width = input.offsetWidth + 'px'; // Manter a largura
-                tempSpan.style.height = input.offsetHeight + 'px'; // Manter a altura para textareas
-                // Outros estilos se necessário, como fontSize, lineHeight, etc.
-
-                // Insere o span temporário antes do input original
-                input.parentNode.insertBefore(tempSpan, input);
-                // Oculta o input original
-                input.classList.add('hidden-for-pdf');
-                // Armazena a referência para poder reverter depois
-                temporaryElements.push({ original: input, temporary: tempSpan });
+                // Para inputs, defina como 'readonly' e desative a borda e background
+                if (input.tagName === 'INPUT') {
+                    input.setAttribute('readonly', 'readonly');
+                    input.style.border = 'none';
+                    input.style.backgroundColor = 'transparent';
+                    input.style.color = '#333'; // Para garantir a cor do texto
+                    // Se houver um placeholder e o campo estiver vazio, use o placeholder como valor visível
+                    if (input.value === '' && input.placeholder) {
+                        input.value = `(${input.placeholder})`; // Exibe placeholder no campo para o PDF
+                        input.style.fontStyle = 'italic';
+                        input.style.color = '#777';
+                    }
+                }
+                // Para textareas, defina como 'disabled' e desative a borda e background
+                else if (input.tagName === 'TEXTAREA') {
+                    input.setAttribute('disabled', 'disabled');
+                    input.style.border = 'none';
+                    input.style.backgroundColor = 'transparent';
+                    input.style.color = '#333'; // Para garantir a cor do texto
+                    // Se houver um placeholder e o campo estiver vazio, use o placeholder como valor visível
+                    if (input.value === '' && input.placeholder) {
+                        input.value = `(${input.placeholder})`; // Exibe placeholder no campo para o PDF
+                        input.style.fontStyle = 'italic';
+                        input.style.color = '#777';
+                    }
+                }
+                formElementsToRestore.push(input); // Adiciona para restauração futura
             });
 
             // Temporariamente oculta o container de botões e a caixa de instruções na versão que vai para o PDF
@@ -482,10 +476,27 @@
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
-                // Reverter as alterações: reexibir inputs originais e remover os spans temporários
-                temporaryElements.forEach(item => {
-                    item.original.classList.remove('hidden-for-pdf');
-                    item.temporary.remove();
+                // Reverter as alterações nos campos do formulário
+                formElementsToRestore.forEach(input => {
+                    if (input.tagName === 'INPUT') {
+                        input.removeAttribute('readonly');
+                        input.style.border = ''; // Restaura a borda original (ou defina para a cor padrão)
+                        input.style.backgroundColor = ''; // Restaura o background
+                        input.style.color = ''; // Restaura a cor do texto
+                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
+                            input.value = ''; // Limpa o valor se era apenas o placeholder temporário
+                        }
+                        input.style.fontStyle = '';
+                    } else if (input.tagName === 'TEXTAREA') {
+                        input.removeAttribute('disabled');
+                        input.style.border = '';
+                        input.style.backgroundColor = '';
+                        input.style.color = '';
+                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
+                            input.value = ''; // Limpa o valor se era apenas o placeholder temporário
+                        }
+                        input.style.fontStyle = '';
+                    }
                 });
 
                 // Reexibe os elementos de UI após a geração do PDF
@@ -497,6 +508,33 @@
 
                 // Rola para a área do botão para que o usuário veja a mensagem
                 document.getElementById('generatePdfButton').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }).catch(error => {
+                console.error("Erro ao gerar PDF:", error);
+                alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente ou verifique o console para mais detalhes.");
+                // Garantir que os campos sejam restaurados mesmo em caso de erro
+                formElementsToRestore.forEach(input => {
+                    if (input.tagName === 'INPUT') {
+                        input.removeAttribute('readonly');
+                        input.style.border = '';
+                        input.style.backgroundColor = '';
+                        input.style.color = '';
+                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
+                            input.value = '';
+                        }
+                        input.style.fontStyle = '';
+                    } else if (input.tagName === 'TEXTAREA') {
+                        input.removeAttribute('disabled');
+                        input.style.border = '';
+                        input.style.backgroundColor = '';
+                        input.style.color = '';
+                        if (input.value.startsWith('(') && input.value.endsWith(')') && input.placeholder) {
+                            input.value = '';
+                        }
+                        input.style.fontStyle = '';
+                    }
+                });
+                buttonsContainer.classList.remove('html2pdf_hide_on_pdf');
+                instructionsBox.classList.remove('html2pdf_hide_on_pdf');
             });
         }
     </script>
