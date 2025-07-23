@@ -175,26 +175,83 @@
 <body>
     <div class="container">
         <div id="pdfContent">
+            <!-- Apenas a introdução ficará oculta ao gerar PDF -->
             <div class="html2pdf_hide_on_pdf">
                 <h1>Questionário para Análise de Ação Trabalhista</h1>
                 <h2>Preencha os campos abaixo com as informações solicitadas para que possamos analisar sua situação e quantificar seus direitos trabalhistas.</h2>
-                <p style="text-align: center; font-style: italic; color: #666;">
-                    Ao finalizar, clique no botão abaixo para gerar e baixar o PDF com suas respostas.
-                </p>
+                <p style="text-align: center; font-style: italic; color: #666;">Ao finalizar, clique no botão abaixo para gerar e baixar o PDF com suas respostas.</p>
             </div>
 
             <form id="questionarioForm">
-                <!-- ... seu formulário inteiro permanece igual ... -->
-                <!-- Troque apenas se quiser otimizações de visual (não obrigatório) -->
-                <!-- Código omitido aqui para economizar espaço, mas é igual ao seu HTML acima -->
+                <h3>I. Dados Pessoais e Contrato de Trabalho</h3>
+                <div class="question-group">
+                    <strong>Dados do Trabalhador:</strong>
+                    <label for="nome_completo">Nome completo:</label>
+                    <input type="text" id="nome_completo" name="Nome Completo" required>
+                    <label for="cpf">CPF:</label>
+                    <input type="text" id="cpf" name="CPF" required>
+                    <label for="rg">RG:</label>
+                    <input type="text" id="rg" name="RG">
+                    <label for="data_nascimento">Data de Nascimento:</label>
+                    <input type="date" id="data_nascimento" name="Data de Nascimento">
+                    <label for="endereco">Endereço completo (Rua, Número, Bairro, Cidade, Estado, CEP):</label>
+                    <textarea id="endereco" name="Endereço Completo"></textarea>
+                    <label for="telefone">Telefone:</label>
+                    <input type="tel" id="telefone" name="Telefone" required>
+                    <label for="email_cliente">E-mail:</label>
+                    <input type="email" id="email_cliente" name="Email do Cliente" required>
+                    <div class="notes html2pdf_hide_on_pdf">Para qualificação da ação e contato.</div>
+                </div>
+                <div class="question-group">
+                    <strong>Dados da Empresa (Empregadora):</strong>
+                    <label for="razao_social">Nome completo (razão social) da empresa:</label>
+                    <input type="text" id="razao_social" name="Razão Social da Empresa" required>
+                    <label for="cnpj">CNPJ da empresa:</label>
+                    <input type="text" id="cnpj" name="CNPJ da Empresa">
+                    <label for="endereco_empresa">Endereço completo da empresa:</label>
+                    <textarea id="endereco_empresa" name="Endereço da Empresa"></textarea>
+                    <label for="responsavel_empresa">Nome do responsável da empresa (RH/Sócio, se souber):</label>
+                    <input type="text" id="responsavel_empresa" name="Responsável da Empresa">
+                    <div class="notes html2pdf_hide_on_pdf">Para qualificação da ação e notificação.</div>
+                </div>
+                <div class="question-group">
+                    <strong>Contrato de Trabalho:</strong>
+                    <label for="copia_contrato">Você possui cópia do contrato de trabalho (se houver)?</label>
+                    <input type="text" id="copia_contrato" name="Cópia Contrato Trabalho" placeholder="Sim / Não / Parcialmente">
+                    <label for="data_inicio">Data de início da sua prestação de serviços (dia/mês/ano):</label>
+                    <input type="date" id="data_inicio" name="Data de Início">
+                    <label for="data_saida">Data de saída (se já ocorreu) (dia/mês/ano):</label>
+                    <input type="date" id="data_saida" name="Data de Saída">
+                    <label for="cargo_funcao">Qual era seu cargo/função registrada no contrato de trabalho?</label>
+                    <input type="text" id="cargo_funcao" name="Cargo/Função Contratada">
+                    <label for="salario_inicial">Qual era o seu salário inicial e quais foram os últimos salários recebidos? Por favor, discrimine o valor nominal e o valor total com adicionais, se houver:</label>
+                    <textarea id="salario_inicial" name="Salários Recebidos"></textarea>
+                    <div class="notes html2pdf_hide_on_pdf">Essencial para verificar a relação empregatícia, tempo de serviço e base de cálculo para verbas.</div>
+                </div>
+                <div class="question-group">
+                    <strong>Registro em CTPS (Carteira de Trabalho e Previdência Social):</strong>
+                    <label for="copia_ctps">Você possui cópia da sua CTPS (página da foto, qualificação civil, contrato de trabalho, anotações de férias, aumentos salariais)?</label>
+                    <input type="text" id="copia_ctps" name="Cópia CTPS" placeholder="Sim / Não / Parcialmente">
+                    <div class="notes html2pdf_hide_on_pdf">Para comprovar o vínculo, data de início, função e salários. Verificar se há divergências.</div>
+                </div>
+                <h3>II. Jornada de Trabalho</h3>
+                <div class="question-group">
+                    <label for="carga_horaria_contratual">Qual a carga horária estabelecida no seu contrato de trabalho (ex: 8h/dia, 44h/semana)?</label>
+                    <input type="text" id="carga_horaria_contratual" name="Carga Horária Contratual">
+                    <div class="notes html2pdf_hide_on_pdf">Base para identificar horas extras.</div>
+                </div>
+                <div class="question-group">
+                    <label for="jornada_praticada">Descreva detalhadamente a sua jornada de trabalho diária efetivamente praticada (horário de entrada, saída, tempo e horário de intervalo para almoço/descanso):</label>
+                    <textarea id="jornada_praticada" name="Jornada Praticada" placeholder="Ex: De segunda a sexta, das 8h às 18h, com 30min de intervalo das 12h às 12h30. Sábados das 8h às 12h."></textarea>
+                    <div class="notes html2pdf_hide_on_pdf">Essencial para calcular horas extras, intrajornada, etc.</div>
+                </div>
+                <!-- ... continue o resto do formulário como no seu exemplo ... -->
             </form>
         </div>
         <div class="action-buttons-container">
             <button type="button" class="action-button" id="generatePdfButton" onclick="generatePdf()">Gerar e Baixar PDF</button>
         </div>
-
         <p id="successMessage" style="display: none;">PDF gerado e baixado com sucesso!</p>
-
         <div class="instructions-box">
             <h4>Instruções Detalhadas para Salvar o PDF:</h4>
             <ol>
@@ -206,7 +263,6 @@
             <p><strong>Importante:</strong> Este arquivo é uma cópia das suas respostas. Guarde-o em um local seguro.</p>
         </div>
     </div>
-
     <script>
         function generatePdf() {
             const originalPdfContent = document.getElementById('pdfContent');
