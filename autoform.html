@@ -13,7 +13,7 @@
             background-color: #f4f4f4;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinha o conteúdo ao topo */
+            align-items: flex-start;
             min-height: 100vh;
         }
 
@@ -24,7 +24,7 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
-            min-height: 500px; /* Altura mínima para a área de texto */
+            min-height: 500px;
             box-sizing: border-box;
         }
 
@@ -37,31 +37,30 @@
             max-width: 150px;
             height: auto;
             margin-bottom: 10px;
-            display: none; /* Escondida por padrão e mostrada apenas na impressão */
+            display: none;
         }
 
         .text-area {
-            border: 1px solid #ddd; /* Borda visível na tela */
-            min-height: 400px; /* Altura da área de edição */
+            border: 1px solid #ddd;
+            min-height: 400px;
             padding: 15px;
-            font-family: Verdana, sans-serif; /* Padrão Verdana */
-            font-size: 12pt; /* Padrão 12pt */
+            font-family: Verdana, sans-serif;
+            font-size: 12pt;
             line-height: 1.6;
             outline: none;
             box-sizing: border-box;
-            overflow-y: auto; /* Adiciona scroll se o conteúdo for maior */
+            overflow-y: auto;
         }
 
-        /* Botão flutuante e container da barra de ferramentas */
         .floating-action-group {
             position: fixed;
             bottom: 30px;
             right: 30px;
             z-index: 1000;
             display: flex;
-            flex-direction: column; /* Para a barra de ferramentas aparecer acima */
-            align-items: flex-end; /* Alinha o grupo à direita */
-            gap: 10px; /* Espaçamento entre a toolbar e o botão */
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
         }
 
         .floating-button {
@@ -84,7 +83,6 @@
             background-color: #0056b3;
         }
 
-        /* Barra de ferramentas */
         .toolbar {
             background-color: #333;
             border-radius: 5px;
@@ -93,65 +91,35 @@
             flex-wrap: wrap;
             gap: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            align-self: flex-end; /* Alinha a toolbar à direita dentro do seu flex container */
-            max-width: 250px; /* Aumentado para acomodar os novos botões */
+            align-self: flex-end;
+            max-width: 200px;
         }
 
         .toolbar button {
             background-color: #555;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 8px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s ease;
-            flex: 1 1 auto; /* Permite que os botões se ajustem e quebrem linha */
-            white-space: nowrap; /* Impede que o texto do botão quebre linha */
+            flex: 1 1 auto;
+            white-space: nowrap;
         }
 
         .toolbar button:hover {
             background-color: #777;
         }
+        
+        .toolbar i {
+            font-size: 16px;
+        }
 
         .hidden {
             display: none;
         }
-        
-        /* NOVO: Estilos para o container de Localizar e Substituir */
-        #findReplaceContainer {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 230px; /* Largura fixa */
-        }
 
-        #findReplaceContainer input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        #findReplaceContainer button {
-             background-color: #007bff;
-             color: white;
-             border: none;
-             padding: 8px;
-             border-radius: 4px;
-             cursor: pointer;
-        }
-        
-        #findReplaceContainer button:hover {
-            background-color: #0056b3;
-        }
-
-
-        /* Estilos de impressão */
         @media print {
             body {
                 background-color: #fff;
@@ -168,17 +136,17 @@
             }
 
             .floating-action-group, .toolbar {
-                display: none; /* Esconde o botão e a barra de ferramentas ao imprimir */
+                display: none;
             }
 
             #logo {
-                display: block; /* Mostra a logo na impressão */
-                margin: 0 auto 0px; /* Centraliza a logo na impressão */
+                display: block;
+                margin: 20px auto;
             }
 
             .text-area {
-                border: none !important; /* Remove a borda na impressão */
-                padding: 0; /* Opcional: remover padding extra na impressão se desejar */
+                border: none !important;
+                padding: 0;
             }
         }
     </style>
@@ -192,58 +160,195 @@
     </div>
 
     <div class="floating-action-group">
-        <div id="findReplaceContainer" class="hidden">
-            <input type="text" id="findInput" placeholder="Localizar...">
-            <input type="text" id="replaceInput" placeholder="Substituir com...">
-            <button onclick="performReplaceAll()">Substituir Tudo</button>
-        </div>
-
         <div id="toolbar" class="toolbar hidden">
-            <button onclick="execCmd('bold')"><i class="fas fa-bold"></i> Negrito</button>
-            <button onclick="execCmd('italic')"><i class="fas fa-italic"></i> Itálico</button>
-            <button onclick="execCmd('underline')"><i class="fas fa-underline"></i> Sublinhado</button>
-            <button onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i> Esquerda</button>
-            <button onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i> Centralizar</button>
-            <button onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i> Direita</button>
-            <button onclick="execCmd('justifyFull')"><i class="fas fa-align-justify"></i> Justificar</button>
-            <button onclick="highlightText()"><i class="fas fa-highlighter"></i> Marcador</button>
-            <button onclick="execCmd('indent')"><i class="fas fa-indent"></i> Recuo Dir.</button>
-            <button onclick="execCmd('outdent')"><i class="fas fa-outdent"></i> Recuo Esq.</button>
-            <button onclick="indentParagraph()"><i class="fas fa-paragraph"></i> Ind. Parágrafo</button>
-            <button onclick="setFontSize('3')"><i class="fas fa-text-height"></i> Tam 12</button>
-            <button onclick="setFontFamily('Verdana')"><i class="fas fa-font"></i> Verdana</button>
-            <button onclick="toggleFindReplace()"><i class="fas fa-search"></i> Localizar</button>
-            <button onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+            <button onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
+            <button onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
+            <button onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
+            <button onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
+            <button onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
+            <button onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i></button>
+            <button onclick="execCmd('justifyFull')"><i class="fas fa-align-justify"></i></button>
+            <button onclick="highlightText()"><i class="fas fa-highlighter"></i></button>
+            <button onclick="execCmd('indent')"><i class="fas fa-indent"></i></button>
+            <button onclick="execCmd('outdent')"><i class="fas fa-outdent"></i></button>
+            <button onclick="setFontSize('3')"><i class="fas fa-text-height"></i></button>
+            <button onclick="setFontFamily('Verdana')"><i class="fas fa-font"></i></button>
+            <button onclick="changeCase('upper')"><i class="fas fa-arrow-up"></i></button>
+            <button onclick="changeCase('lower')"><i class="fas fa-arrow-down"></i></button>
+            <button onclick="clearFormatting()"><i class="fas fa-eraser"></i></button>
+            <button onclick="insertImage()"><i class="fas fa-image"></i></button>
+            <button onclick="adjustImageSize(1.1)"><i class="fas fa-plus-circle"></i></button>
+            <button onclick="adjustImageSize(0.9)"><i class="fas fa-minus-circle"></i></button>
+            <button onclick="findAndReplace()"><i class="fas fa-search"></i></button>
+            <button onclick="window.print()"><i class="fas fa-print"></i></button>
         </div>
         <button id="toggleTools" class="floating-button">
             <i class="fas fa-tools"></i>
         </button>
     </div>
 
-    <script>
-        // --- CORREÇÃO INICIA AQUI ---
-        // Variáveis declaradas fora do 'DOMContentLoaded' para serem acessíveis globalmente
-        let editor;
-        let toggleToolsButton;
-        let toolbar;
-        let logo;
-        let findReplaceContainer;
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
 
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Atribuição das variáveis após o carregamento do documento
-            editor = document.getElementById('editor');
-            toggleToolsButton = document.getElementById('toggleTools');
-            toolbar = document.getElementById('toolbar');
-            logo = document.getElementById('logo');
-            findReplaceContainer = document.getElementById('findReplaceContainer');
+            const editor = document.getElementById('editor');
+            const toggleToolsButton = document.getElementById('toggleTools');
+            const toolbar = document.getElementById('toolbar');
+            const logo = document.getElementById('logo');
+            const imageInput = document.getElementById('imageInput');
 
             toggleToolsButton.addEventListener('click', () => {
                 toolbar.classList.toggle('hidden');
-                // Garante que o painel de localizar também seja escondido ao fechar a barra
-                if (toolbar.classList.contains('hidden')) {
-                    findReplaceContainer.classList.add('hidden');
+            });
+
+            window.execCmd = (command, value = null) => {
+                document.execCommand(command, false, value);
+                editor.focus();
+            };
+
+            window.setFontSize = (size) => {
+                execCmd('fontSize', size);
+            };
+
+            window.setFontFamily = (fontName) => {
+                execCmd('fontName', fontName);
+            };
+
+            window.highlightText = () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+
+                const range = selection.getRangeAt(0);
+                const parentElement = range.commonAncestorContainer.nodeType === 3 ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+
+                let currentHighlightSpan = null;
+                if (parentElement.tagName === 'SPAN' && parentElement.style.backgroundColor === 'yellow') {
+                    currentHighlightSpan = parentElement;
+                } else {
+                    let tempParent = parentElement;
+                    while (tempParent && tempParent !== editor) {
+                        if (tempParent.tagName === 'SPAN' && tempParent.style.backgroundColor === 'yellow') {
+                            currentHighlightSpan = tempParent;
+                            break;
+                        }
+                        tempParent = tempParent.parentNode;
+                    }
+                }
+
+                if (currentHighlightSpan) {
+                    const parentOfSpan = currentHighlightSpan.parentNode;
+                    while (currentHighlightSpan.firstChild) {
+                        parentOfSpan.insertBefore(currentHighlightSpan.firstChild, currentHighlightSpan);
+                    }
+                    parentOfSpan.removeChild(currentHighlightSpan);
+                } else {
+                    const span = document.createElement('span');
+                    span.style.backgroundColor = 'yellow';
+                    span.style.color = 'black';
+                    try {
+                        range.surroundContents(span);
+                    } catch (e) {
+                        const selectedText = selection.toString();
+                        if (selectedText) {
+                            document.execCommand('backcolor', false, 'yellow');
+                        }
+                    }
+                }
+                editor.focus();
+            };
+            
+            window.changeCase = (caseType) => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                const text = selection.toString();
+                if (!text) return;
+
+                const newText = caseType === 'upper' ? text.toUpperCase() : text.toLowerCase();
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(newText));
+                editor.focus();
+            };
+
+            window.clearFormatting = () => {
+                execCmd('removeFormat');
+                editor.focus();
+            };
+
+            window.insertImage = () => {
+                imageInput.click();
+            };
+
+            imageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100%';
+                        editor.appendChild(img);
+                        editor.focus();
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
+
+            window.adjustImageSize = (scale) => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+
+                const selectedNode = selection.getRangeAt(0).startContainer;
+                let img = null;
+                if (selectedNode.nodeType === 1 && selectedNode.tagName === 'IMG') {
+                    img = selectedNode;
+                } else if (selectedNode.parentNode && selectedNode.parentNode.tagName === 'IMG') {
+                    img = selectedNode.parentNode;
+                } else {
+                    img = editor.querySelector('img');
+                }
+
+                if (img) {
+                    const currentWidth = img.clientWidth;
+                    const newWidth = currentWidth * scale;
+                    img.style.width = `${newWidth}px`;
+                    img.style.height = 'auto';
+                    editor.focus();
+                }
+            };
+
+            // Função de Localizar e Substituir (Corrigida)
+            window.findAndReplace = () => {
+                const searchText = prompt("Digite o texto que deseja localizar:");
+                if (!searchText) return;
+                const replaceText = prompt("Digite o texto que substituirá '" + searchText + "':");
+                if (replaceText === null) return;
+
+                const editor = document.getElementById('editor');
+                const walk = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                let found = false;
+
+                while ((node = walk.nextNode())) {
+                    const text = node.nodeValue;
+                    const index = text.indexOf(searchText);
+                    if (index !== -1) {
+                        found = true;
+                        const range = document.createRange();
+                        range.setStart(node, index);
+                        range.setEnd(node, index + searchText.length);
+
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(replaceText));
+                    }
+                }
+
+                if (!found) {
+                    alert("Texto não encontrado.");
+                }
+
+                editor.focus();
+            };
 
             window.onbeforeprint = () => {
                 logo.style.display = 'block';
@@ -257,112 +362,6 @@
                 document.querySelector('.editor-header').appendChild(logo);
             };
         });
-
-        // Funções globais que agora podem acessar as variáveis acima
-        window.execCmd = (command, value = null) => {
-            document.execCommand(command, false, value);
-            editor.focus();
-        };
-
-        window.setFontSize = (size) => {
-            execCmd('fontSize', size);
-        };
-
-        window.setFontFamily = (fontName) => {
-            execCmd('fontName', fontName);
-        };
-        
-        window.toggleFindReplace = () => {
-            findReplaceContainer.classList.toggle('hidden');
-            if (!findReplaceContainer.classList.contains('hidden')) {
-                toolbar.classList.remove('hidden');
-            }
-        };
-
-        // Função corrigida e mais robusta
-        window.performReplaceAll = () => {
-            const findText = document.getElementById('findInput').value;
-            const replaceText = document.getElementById('replaceInput').value;
-            
-            if (!findText) {
-                alert('Por favor, insira o texto a ser localizado.');
-                return;
-            }
-
-            // Função para "escapar" caracteres especiais para a RegExp
-            const escapeRegExp = (string) => {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            };
-            
-            const findRegex = new RegExp(escapeRegExp(findText), 'g');
-            
-            editor.innerHTML = editor.innerHTML.replace(findRegex, replaceText);
-            editor.focus();
-        };
-        
-        window.indentParagraph = () => {
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-
-            let node = selection.anchorNode;
-            
-            while (node && node.parentNode !== editor) {
-                node = node.parentNode;
-            }
-
-            if (node && node !== editor) {
-                if (node.style.textIndent && node.style.textIndent !== '0px') {
-                     node.style.textIndent = '';
-                } else {
-                     node.style.textIndent = '40px';
-                }
-            }
-            editor.focus();
-        };
-
-        window.highlightText = () => {
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-
-            const range = selection.getRangeAt(0);
-            const parentElement = range.commonAncestorContainer.nodeType === 3 ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
-
-            let currentHighlightSpan = null;
-            if (parentElement.tagName === 'SPAN' && parentElement.style.backgroundColor === 'yellow') {
-                currentHighlightSpan = parentElement;
-            } else {
-                let tempParent = parentElement;
-                while (tempParent && tempParent !== editor) {
-                    if (tempParent.tagName === 'SPAN' && tempParent.style.backgroundColor === 'yellow') {
-                        currentHighlightSpan = tempParent;
-                        break;
-                    }
-                    tempParent = tempParent.parentNode;
-                }
-            }
-
-            if (currentHighlightSpan) {
-                const parentOfSpan = currentHighlightSpan.parentNode;
-                while (currentHighlightSpan.firstChild) {
-                    parentOfSpan.insertBefore(currentHighlightSpan.firstChild, currentHighlightSpan);
-                }
-                parentOfSpan.removeChild(currentHighlightSpan);
-            } else {
-                const span = document.createElement('span');
-                span.style.backgroundColor = 'yellow';
-                span.style.color = 'black';
-                try {
-                    range.surroundContents(span);
-                } catch (e) {
-                    const selectedText = selection.toString();
-                    if (selectedText) {
-                        document.execCommand('backcolor', false, 'yellow');
-                    }
-                }
-            }
-            editor.focus();
-        };
-        // --- CORREÇÃO TERMINA AQUI ---
     </script>
 </body>
 </html>
