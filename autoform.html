@@ -133,7 +133,6 @@
                 width: 100%;
                 max-width: none;
                 padding: 0;
-                /* Remova a margem superior do container para mover tudo para cima */
                 margin-top: 0;
             }
 
@@ -141,11 +140,10 @@
                 display: none;
             }
 
-            /* Novo estilo para o logotipo na impressão */
             #logo {
                 display: block;
                 position: absolute;
-                top: 1px; /* Ajuste este valor para mover a imagem para cima ou para baixo */
+                top: 5px;
                 left: 50%;
                 transform: translateX(-50%);
                 margin: 0;
@@ -154,8 +152,8 @@
             .text-area {
                 border: none !important;
                 padding: 0;
-                /* Adicione uma margem superior para o texto não ficar por cima do logo */
-                padding-top: 80px; /* Ajuste conforme a altura da sua logo + espaçamento */
+                padding-top: 80px;
+                overflow-y: visible !important; /* Adicionado para remover a barra de rolagem */
             }
         }
     </style>
