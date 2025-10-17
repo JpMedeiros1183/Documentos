@@ -93,18 +93,20 @@
         .btn:hover {
             background-color: #218838;
         }
+        
+        /* POR PADRÃO, ESCONDE O CONTEÚDO QUE SERÁ CONVERTIDO */
         .pdf-content {
-            /* Estilo para a versão PDF: esconde o formulário, mostra apenas os dados */
             display: none;
-            white-space: pre-wrap; /* Preserva quebras de linha */
+            white-space: pre-wrap;
         }
-        /* Media query para a impressão/pdf */
-        @media print, (min-width: 1px) {
+        
+        /* REGRA CORRIGIDA: Esconde o formulário SOMENTE QUANDO ESTIVER IMPRIMINDO/GERANDO PDF */
+        @media print {
             #questionario-form {
-                display: none !important; /* Esconde o formulário na geração do PDF */
+                display: none !important;
             }
             .pdf-content {
-                display: block !important; /* Mostra o conteúdo formatado para PDF */
+                display: block !important;
                 /* Adiciona estilos básicos para o PDF gerado */
                 font-family: Arial, sans-serif;
                 font-size: 12px;
@@ -406,7 +408,7 @@
 
         // 4. Inicia a conversão e o download
         html2pdf().set(opt).from(document.getElementById('pdf-content')).save().then(() => {
-             // Limpa o conteúdo após o download (opcional)
+             // Limpa o conteúdo após o download (opcional, mas recomendado)
              document.getElementById('pdf-content').innerHTML = '';
              alert("PDF Gerado e Baixado com sucesso! O arquivo está na sua pasta de Downloads.");
         });
