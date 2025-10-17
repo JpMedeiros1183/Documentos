@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário Trabalhista</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        p {
+            line-height: 1.5;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="date"], textarea {
+            width: 98%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .form-section {
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-left: 5px solid #007bff;
+            padding-left: 15px;
+        }
+        .tabela-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        .tabela-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .tabela-container th, .tabela-container td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .tabela-container th {
+            background-color: #f2f2f2;
+        }
+        .tabela-container input[type="text"] {
+             width: 100%; /* Ajusta o input dentro da célula */
+             margin: 0;
+             padding: 5px;
+        }
+        .buttons-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+            background-color: #28a745; /* Verde principal para Download */
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .pdf-content {
+            /* Estilo para a versão PDF: esconde o formulário, mostra apenas os dados */
+            display: none;
+            white-space: pre-wrap; /* Preserva quebras de linha */
+        }
+        /* Media query para a impressão/pdf */
+        @media print, (min-width: 1px) {
+            #questionario-form {
+                display: none !important; /* Esconde o formulário na geração do PDF */
+            }
+            .pdf-content {
+                display: block !important; /* Mostra o conteúdo formatado para PDF */
+                /* Adiciona estilos básicos para o PDF gerado */
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                padding: 10px;
+            }
+            .pdf-content table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 5px;
+            }
+            .pdf-content th, .pdf-content td {
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Questionário Trabalhista - Coleta de Dados</h1>
+    <p>Preencha todas as informações abaixo. Ao final, clique no botão verde para gerar e baixar o arquivo PDF. **Este arquivo PDF deve ser enviado para o seu advogado.**</p>
+
+    <div id="pdf-content" class="pdf-content">
+        </div>
+
+    <form id="questionario-form">
+        
+        <div class="form-section">
+            <h2>I. Qualificação do Reclamante</h2>
+            <label for="nome">1. Nome Completo:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="nacionalidade">2. Nacionalidade, Estado Civil, Profissão:</label>
+            <input type="text" id="nacionalidade" name="nacionalidade" placeholder="Ex: Brasileira, Solteiro(a), Professor(a)" required>
+
+            <label for="rg_cpf_pis">3. RG, CPF e PIS/PASEP:</label>
+            <input type="text" id="rg_cpf_pis" name="rg_cpf_pis" placeholder="RG: 000000, CPF: 00000000000, PIS: 00000000000" required>
+
+            <label for="nascimento">4. Data de Nascimento:</label>
+            <input type="date" id="nascimento" name="nascimento" required>
+            
+            <label for="endereco">5. Endereço Completo (com CEP):</label>
+            <input type="text" id="endereco" name="endereco" required>
+
+            <label for="contato">6. E-mail e Telefone para Contato (Seu):</label>
+            <input type="text" id="contato" name="contato" placeholder="email@exemplo.com | (00) 90000-0000" required>
+            
+            <label for="nome_mae">7. Nome Completo da Mãe:</label>
+            <input type="text" id="nome_mae" name="nome_mae" required>
+        </div>
+
+        <div class="form-section">
+            <h2>II. Qualificação da Reclamada (Empresa)</h2>
+            <label for="razao_social">8. Nome ou Razão Social da Empresa (Completo):</label>
+            <input type="text" id="razao_social" name="razao_social" required>
+
+            <label for="cnpj">9. CNPJ da Empresa:</label>
+            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" required>
+
+            <label for="endereco_empresa">10. Endereço Completo da Empresa (para citação):</label>
+            <input type="text" id="endereco_empresa" name="endereco_empresa" required>
+
+            <label for="ramo_atividade">11. Qual é o ramo de atividade da empresa?</label>
+            <input type="text" id="ramo_atividade" name="ramo_atividade" required>
+        </div>
+
+        <div class="form-section">
+            <h2>III. Vínculo Empregatício e Funções</h2>
+            <label for="admissao">12. Data Exata de Admissão na Empresa (Início do trabalho):</label>
+            <input type="date" id="admissao" name="admissao" required>
+
+            <label for="rescisao">13. Se já houve a rescisão, qual a data e o motivo?</label>
+            <input type="text" id="rescisao" name="rescisao" placeholder="Ex: 17/10/2025, Dispensa sem justa causa ou 'Ainda estou trabalhando'">
+
+            <label for="ctps_registro">14. O registro em CTPS foi feito? Se sim, desde qual data, qual função e qual salário estão registrados?</label>
+            <textarea id="ctps_registro" name="ctps_registro" rows="3" required></textarea>
+
+            <label for="tabela_funcoes">15. Detalhe Salário e Atraso por Período:</label>
+            <div class="tabela-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th>Função</th>
+                            <th>Salário Mensal Combinado (Bruto)</th>
+                            <th>Valor Total dos Salários Atrasados no Período</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>05/Jan/2022 a Dez/2023</td>
+                            <td>Auxiliar de Coordenador</td>
+                            <td><input type="text" name="salario_aux_coordenador" placeholder="R$ 0.000,00"></td>
+                            <td><input type="text" name="atraso_aux_coordenador" placeholder="R$ 0.000,00"></td>
+                        </tr>
+                        <tr>
+                            <td>Jan/2024 a Jun/2024</td>
+                            <td>Coordenador</td>
+                            <td><input type="text" name="salario_coordenador_jan_jun" placeholder="R$ 0.000,00"></td>
+                            <td><input type="text" name="atraso_coordenador_jan_jun" placeholder="R$ 0.000,00"></td>
+                        </tr>
+                        <tr>
+                            <td>Jul/2024 a Dez/2024</td>
+                            <td>Trabalhando Externo (Função formal?)</td>
+                            <td><input type="text" name="salario_externo" placeholder="R$ 0.000,00"></td>
+                            <td><input type="text" name="atraso_externo" placeholder="R$ 0.000,00"></td>
+                        </tr>
+                        <tr>
+                            <td>05/Jan/2025 a Set/2025</td>
+                            <td>Coordenador</td>
+                            <td><input type="text" name="salario_coordenador_jan_set" placeholder="R$ 0.000,00"></td>
+                            <td><input type="text" name="atraso_coordenador_jan_set" placeholder="R$ 0.000,00"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>IV. Jornada de Trabalho</h2>
+            <label for="jornada">16. Qual era sua jornada de trabalho (Dias, horários e intervalo)?</label>
+            <textarea id="jornada" name="jornada" rows="3" placeholder="Ex: Segunda a Sábado, das 8h às 18h, com 1h de almoço."></textarea>
+
+            <label for="fds_feriados">17. Você trabalhava em finais de semana ou feriados? Se sim, com qual frequência e horários?</label>
+            <textarea id="fds_feriados" name="fds_feriados" rows="3"></textarea>
+
+            <label for="externo_controle">18. Durante o período "Trabalhando Externo", sua jornada era controlada?</label>
+            <input type="text" id="externo_controle" name="externo_controle" placeholder="Sim/Não/Qual era o método de controle?">
+
+            <label for="horas_extras">19. Você fazia horas extras? Quantas horas extras, em média, por dia/semana/mês? Eram pagas ou compensadas?</label>
+            <textarea id="horas_extras" name="horas_extras" rows="3"></textarea>
+        </div>
+
+        <div class="form-section">
+            <h2>V. Atrasos Salariais</h2>
+            <label for="meses_atraso">20. Qual o período exato (mês a mês) em que os salários estão em atraso?</label>
+            <textarea id="meses_atraso" name="meses_atraso" rows="4" placeholder="Ex: Todos os meses de 2023, de Janeiro a Março de 2024, etc."></textarea>
+
+            <label for="holerites">21. Você possui holerites (recibos de pagamento) de todo o período?</label>
+            <input type="text" id="holerites" name="holerites" placeholder="Sim/Não, tenho apenas de [mencione o período]">
+
+            <label for="outras_verbas_atraso">22. Os atrasos se referem apenas ao salário base ou a outras verbas (ex: 13º salário, férias)?</label>
+            <input type="text" id="outras_verbas_atraso" name="outras_verbas_atraso">
+
+            <label for="decimo_terceiro">23. Você recebeu o 13º Salário de 2022, 2023 e 2024? Se sim, em que datas?</label>
+            <textarea id="decimo_terceiro" name="decimo_terceiro" rows="3"></textarea>
+
+            <label for="ferias">24. Você tirou férias em algum momento? Se sim, em quais períodos e foram pagas (salário e 1/3)?</label>
+            <textarea id="ferias" name="ferias" rows="3"></textarea>
+        </div>
+
+        <div class="form-section">
+            <h2>VI. Documentos e Provas</h2>
+            <label for="documentos_existentes">25. Quais documentos abaixo você possui (CTPS, Comprovante de Residência, Extrato FGTS, Contrato, E-mails/WhatsApp sobre atrasos)?</label>
+            <textarea id="documentos_existentes" name="documentos_existentes" rows="4"></textarea>
+
+            <label for="testemunhas">26. Nome, contato e vínculo de até 3 testemunhas que confirmam os fatos:</label>
+            <textarea id="testemunhas" name="testemunhas" rows="4"></textarea>
+        </div>
+
+        <div class="form-section">
+            <h2>VII. Detalhes Adicionais</h2>
+            <label for="beneficios">27. Você recebia Vale-Transporte, Vale-Alimentação/Refeição, Plano de Saúde? Estava sendo fornecido ou pago corretamente?</label>
+            <textarea id="beneficios" name="beneficios" rows="3"></textarea>
+
+            <label for="dano_moral">28. Houve alguma situação de assédio, tratamento inadequado ou outra lesão a direitos (dano moral)?</label>
+            <textarea id="dano_moral" name="dano_moral" rows="3"></textarea>
+
+            <label for="salario_colega">29. Qual era o salário do colega que você substituiu ou que exerce a mesma função (para fins de equiparação salarial)?</label>
+            <input type="text" id="salario_colega" name="salario_colega" placeholder="R$ 0.000,00 / Não sei / Não se aplica">
+        </div>
+        
+        <div class="buttons-container">
+            <button type="button" id="btn-download" class="btn">Gerar e Baixar Relatório em PDF</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.getElementById('btn-download').addEventListener('click', function() {
+        // Validação básica do formulário
+        if (!document.getElementById('questionario-form').checkValidity()) {
+            alert("Por favor, preencha todos os campos obrigatórios (*) antes de gerar o PDF.");
+            document.getElementById('questionario-form').reportValidity();
+            return;
+        }
+
+        // 1. Coleta os dados do formulário
+        const formData = new FormData(document.getElementById('questionario-form'));
+        let outputHTML = `
+            <h2>Questionário Trabalhista Preenchido</h2>
+            <p><strong>Gerado em:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+            <hr>
+            
+            <h3>I. Qualificação do Reclamante</h3>
+            <p><strong>1. Nome Completo:</strong> ${formData.get('nome')}</p>
+            <p><strong>2. Nacionalidade/Estado Civil/Profissão:</strong> ${formData.get('nacionalidade')}</p>
+            <p><strong>3. RG, CPF e PIS/PASEP:</strong> ${formData.get('rg_cpf_pis')}</p>
+            <p><strong>4. Data de Nascimento:</strong> ${formData.get('nascimento')}</p>
+            <p><strong>5. Endereço Completo:</strong> ${formData.get('endereco')}</p>
+            <p><strong>6. E-mail e Telefone:</strong> ${formData.get('contato')}</p>
+            <p><strong>7. Nome da Mãe:</strong> ${formData.get('nome_mae')}</p>
+            <hr>
+
+            <h3>II. Qualificação da Reclamada (Empresa)</h3>
+            <p><strong>8. Razão Social:</strong> ${formData.get('razao_social')}</p>
+            <p><strong>9. CNPJ:</strong> ${formData.get('cnpj')}</p>
+            <p><strong>10. Endereço da Empresa:</strong> ${formData.get('endereco_empresa')}</p>
+            <p><strong>11. Ramo de Atividade:</strong> ${formData.get('ramo_atividade')}</p>
+            <hr>
+
+            <h3>III. Vínculo Empregatício e Funções</h3>
+            <p><strong>12. Data de Admissão:</strong> ${formData.get('admissao')}</p>
+            <p><strong>13. Data/Motivo da Rescisão:</strong> ${formData.get('rescisao')}</p>
+            <p><strong>14. Registro em CTPS:</strong> ${formData.get('ctps_registro').replace(/\n/g, '<br>')}</p>
+            <p><strong>15. Detalhe Salário e Atraso por Período:</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Função</th>
+                        <th>Salário Mensal Combinado</th>
+                        <th>Atraso Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>05/Jan/2022 a Dez/2023</td>
+                        <td>Auxiliar de Coordenador</td>
+                        <td>${formData.get('salario_aux_coordenador')}</td>
+                        <td>${formData.get('atraso_aux_coordenador')}</td>
+                    </tr>
+                    <tr>
+                        <td>Jan/2024 a Jun/2024</td>
+                        <td>Coordenador</td>
+                        <td>${formData.get('salario_coordenador_jan_jun')}</td>
+                        <td>${formData.get('atraso_coordenador_jan_jun')}</td>
+                    </tr>
+                    <tr>
+                        <td>Jul/2024 a Dez/2024</td>
+                        <td>Trabalhando Externo</td>
+                        <td>${formData.get('salario_externo')}</td>
+                        <td>${formData.get('atraso_externo')}</td>
+                    </tr>
+                    <tr>
+                        <td>05/Jan/2025 a Set/2025</td>
+                        <td>Coordenador</td>
+                        <td>${formData.get('salario_coordenador_jan_set')}</td>
+                        <td>${formData.get('atraso_coordenador_jan_set')}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+
+            <h3>IV. Jornada de Trabalho</h3>
+            <p><strong>16. Jornada:</strong> ${formData.get('jornada').replace(/\n/g, '<br>')}</p>
+            <p><strong>17. Finais de Semana/Feriados:</strong> ${formData.get('fds_feriados').replace(/\n/g, '<br>')}</p>
+            <p><strong>18. Controle Externo:</strong> ${formData.get('externo_controle')}</p>
+            <p><strong>19. Horas Extras:</strong> ${formData.get('horas_extras').replace(/\n/g, '<br>')}</p>
+            <hr>
+
+            <h3>V. Atrasos Salariais</h3>
+            <p><strong>20. Meses Exatos em Atraso:</strong> ${formData.get('meses_atraso').replace(/\n/g, '<br>')}</p>
+            <p><strong>21. Holerites:</strong> ${formData.get('holerites')}</p>
+            <p><strong>22. Outras Verbas em Atraso:</strong> ${formData.get('outras_verbas_atraso')}</p>
+            <p><strong>23. 13º Salário (2022, 2023, 2024):</strong> ${formData.get('decimo_terceiro').replace(/\n/g, '<br>')}</p>
+            <p><strong>24. Férias:</strong> ${formData.get('ferias').replace(/\n/g, '<br>')}</p>
+            <hr>
+            
+            <h3>VI. Documentos e Provas</h3>
+            <p><strong>25. Documentos Existentes:</strong> ${formData.get('documentos_existentes').replace(/\n/g, '<br>')}</p>
+            <p><strong>26. Testemunhas:</strong> ${formData.get('testemunhas').replace(/\n/g, '<br>')}</p>
+            <hr>
+            
+            <h3>VII. Detalhes Adicionais</h3>
+            <p><strong>27. Benefícios:</strong> ${formData.get('beneficios').replace(/\n/g, '<br>')}</p>
+            <p><strong>28. Dano Moral/Assédio:</strong> ${formData.get('dano_moral').replace(/\n/g, '<br>')}</p>
+            <p><strong>29. Salário de Colega:</strong> ${formData.get('salario_colega')}</p>
+            
+            <br><br>
+            <p style="text-align:center;">--- FIM DO RELATÓRIO ---</p>
+        `;
+
+        // 2. Insere o HTML de saída no container que será convertido
+        document.getElementById('pdf-content').innerHTML = outputHTML;
+
+        // 3. Configurações para o html2pdf
+        const nomeArquivo = 'Questionario_Trabalhista_' + formData.get('nome').replace(/ /g, '_').substring(0, 20) + '.pdf';
+
+        const opt = {
+            margin:       1,
+            filename:     nomeArquivo,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, logging: true, dpi: 192, letterRendering: true },
+            jsPDF:        { unit: 'cm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // 4. Inicia a conversão e o download
+        html2pdf().set(opt).from(document.getElementById('pdf-content')).save().then(() => {
+             // Limpa o conteúdo após o download (opcional)
+             document.getElementById('pdf-content').innerHTML = '';
+             alert("PDF Gerado e Baixado com sucesso! O arquivo está na sua pasta de Downloads.");
+        });
+    });
+</script>
+</body>
+</html>
