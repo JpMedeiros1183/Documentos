@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário Trabalhista</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        legend {
+            padding: 0 10px;
+            font-weight: bold;
+            color: #1a5276;
+        }
+        legend h2 {
+            border-bottom: none;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box; /* Garante que o padding não afete a largura */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .radio-group label {
+            font-weight: normal;
+            margin-right: 15px;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #229954;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Questionário para Análise de Potencial Ação Trabalhista</h1>
+    <h2>Cozinha de Empresa Terceirizada - Demissões em Grupo</h2>
+
+    <form id="questionarioForm">
+
+        <fieldset>
+            <legend><h2>1. DADOS PESSOAIS E CONTRATUAIS</h2></legend>
+
+            <h3>Identificação</h3>
+            <div class="form-group">
+                <label for="nome">Nome completo, CPF, RG, endereço atual e contato?</label>
+                <textarea id="nome" name="dados_pessoais" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="estado_civil">Estado civil e número de dependentes?</label>
+                <input type="text" id="estado_civil" name="estado_civil">
+            </div>
+
+            <h3>Vínculo Empregatício</h3>
+            <div class="form-group">
+                <label for="admissao">Data de admissão?</label>
+                <input type="date" id="admissao" name="admissao">
+            </div>
+            <div class="form-group">
+                <label for="demissao">Data de demissão?</label>
+                <input type="date" id="demissao" name="demissao">
+            </div>
+            <div class="form-group">
+                <label for="funcao_ctps">Qual era a função/cargo registrado na CTPS?</label>
+                <input type="text" id="funcao_ctps" name="funcao_ctps">
+            </div>
+            <div class="form-group">
+                <label for="funcao_real">Qual era a função efetivamente exercida?</label>
+                <input type="text" id="funcao_real" name="funcao_real">
+            </div>
+            <div class="form-group">
+                <label>Houve mudança de função durante o contrato? Se sim, foi registrada na CTPS?</label>
+                <textarea name="mudanca_funcao" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="salario">Qual o último salário registrado? Recebia outros valores (gorjetas, comissões, prêmios)?</label>
+                <textarea id="salario" name="salario_valores" rows="2"></textarea>
+            </div>
+
+            <h3>Documentação</h3>
+            <div class="form-group">
+                <label>Possui cópia da CTPS (páginas de identificação e contrato)?</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="possui_ctps" value="Sim"> Sim</label>
+                    <label><input type="radio" name="possui_ctps" value="Não"> Não</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Possui contracheques de todo o período? Quantos meses faltam, se algum?</label>
+                <input type="text" id="contracheques" name="contracheques">
+            </div>
+            <div class="form-group">
+                <label>Recebeu e possui o Termo de Rescisão (TRCT)?</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="possui_trct" value="Sim"> Sim</label>
+                    <label><input type="radio" name="possui_trct" value="Não"> Não</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Possui recibos de férias, 13º salário, horas extras?</label>
+                <input type="text" id="recibos_outros" name="recibos_outros">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>2. CIRCUNSTÂNCIAS DA DEMISSÃO</h2></legend>
+
+            <h3>Tipo e Forma</h3>
+            <div class="form-group">
+                <label for="comunicacao_demissao">Como foi comunicada a demissão (verbalmente, por escrito, por WhatsApp)?</label>
+                <input type="text" id="comunicacao_demissao" name="comunicacao_demissao">
+            </div>
+            <div class="form-group">
+                <label for="tipo_demissao">Foi demissão sem justa causa, com justa causa ou pedido de demissão?</label>
+                <input type="text" id="tipo_demissao" name="tipo_demissao">
+            </div>
+            <div class="form-group">
+                <label for="motivo_justa_causa">Se foi justa causa, qual motivo foi alegado?</label>
+                <textarea id="motivo_justa_causa" name="motivo_justa_causa" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Houve pressão para assinar pedido de demissão?</label>
+                <textarea name="pressao_pedir_demissao" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="acordo_oferecido">Foi oferecido algum acordo? Quais condições?</label>
+                <textarea id="acordo_oferecido" name="acordo_oferecido" rows="2"></textarea>
+            </div>
+
+            <h3>Contexto da Demissão em Grupo</h3>
+            <div class="form-group">
+                <label for="grupo_qnt">Quantas pessoas foram demitidas junto?</label>
+                <input type="text" id="grupo_qnt" name="grupo_qnt">
+            </div>
+            <div class="form-group">
+                <label for="grupo_funcoes">Todos exerciam a mesma função ou funções diferentes?</label>
+                <input type="text" id="grupo_funcoes" name="grupo_funcoes">
+            </div>
+            <div class="form-group">
+                <label for="grupo_data">A demissão ocorreu no mesmo dia para todos?</label>
+                <input type="text" id="grupo_data" name="grupo_data">
+            </div>
+            <div class="form-group">
+                <label for="grupo_justificativa">Foi dada alguma justificativa pela empresa (corte de custos, fim de contrato, etc.)?</label>
+                <textarea id="grupo_justificativa" name="grupo_justificativa" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Houve contratação de novos funcionários logo após as demissões?</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="novas_contratacoes" value="Sim"> Sim</label>
+                    <label><input type="radio" name="novas_contratacoes" value="Não"> Não</label>
+                    <label><input type="radio" name="novas_contratacoes" value="Não sei"> Não sei</label>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>3. VERBAS RESCISÓRIAS</h2></legend>
+
+            <h3>Pagamento</h3>
+            <div class="form-group">
+                <label>Recebeu todas as verbas rescisórias? Quando?</label>
+                <input type="text" name="recebeu_verbas">
+            </div>
+            <div class="form-group">
+                <label>Quais valores foram pagos (aviso prévio, férias, 13º, saldo de salário, FGTS)?</label>
+                <textarea name="valores_pagos" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Alguma verba foi negada ou teve desconto não explicado?</label>
+                <textarea name="verba_negada" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>O valor está correto conforme seu cálculo?</label>
+                 <div class="radio-group">
+                    <label><input type="radio" name="valor_correto" value="Sim"> Sim</label>
+                    <label><input type="radio" name="valor_correto" value="Não"> Não</label>
+                    <label><input type="radio" name="valor_correto" value="Não sei"> Não sei</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Foi liberado o seguro-desemprego?</label>
+                 <div class="radio-group">
+                    <label><input type="radio" name="seguro_desemprego" value="Sim"> Sim</label>
+                    <label><input type="radio" name="seguro_desemprego" value="Não"> Não</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Conseguiu sacar o FGTS? Qual o saldo?</label>
+                <input type="text" name="saque_fgts">
+            </div>
+        </fieldset>
+        
+        <fieldset>
+            <legend><h2>4. JORNADA DE TRABALHO E HORAS EXTRAS</h2></legend>
+        
+            <h3>Horário</h3>
+            <div class="form-group">
+                <label>Qual era o horário contratual (registrado na CTPS/contrato)?</label>
+                <input type="text" name="horario_contratual">
+            </div>
+            <div class="form-group">
+                <label>Qual era o horário efetivamente trabalhado (entrada e saída)?</label>
+                <input type="text" name="horario_real">
+            </div>
+            <div class="form-group">
+                <label>Trabalhava aos sábados, domingos ou feriados? Com que frequência?</label>
+                <input type="text" name="horario_fds_feriados">
+            </div>
+            <div class="form-group">
+                <label>Havia controle de ponto? De que tipo (manual, eletrônico, biométrico)?</label>
+                <input type="text" name="controle_ponto_tipo">
+            </div>
+            <div class="form-group">
+                <label>Possui cópias dos cartões de ponto ou registro de ponto?</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="possui_copia_ponto" value="Sim"> Sim</label>
+                    <label><input type="radio" name="possui_copia_ponto" value="Não"> Não</label>
+                </div>
+            </div>
+        
+            <h3>Horas Extras e Intervalos</h3>
+            <div class="form-group">
+                <label>Fazia horas extras regularmente? Quantas por dia/semana em média?</label>
+                <input type="text" name="he_regularidade">
+            </div>
+            <div class="form-group">
+                <label>Essas horas extras eram pagas? Com qual adicional?</label>
+                <input type="text" name="he_pagamento">
+            </div>
+            <div class="form-group">
+                <label>O intervalo de almoço/descanso era respeitado (mínimo 1h)?</label>
+                <input type="text" name="intervalo_almoco">
+            </div>
+            <div class="form-group">
+                <label>Havia intervalo intrajornada de 15 minutos (se jornada superior a 6h)?</label>
+                <input type="text" name="intervalo_15min">
+            </div>
+            <div class="form-group">
+                <label>Alguma vez foi impedido de registrar o ponto corretamente?</label>
+                <textarea name="impedido_ponto" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Havia "batida de ponto britânica" (horário predeterminado)?</label>
+                <input type="text" name="ponto_britanico">
+            </div>
+        </fieldset>
+        
+        <fieldset>
+            <legend><h2>5. CONDIÇÕES DE TRABALHO - SAÚDE E SEGURANÇA</h2></legend>
+        
+            <h3>Ambiente</h3>
+            <div class="form-group">
+                <label>A cozinha tinha condições adequadas de higiene e segurança?</label>
+                <textarea name="ambiente_higiene" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Havia equipamentos de proteção individual (EPIs)? Quais?</label>
+                <input type="text" name="epis_quais">
+            </div>
+            <div class="form-group">
+                <label>Os EPIs eram fornecidos gratuitamente e regularmente?</label>
+                <input type="text" name="epis_fornecimento">
+            </div>
+            <div class="form-group">
+                <label>Era obrigado a usar os EPIs? Recebia treinamento?</label>
+                <input type="text" name="epis_treinamento">
+            </div>
+            <div class="form-group">
+                <label>Havia exposição a calor excessivo, ruído, produtos químicos?</label>
+                <input type="text" name="exposicao_agentes">
+            </div>
+        
+            <h3>Saúde Ocupacional</h3>
+            <div class="form-group">
+                <label>Realizou exames admissional, periódicos e demissional?</label>
+                <input type="text" name="exames_aso">
+            </div>
+            <div class="form-group">
+                <label>Possui cópias dos ASOs (Atestados de Saúde Ocupacional)?</label>
+                 <div class="radio-group">
+                    <label><input type="radio" name="possui_aso" value="Sim"> Sim</label>
+                    <label><input type="radio" name="possui_aso" value="Não"> Não</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Sofreu algum acidente de trabalho? Foi registrado CAT?</label>
+                <textarea name="acidente_trabalho" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Desenvolveu alguma doença relacionada ao trabalho?</label>
+                <textarea name="doenca_trabalho" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Possui atestados médicos do período? Quantos dias no total?</label>
+                <input type="text" name="atestados_medicos">
+            </div>
+        </fieldset>
+        
+        <fieldset>
+            <legend><h2>6. ADICIONAL DE INSALUBRIDADE/PERICULOSIDADE</h2></legend>
+            
+            <div class="form-group">
+                <label>Recebia adicional de insalubridADE ou periculosidade?</label>
+                <input type="text" name="recebia_adicional">
+            </div>
+            <div class="form-group">
+                <label>Havia laudo técnico (PPRA/PCMSO/LTCAT) reconhecendo condições insalubres?</label>
+                <input type="text" name="laudo_tecnico">
+            </div>
+            <div class="form-group">
+                <label>Se não recebia, havia exposição a agentes insalubres (calor, frio, umidade, produtos de limpeza)?</label>
+                <textarea name="exposicao_insalubre" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Manipulava alimentos? Em que temperatura ambiente?</label>
+                <input type="text" name="manipulacao_alimentos">
+            </div>
+            <div class="form-group">
+                <label>Havia câmara fria? Entrava com que frequência e por quanto tempo?</label>
+                <input type="text" name="camara_fria">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>7. FÉRIAS E DESCANSOS</h2></legend>
+            <div class="form-group">
+                <label>Todas as férias foram concedidas dentro do período legal?</label>
+                <input type="text" name="ferias_periodo">
+            </div>
+            <div class="form-group">
+                <label>Recebeu o adicional de 1/3 de férias?</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="ferias_um_terco" value="Sim"> Sim</label>
+                    <label><input type="radio" name="ferias_um_terco" value="Não"> Não</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Alguma férias foi "vendida" (conversão em abono pecuniário)?</label>
+                <input type="text" name="ferias_venda">
+            </div>
+            <div class="form-group">
+                <label>Os descansos semanais remunerados eram respeitados?</label>
+                <input type="text" name="dsr_respeitado">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>8. EQUIPAMENTOS E UNIFORMES</h2></legend>
+            <div class="form-group">
+                <label>A empresa fornecia uniformes? Eram descontados do salário?</label>
+                <input type="text" name="uniformes">
+            </div>
+            <div class="form-group">
+                <label>Fornecia calçados adequados (antiderrapantes, por exemplo)?</label>
+                <input type="text" name="calcados">
+            </div>
+            <div class="form-group">
+                <label>Havia desconto por danos em equipamentos ou utensílios?</label>
+                <input type="text" name="desconto_danos">
+            </div>
+            <div class="form-group">
+                <label>Era obrigado a comprar qualquer material de trabalho?</label>
+                <input type="text" name="compra_material">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>9. RELACIONAMENTO COM A EMPRESA TOMADORA</h2></legend>
+        
+            <h3>Subordinação</h3>
+            <div class="form-group">
+                <label>Além da empresa terceirizada, quem mais dava ordens no dia a dia?</label>
+                <input type="text" name="sub_ordens">
+            </div>
+            <div class="form-group">
+                <label>Funcionários da empresa contratante (tomadora) supervisionavam o trabalho?</label>
+                <input type="text" name="sub_supervisao_tomadora">
+            </div>
+            <div class="form-group">
+                <label>A escala de trabalho era definida por qual empresa?</label>
+                <input type="text" name="sub_escala">
+            </div>
+            <div class="form-group">
+                <label>Os treinamentos eram dados por qual empresa?</label>
+                <input type="text" name="sub_treinamento">
+            </div>
+            <div class="form-group">
+                <label>O uniforme tinha a marca de qual empresa?</label>
+                <input type="text" name="sub_uniforme_marca">
+            </div>
+        
+            <h3>Estrutura</h3>
+            <div class="form-group">
+                <label>A cozinha ficava dentro das instalações da empresa contratante?</label>
+                <input type="text" name="est_local_cozinha">
+            </div>
+            <div class="form-group">
+                <label>Os equipamentos e utensílios eram de qual empresa?</label>
+                <input type="text" name="est_equipamentos">
+            </div>
+            <div class="form-group">
+                <label>Havia outros funcionários da empresa tomadora trabalhando no mesmo local?</label>
+                <input type="text" name="est_outros_funcionarios">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>10. QUESTÕES ESPECÍFICAS DE DISCRIMINAÇÃO</h2></legend>
+            <div class="form-group">
+                <label>Houve alguma discriminação (idade, gênero, raça, gravidez, doença)?</label>
+                <textarea name="discriminacao" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Mulheres grávidas foram demitidas no grupo?</label>
+                <input type="text" name="disc_gravidas">
+            </div>
+            <div class="form-group">
+                <label>Pessoas próximas da aposentadoria foram demitidas?</label>
+                <input type="text" name="disc_aposentadoria">
+            </div>
+            <div class="form-group">
+                <label>Algum funcionário estava afastado pelo INSS ou retornando de afastamento?</label>
+                <input type="text" name="disc_afastados_inss">
+            </div>
+            <div class="form-group">
+                <label>Houve assédio moral ou sexual? Por quem?</label>
+                <textarea name="assedio" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>11. OUTROS BENEFÍCIOS E DESCONTOS</h2></legend>
+            <div class="form-group">
+                <label>Recebia vale-transporte? Era suficiente? Havia desconto?</label>
+                <input type="text" name="benef_vt">
+            </div>
+            <div class="form-group">
+                <label>Recebia vale-refeição ou alimentação? Havia desconto?</label>
+                <input type="text" name="benef_vr_va">
+            </div>
+            <div class="form-group">
+                <label>Havia plano de saúde? Era descontado?</label>
+                <input type="text" name="benef_plano_saude">
+            </div>
+            <div class="form-group">
+                <label>Outros benefícios (cesta básica, auxílio-creche)?</label>
+                <input type="text" name="benef_outros">
+            </div>
+            <div class="form-group">
+                <label>Havia descontos irregulares no salário (quebra de caixa, produtos, etc.)?</label>
+                <textarea name="descontos_irregulares" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>12. TESTEMUNHAS E PROVAS</h2></legend>
+            <div class="form-group">
+                <label>Conhece colegas que passaram pela mesma situação e que poderiam testemunhar?</label>
+                <textarea name="provas_testemunhas" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Possui mensagens de WhatsApp, e-mails ou comunicados da empresa?</label>
+                <input type="text" name="provas_msgs">
+            </div>
+            <div class="form-group">
+                <label>Possui fotos ou vídeos do ambiente de trabalho?</label>
+                <input type="text" name="provas_fotos">
+            </div>
+            <div class="form-group">
+                <label>Possui documentos, escalas, anotações pessoais sobre a jornada?</label>
+                <input type="text" name="provas_anotacoes">
+            </div>
+            <div class="form-group">
+                <label>Havia câmeras de segurança no local?</label>
+                <input type="text" name="provas_cameras">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>13. TENTATIVA DE SOLUÇÃO</h2></legend>
+            <div class="form-group">
+                <label>Tentou resolver alguma questão diretamente com a empresa antes da demissão?</label>
+                <input type="text" name="solucao_antes">
+            </div>
+            <div class="form-group">
+                <label>Procurou o sindicato da categoria?</label>
+                <input type="text" name="solucao_sindicato">
+            </div>
+            <div class="form-group">
+                <label>Já acionou a Justiça do Trabalho ou fez reclamação no Ministério do Trabalho?</label>
+                <input type="text" name="solucao_justica_mte">
+            </div>
+            <div class="form-group">
+                <label>A empresa já entrou em contato propondo acordo após a demissão?</label>
+                <input type="text" name="solucao_acordo_pos">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>14. INFORMAÇÕES SOBRE AS EMPRESAS</h2></legend>
+        
+            <h3>Empresa Terceirizada (Empregadora)</h3>
+            <div class="form-group">
+                <label>Razão social completa e CNPJ?</label>
+                <input type="text" name="emp_terceirizada_razao">
+            </div>
+            <div class="form-group">
+                <label>Endereço da sede e do local de trabalho?</label>
+                <input type="text" name="emp_terceirizada_endereco">
+            </div>
+            <div class="form-group">
+                <label>Nome dos responsáveis/sócios que você conhece?</label>
+                <input type="text" name="emp_terceirizada_socios">
+            </div>
+        
+            <h3>Empresa Tomadora (Contratante)</h3>
+            <div class="form-group">
+                <label>Razão social completa e CNPJ?</label>
+                <input type="text" name="emp_tomadora_razao">
+            </div>
+            <div class="form-group">
+                <label>Endereço?</label>
+                <input type="text" name="emp_tomadora_endereco">
+            </div>
+            <div class="form-group">
+                <label>Qual a atividade-fim da empresa?</label>
+                <input type="text" name="emp_tomadora_atividade">
+            </div>
+        
+            <h3>Relação entre as empresas</h3>
+            <div class="form-group">
+                <label>Sabe há quanto tempo existe o contrato entre as empresas?</label>
+                <input type="text" name="rel_contrato_tempo">
+            </div>
+            <div class="form-group">
+                <label>Houve troca de empresa terceirizada durante seu contrato?</label>
+                <input type="text" name="rel_troca_empresa">
+            </div>
+            <div class="form-group">
+                <label>Se sim, foi aproveitado pela nova empresa (sucessão)?</label>
+                <input type="text" name="rel_sucessao">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>15. EXPECTATIVAS E OBJETIVOS</h2></legend>
+            <div class="form-group">
+                <label>Qual o principal motivo para buscar orientação jurídica?</label>
+                <textarea name="exp_motivo" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Quais direitos acredita que foram desrespeitados?</label>
+                <textarea name="exp_direitos" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Tem interesse em acordo ou prefere seguir com ação judicial?</label>
+                <input type="text" name="exp_acordo_ou_acao">
+            </div>
+            <div class="form-group">
+                <label>Tem condições financeiras de aguardar o processo (pode demorar meses/anos)?</label>
+                <input type="text" name="exp_condicoes_financeiras">
+            </div>
+            <div class="form-group">
+                <label>Já trabalhou em outra empresa após a demissão?</label>
+                <input type="text" name="exp_novo_trabalho">
+            </div>
+        </fieldset>
+
+        <button type="button" id="downloadPdfButton">Baixar como PDF</button>
+
+    </form>
+
+
+    <script>
+        document.getElementById('downloadPdfButton').addEventListener('click', function () {
+            
+            // Inicializa o jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4'); // 'p' = retrato, 'pt' = pontos, 'a4' = tamanho
+            
+            const form = document.getElementById('questionarioForm');
+            const pageMargin = 40;
+            const pageHeight = doc.internal.pageSize.height;
+            let currentY = pageMargin; // Posição vertical inicial
+
+            // Título principal do PDF
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Questionário de Análise Trabalhista", doc.internal.pageSize.width / 2, currentY, { align: 'center' });
+            currentY += 30;
+
+            // Função auxiliar para adicionar texto e quebrar a página se necessário
+            function addText(text, size, style, indent = 0) {
+                // Verifica se o texto excede a margem
+                const lines = doc.splitTextToSize(text, doc.internal.pageSize.width - pageMargin * 2 - indent);
+                
+                lines.forEach(line => {
+                    if (currentY + size > pageHeight - pageMargin) {
+                        doc.addPage();
+                        currentY = pageMargin;
+                    }
+                    doc.setFontSize(size);
+                    doc.setFont('helvetica', style);
+                    doc.text(line, pageMargin + indent, currentY);
+                    currentY += (size * 1.2); // Avança a linha
+                });
+            }
+
+            // Itera sobre cada <fieldset> (seção)
+            const fieldsets = form.querySelectorAll('fieldset');
+            fieldsets.forEach((fieldset, fsIndex) => {
+                
+                // Adiciona o título da seção (do <legend>)
+                const legend = fieldset.querySelector('legend h2');
+                if (legend) {
+                    currentY += 15; // Espaço antes da seção
+                    addText(legend.innerText, 14, 'bold');
+                    currentY += 5;
+                }
+
+                // Itera sobre os elementos dentro do fieldset
+                const elements = fieldset.children;
+                for (let el of elements) {
+                    
+                    // Adiciona subtítulos (H3)
+                    if (el.tagName === 'H3') {
+                        currentY += 10;
+                        addText(el.innerText, 11, 'bold', 10); // Indenta o subtítulo
+                    }
+                    
+                    // Processa grupos de formulário (div.form-group)
+                    if (el.classList.contains('form-group')) {
+                        const label = el.querySelector('label');
+                        if (!label) continue;
+
+                        let value = "";
+                        
+                        // Pega o valor de inputs de texto, date, number e textareas
+                        const input = el.querySelector('input[type="text"], input[type="date"], input[type="number"], textarea, select');
+                        if (input) {
+                            value = input.value || "N/A";
+                        } else {
+                            // Pega o valor de grupos de radio
+                            const radioChecked = el.querySelector('input[type="radio"]:checked');
+                            if (radioChecked) {
+                                value = radioChecked.value;
+                            } else {
+                                value = "Nenhuma opção selecionada";
+                            }
+                        }
+
+                        // Adiciona a Pergunta (Label)
+                        addText(label.innerText, 10, 'normal', 10); // Indenta a pergunta
+                        
+                        // Adiciona a Resposta (Value)
+                        addText(value, 10, 'italic', 25); // Indenta mais a resposta
+                        currentY += 5; // Espaço extra entre perguntas
+                    }
+                }
+                
+                // Adiciona uma quebra de página se a próxima seção for muito grande (prevenção)
+                if (currentY > pageHeight - 100 && fsIndex < fieldsets.length - 1) {
+                    doc.addPage();
+                    currentY = pageMargin;
+                }
+            });
+
+            // Salva o documento PDF
+            doc.save('Questionario_Trabalhista_Preenchido.pdf');
+        });
+    </script>
+
+</body>
+</html>
