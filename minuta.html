@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificação Extrajudicial - Medida Protetiva</title>
+    <style>
+        /* =========================================
+           ESTILOS GERAIS (TELA)
+           ========================================= */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --bg: #f3f4f6;
+        }
+
+        * {
+            box-sizing: border-box; /* Garante que preenchimento não aumente a largura */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* FORMULÁRIO */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary);
+        }
+
+        h1 { color: var(--primary); text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
+        p.desc { text-align: center; color: #666; margin-bottom: 30px; }
+
+        .section-header {
+            background: #e9ecef;
+            padding: 10px 15px;
+            margin: 20px -15px 15px -15px;
+            font-weight: bold;
+            color: var(--primary);
+            border-left: 5px solid var(--secondary);
+        }
+
+        .row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .col { flex: 1; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        /* Botão de Imprimir */
+        .btn-print {
+            display: block;
+            width: 100%;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-print:hover { background: #219150; }
+
+        /* =========================================
+           VISUALIZAÇÃO DO PAPEL NA TELA
+           ========================================= */
+        .documento-preview {
+            background: white;
+            width: 210mm; /* Largura A4 Real */
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 20mm 20mm; /* Margens visuais na tela */
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        /* CONTEÚDO DO DOCUMENTO (TEXTO) */
+        .doc-content {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+            text-align: justify;
+            
+            /* CORREÇÃO PRINCIPAL: Quebra palavras gigantes se necessário */
+            overflow-wrap: break-word; 
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .doc-title { text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 30px; }
+        .doc-dest { font-weight: bold; margin-bottom: 25px; }
+        .doc-assunto { margin-bottom: 20px; border-bottom: 1px solid #000; padding-bottom: 5px; font-weight: bold; }
+        .doc-p { text-indent: 2cm; margin-bottom: 15px; } /* Recuo de parágrafo */
+        .doc-item { margin-left: 0; margin-bottom: 10px; display: block; } /* Ajuste de item */
+        .doc-assinatura { margin-top: 60px; text-align: center; }
+        .doc-linha { border-top: 1px solid #000; width: 60%; margin: 50px auto 5px auto; }
+        
+        /* Marcadores de campo vazio/preenchido */
+        .empty-field { color: #aaa; background: #fffbe6; border-bottom: 1px dashed #ccc; }
+        .filled-field { color: #000; background: transparent; border: none; font-weight: bold; }
+
+        /* =========================================
+           CONFIGURAÇÃO DE IMPRESSÃO (PDF)
+           ========================================= */
+        @media print {
+            /* Define margens do papel direto na impressora (2cm em cada lado) */
+            @page {
+                margin: 20mm; 
+                size: A4 portrait;
+            }
+
+            body { 
+                background: white; 
+                padding: 0; 
+                margin: 0; 
+            }
+
+            /* Esconde tudo que não é o documento */
+            .form-container, .btn-print, h1, p.desc { 
+                display: none !important; 
+            }
+
+            /* Ajusta o documento para ocupar a área útil da página */
+            .documento-preview { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 100%; 
+                padding: 0; /* Remove padding interno pois já usamos margem do @page */
+            }
+            
+            /* Força cor preta */
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color: black !important; }
+            .empty-field { display: none; } /* Opcional: esconde campos não preenchidos na impressão */
+        }
+
+        @media (max-width: 768px) {
+            .row { flex-direction: column; gap: 10px; }
+            .documento-preview { width: 100%; box-sizing: border-box; transform: scale(0.95); transform-origin: top center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Gerador de Notificação</h1>
+        <p class="desc">Preencha os campos. O documento abaixo é atualizado automaticamente.</p>
+
+        <div class="section-header">1. Destinatário (Síndico)</div>
+        <div class="form-group"><label>Nome do Síndico:</label><input type="text" oninput="update('sindico', this.value)" placeholder="Ex: João da Silva"></div>
+        <div class="form-group"><label>Nome do Condomínio:</label><input type="text" oninput="update('condominio', this.value)" placeholder="Ex: Edifício Solar"></div>
+        <div class="form-group"><label>Endereço do Condomínio:</label><input type="text" oninput="update('end_cond', this.value)" placeholder="Rua das Flores, 123"></div>
+
+        <div class="section-header">2. Seus Dados (Filha/Procuradora)</div>
+        <div class="form-group"><label>Seu Nome Completo:</label><input type="text" oninput="update('filha', this.value)"></div>
+        <div class="row">
+            <div class="col"><label>Nacionalidade:</label><input type="text" oninput="update('nacio', this.value)" value="brasileira"></div>
+            <div class="col"><label>Estado Civil:</label><input type="text" oninput="update('civil', this.value)"></div>
+        </div>
+        <div class="row">
+            <div class="col"><label>Profissão:</label><input type="text" oninput="update('prof', this.value)"></div>
+            <div class="col"><label>CPF:</label><input type="text" oninput="update('cpf', this.value)"></div>
+        </div>
+        <div class="form-group"><label>RG:</label><input type="text" oninput="update('rg', this.value)"></div>
+        <div class="form-group"><label>Seu Endereço Completo:</label><input type="text" oninput="update('end_filha', this.value)"></div>
+
+        <div class="section-header">3. Dados da Proprietária (Mãe)</div>
+        <div class="row">
+            <div class="col"><label>Nome da Mãe:</label><input type="text" oninput="update('mae', this.value)"></div>
+            <div class="col"><label>Unidade (Apto):</label><input type="text" oninput="update('unidade', this.value)"></div>
+        </div>
+
+        <div class="section-header">4. Detalhes do Caso</div>
+        <div class="row">
+            <div class="col"><label>Nº Processo Medida Protetiva:</label><input type="text" oninput="update('proc', this.value)"></div>
+            <div class="col"><label>Metros de Distância:</label><input type="number" oninput="update('metros', this.value)" value="200"></div>
+        </div>
+        <div class="row">
+            <div class="col"><label>Data da Assembleia:</label><input type="date" oninput="updateData(this.value)"></div>
+            <div class="col"><label>Horário:</label><input type="time" oninput="update('hora', this.value)"></div>
+        </div>
+
+        <div class="section-header">5. Finalização</div>
+        <div class="row">
+            <div class="col"><label>Cidade:</label><input type="text" oninput="update('cidade', this.value)"></div>
+            <div class="col"><label>Seu Telefone/Email:</label><input type="text" oninput="update('contato', this.value)"></div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">SALVAR PDF / IMPRIMIR</button>
+    </div>
+
+    <div class="documento-preview">
+        <div class="doc-content">
+            <div class="doc-title">NOTIFICAÇÃO EXTRAJUDICIAL URGENTE</div>
+
+            <div class="doc-dest">
+                À ILMO SR. <span id="out_sindico" class="empty-field">[NOME SÍNDICO]</span><br>
+                Síndico do Condomínio <span id="out_condominio" class="empty-field">[CONDOMÍNIO]</span><br>
+                <span id="out_end_cond" class="empty-field">[ENDEREÇO DO CONDOMÍNIO]</span>
+            </div>
+
+            <div class="doc-assunto">
+                ASSUNTO: Medida Protetiva de Urgência e Impedimento de Participação em Assembleia Geral
+            </div>
+
+            <p class="doc-p">
+                Prezado Senhor,
+            </p>
+
+            <p class="doc-p">
+                <strong><span id="out_filha" class="empty-field">[NOME DA FILHA]</span></strong>, <span id="out_nacio">brasileira</span>, <span id="out_civil" class="empty-field">[ESTADO CIVIL]</span>, <span id="out_prof" class="empty-field">[PROFISSÃO]</span>, inscrita no CPF sob nº <span id="out_cpf" class="empty-field">[CPF]</span> e RG nº <span id="out_rg" class="empty-field">[RG]</span>, residente e domiciliada em <span id="out_end_filha" class="empty-field">[ENDEREÇO DA FILHA]</span>, neste ato atuando na qualidade de <strong>PROCURADORA</strong> de sua mãe, a Sra. <strong><span id="out_mae" class="empty-field">[NOME DA MÃE]</span></strong> (Proprietária da Unidade <span id="out_unidade" class="empty-field">[UNIDADE]</span>), vem, respeitosamente, NOTIFICÁ-LO do que segue:
+            </p>
+
+            <div class="doc-item">
+                1. A Notificante é procuradora legalmente constituída da proprietária da unidade, conforme instrumento de procuração em anexo, possuindo plenos poderes para representá-la em assembleias e deliberações condominiais;
+            </div>
+
+            <div class="doc-item">
+                2. Conforme é de conhecimento de V.Sa., vigora <strong>MEDIDA PROTETIVA DE URGÊNCIA</strong> em favor da Notificante (Processo nº <span id="out_proc" class="empty-field">[PROC]</span>), a qual determina expressamente que V.Sa. mantenha distância mínima de <strong><span id="out_metros">200</span> metros</strong> da Notificante;
+            </div>
+
+            <div class="doc-item">
+                3. Ocorre que foi convocada Assembleia Geral para o dia <strong><span id="out_data" class="empty-field">[DATA]</span></strong>, às <strong><span id="out_hora" class="empty-field">[HORA]</span></strong>, a ser realizada na residência de V.Sa. ou em local onde V.Sa. estará presente;
+            </div>
+
+            <div class="doc-item">
+                4. A realização do ato nessas condições <strong>inviabiliza</strong> a participação presencial da Notificante (representante legal da unidade), pois sua presença configuraria risco de descumprimento da ordem judicial de afastamento e risco à sua integridade.
+            </div>
+
+            <p class="doc-p" style="margin-top: 20px;">
+                <strong>DIANTE DO EXPOSTO, REQUER:</strong>
+            </p>
+
+            <div class="doc-item">
+                a) Que V.Sa. se ausente do local durante a realização da assembleia para permitir a participação segura da Notificante na representação da unidade; <strong>OU</strong>
+            </div>
+
+            <div class="doc-item">
+                b) Subsidiariamente, que a assembleia seja realizada ou transmitida em formato <strong>VIRTUAL</strong>, garantindo à Notificante o link de acesso, direito a voz e voto sem contato presencial.
+            </div>
+
+            <p class="doc-p">
+                O impedimento do exercício do direito de voto da proprietária (através de sua procuradora) poderá ensejar a anulação das deliberações da assembleia, bem como responsabilização civil e criminal.
+            </p>
+
+            <p class="doc-p">
+                Aguarda-se confirmação de recebimento e providências urgentes pelo contato: <span id="out_contato" class="empty-field">[TELEFONE/EMAIL]</span>.
+            </p>
+
+            <div class="doc-assinatura">
+                <p><span id="out_cidade" class="empty-field">[CIDADE]</span>, <span id="out_hoje"></span>.</p>
+                <div class="doc-linha"></div>
+                <p><strong><span id="out_filha_ass" class="empty-field">[NOME DA FILHA]</span></strong></p>
+                <p>Notificante / Procuradora</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data automática
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        const mes = meses[hoje.getMonth()];
+        const ano = hoje.getFullYear();
+        document.getElementById('out_hoje').innerText = `${dia} de ${mes} de ${ano}`;
+
+        // Função para atualizar texto
+        function update(id, valor) {
+            const spans = document.querySelectorAll('#out_' + id + ', #out_' + id + '_ass');
+            spans.forEach(span => {
+                if(valor) {
+                    span.innerText = valor;
+                    span.className = 'filled-field';
+                } else {
+                    span.innerText = '[' + id.toUpperCase() + ']';
+                    span.className = 'empty-field';
+                }
+            });
+        }
+
+        // Função para data
+        function updateData(valor) {
+            const span = document.getElementById('out_data');
+            if(valor) {
+                const partes = valor.split('-');
+                span.innerText = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                span.className = 'filled-field';
+            } else {
+                span.innerText = '[DATA]';
+                span.className = 'empty-field';
+            }
+        }
+    </script>
+</body>
+</html>
