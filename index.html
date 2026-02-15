@@ -1783,6 +1783,95 @@
             const descricao = dados.hipossuficiencia?.descricao || '';
             const processoHipo = dados.hipossuficiencia?.processo || '';
 
+            // CORREÇÃO: Geração detalhada das cláusulas de pagamento do contrato
+            function gerarClausulaPagamento() {
+                if (!dados.contrato) return '';
+                
+                const forma = dados.contrato.formaPagamento;
+                const valorTotal = dados.contrato.valorTotal;
+                const exito = dados.contrato.exito;
+                const entrada = dados.contrato.entrada;
+                const parcelas = dados.contrato.parcelas;
+                const vencimento = dados.contrato.vencimento;
+                const valorParcela = dados.contrato.valorParcela;
+                
+                let clausula = '';
+                
+                // Cláusula 2 - Honorários
+                clausula += `<h4 style="text-align:center;margin:20px 0 10px;text-transform:uppercase;font-size:11pt;">Dos Honorários</h4>`;
+                
+                if (forma === 'vista') {
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:10px;">
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor de <strong>${valorTotal}</strong>, 
+                            à vista, no ato da assinatura deste contrato.
+                        </p>`;
+                } 
+                else if (forma === 'vista-exito') {
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:10px;">
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO:
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            a) O valor de <strong>${valorTotal}</strong>, à vista, no ato da assinatura deste contrato;
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            b) Honorários de êxito no percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo, 
+                            devidos apenas em caso de procedência do pedido ou acordo.
+                        </p>`;
+                }
+                else if (forma === 'parcelado') {
+                    const valorEntrada = entrada && entrada !== 'R$ 0,00' ? entrada : 'R$ 0,00';
+                    const temEntrada = valorEntrada !== 'R$ 0,00';
+                    
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:10px;">
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor total de <strong>${valorTotal}</strong>, 
+                            da seguinte forma:
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            a) <strong>Entrada:</strong> ${temEntrada ? valorEntrada : 'Não há entrada'}, 
+                            ${temEntrada ? 'no ato da assinatura deste contrato' : 'sendo o valor integral parcelado'};
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            b) <strong>Parcelamento:</strong> O saldo remanescente será pago em <strong>${parcelas}x</strong> parcelas mensais e consecutivas 
+                            de <strong>${valorParcela || 'a calcular'}</strong>, vencendo-se a primeira no dia <strong>${vencimento}</strong> do mês seguinte à assinatura, 
+                            e as demais no mesmo dia dos meses subsequentes.
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            c) <strong>Forma de pagamento:</strong> As parcelas serão pagas mediante boleto bancário ou transferência bancária para conta indicada pelo CONTRATADO.
+                        </p>`;
+                }
+                else if (forma === 'parcelado-exito') {
+                    const valorEntrada = entrada && entrada !== 'R$ 0,00' ? entrada : 'R$ 0,00';
+                    const temEntrada = valorEntrada !== 'R$ 0,00';
+                    
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:10px;">
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO:
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            a) <strong>Honorários contratuais:</strong> O valor de <strong>${valorTotal}</strong>, 
+                            ${temEntrada ? `sendo <strong>${valorEntrada}</strong> de entrada no ato da assinatura,` : 'sendo o valor integral parcelado,'} 
+                            e o saldo em <strong>${parcelas}x</strong> parcelas mensais de <strong>${valorParcela || 'a calcular'}</strong>, 
+                            vencendo-se a primeira no dia <strong>${vencimento}</strong> do mês seguinte;
+                        </p>
+                        <p style="text-align:justify;margin-bottom:10px;padding-left:20px;">
+                            b) <strong>Honorários de êxito:</strong> Percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo, 
+                            devidos apenas em caso de procedência do pedido ou acordo, calculados sobre o valor líquido recebido pelo CONTRATANTE.
+                        </p>`;
+                }
+                
+                // Cláusula de inadimplemento
+                clausula += `
+                    <p style="text-align:justify;margin-bottom:10px;">
+                        <strong>Cláusula 2ª-A.</strong> Em caso de atraso no pagamento de qualquer parcela, incidirá multa de 2% (dois por cento) 
+                        sobre o valor em atraso, além de juros de 1% (um por cento) ao mês e correção monetária pelo índice IGPM/FGV ou outro que venha a substituí-lo.
+                    </p>`;
+                
+                return clausula;
+            }
+
             const templates = {
                 procuracao: `
                     <div style="font-family:'Times New Roman',serif;font-size:11pt;line-height:1.6;padding:25mm 20mm;">
@@ -1860,10 +1949,7 @@
                         <p style="text-align:justify;margin-bottom:15px;">
                             <strong>Cláusula 1ª.</strong> É objeto do presente contrato a prestação de serviços advocatícios no processo: <strong>${dados.contrato?.processo || ''}</strong>${dados.contrato?.vara ? ', perante a ' + dados.contrato.vara : ''}.
                         </p>
-                        <h4 style="text-align:center;margin:20px 0 10px;text-transform:uppercase;font-size:11pt;">Dos Honorários</h4>
-                        <p style="text-align:justify;margin-bottom:10px;">
-                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor de <strong>${dados.contrato?.valorTotal || ''}</strong>.
-                        </p>
+                        ${gerarClausulaPagamento()}
                         <h4 style="text-align:center;margin:20px 0 10px;text-transform:uppercase;font-size:11pt;">Do Foro</h4>
                         <p style="text-align:justify;margin-bottom:30px;">
                             <strong>Cláusula 3ª.</strong> Para dirimir quaisquer dúvidas ou controvérsias decorrentes do presente contrato, as partes elegem o foro da Comarca de Natal/RN.
