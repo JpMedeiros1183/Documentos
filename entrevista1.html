@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrevista Trabalhista - Verbas Atrasadas</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; }
+        fieldset { border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; background-color: #fafafa; }
+        legend { font-weight: bold; color: #2980b9; background: #fff; padding: 0 10px; border: 1px solid #ddd; border-radius: 3px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="date"], input[type="number"], input[type="tel"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        textarea { resize: vertical; }
+        .radio-group, .checkbox-group { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .radio-group input, .checkbox-group input { width: auto; margin-right: 5px; }
+        .radio-group label, .checkbox-group label { font-weight: normal; display: inline; }
+        .botoes-acao { display: flex; gap: 10px; margin-top: 20px; flex-direction: column; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; color: white; }
+        .btn-pdf { background-color: #2c3e50; }
+        .btn-pdf:hover { background-color: #1a252f; }
+        .btn-whats { background-color: #25D366; }
+        .btn-whats:hover { background-color: #1ebe57; }
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Esconde os botões na hora de gerar o PDF */
+        @media print {
+            .botoes-acao { display: none; }
+            body { background-color: #fff; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Ficha de Entrevista Trabalhista <br><small>Falta de Pagamento / Troca de Empresa</small></h2>
+    
+    <form id="formTrabalhista">
+        <fieldset>
+            <legend>1. Dados Pessoais</legend>
+            <div class="form-group"><label>Nome Completo:</label><input type="text" id="nome"></div>
+            <div class="grid-2-col">
+                <div class="form-group"><label>CPF:</label><input type="text" id="cpf"></div>
+                <div class="form-group"><label>RG:</label><input type="text" id="rg"></div>
+            </div>
+            <div class="grid-2-col">
+                <div class="form-group"><label>Telefone / WhatsApp:</label><input type="tel" id="telefone"></div>
+                <div class="form-group"><label>Nº CTPS e Série:</label><input type="text" id="ctps"></div>
+            </div>
+            <div class="form-group"><label>Endereço Completo:</label><input type="text" id="endereco"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>2. Empresa Anterior (Que parou de pagar)</legend>
+            <div class="form-group"><label>Nome da Empresa (Carteira):</label><input type="text" id="empresa1"></div>
+            <div class="grid-2-col">
+                <div class="form-group"><label>Data Admissão:</label><input type="date" id="data_admissao"></div>
+                <div class="form-group"><label>Último dia trabalhado:</label><input type="date" id="ultimo_dia"></div>
+            </div>
+            <div class="grid-2-col">
+                <div class="form-group"><label>Função:</label><input type="text" id="funcao"></div>
+                <div class="form-group"><label>Último Salário (R$):</label><input type="number" step="0.01" id="salario"></div>
+            </div>
+            <div class="form-group">
+                <label>Deu baixa na CTPS?</label>
+                <div class="radio-group">
+                    <input type="radio" name="baixa" value="Sim" id="baixa_sim"><label for="baixa_sim">Sim</label>
+                    <input type="radio" name="baixa" value="Não" id="baixa_nao"><label for="baixa_nao">Não</label>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>3. Local e Nova Empresa</legend>
+            <div class="form-group"><label>Local de prestação do serviço (Tomador):</label><input type="text" id="tomador"></div>
+            <div class="form-group"><label>Nome da Nova Empresa:</label><input type="text" id="empresa2"></div>
+            <div class="form-group">
+                <label>Foi absorvido pela nova empresa?</label>
+                <div class="radio-group">
+                    <input type="radio" name="absorvido" value="Sim" id="abs_sim"><label for="abs_sim">Sim</label>
+                    <input type="radio" name="absorvido" value="Não" id="abs_nao"><label for="abs_nao">Não</label>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>4. Verbas Atrasadas e Documentos</legend>
+            <div class="form-group">
+                <label>Quais verbas estão atrasadas? (Detalhe meses não pagos, férias, FGTS):</label>
+                <textarea id="detalhes_verbas" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Provas e Testemunhas (Nomes/Contatos e documentos que possui):</label>
+                <textarea id="provas" rows="3"></textarea>
+            </div>
+        </fieldset>
+
+        <div class="botoes-acao">
+            <button type="button" class="btn-pdf" onclick="salvarComoPDF()">📥 Salvar como PDF no Celular</button>
+            <button type="button" class="btn-whats" onclick="enviarParaWhatsApp()">📲 Enviar direto pelo WhatsApp</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Função para gerar o PDF via impressão do sistema do Android
+    function salvarComoPDF() {
+        window.print();
+    }
+
+    // Função para formatar o texto e mandar pro WhatsApp
+    function enviarParaWhatsApp() {
+        // Coloque seu número de WhatsApp aqui (Código do país + DDD + Número. Ex: 5584999999999)
+        const SEU_NUMERO_WHATSAPP = "5584000000000"; 
+        
+        let nome = document.getElementById('nome').value;
+        let cpf = document.getElementById('cpf').value;
+        let empresa1 = document.getElementById('empresa1').value;
+        let tomador = document.getElementById('tomador').value;
+        let detalhes = document.getElementById('detalhes_verbas').value;
+        
+        // Pega os botões de rádio selecionados
+        let baixa = document.querySelector('input[name="baixa"]:checked');
+        let baixaVal = baixa ? baixa.value : "Não informado";
+        
+        let absorvido = document.querySelector('input[name="absorvido"]:checked');
+        let absVal = absorvido ? absorvido.value : "Não informado";
+
+        // Monta a mensagem que chegará no seu celular
+        let mensagem = `*Ficha de Entrevista Trabalhista*\n\n`;
+        mensagem += `*1. Trabalhador(a)*\nNome: ${nome}\nCPF: ${cpf}\n\n`;
+        mensagem += `*2. Empresa Antiga*\nNome: ${empresa1}\nDeu baixa na CTPS?: ${baixaVal}\n\n`;
+        mensagem += `*3. Nova Empresa / Local*\nLocal (Tomador): ${tomador}\nFoi absorvido(a)?: ${absVal}\n\n`;
+        mensagem += `*4. Verbas Reclamadas*\n${detalhes}`;
+
+        // Codifica o texto para formato de link
+        let mensagemCodificada = encodeURIComponent(mensagem);
+        
+        // Abre o WhatsApp
+        window.open(`https://wa.me/${SEU_NUMERO_WHATSAPP}?text=${mensagemCodificada}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
