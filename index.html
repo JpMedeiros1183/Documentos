@@ -458,26 +458,26 @@
             .form-row {
                 flex-direction: column;
             }
-            
+
             .form-col, .form-col-small {
                 flex: 1 0 100%;
             }
-            
+
             .tipo-rep-selector {
                 flex-direction: column;
             }
-            
+
             .buttons {
                 flex-direction: column;
             }
-            
+
             button {
                 width: 100%;
             }
         }
 
         .hidden { display: none !important; }
-        
+
         .debug-console {
             position: fixed;
             bottom: 10px;
@@ -496,7 +496,7 @@
             opacity: 1;
             transition: opacity 0.5s ease;
         }
-        
+
         .debug-console.fade-out {
             opacity: 0;
         }
@@ -534,16 +534,16 @@
         </div>
 
         <div class="form-container" id="formulario-principal">
-            
+
             <div id="secao-representacao" class="hidden">
                 <div class="representacao-box">
                     <div class="representacao-header">
                         <input type="checkbox" id="representa-terceiro" onchange="toggleRepresentacao()">
                         <label for="representa-terceiro">🛡️ Estou representando um terceiro (não sou o próprio interessado)</label>
                     </div>
-                    
+
                     <div class="representacao-fields" id="campos-representacao">
-                        
+
                         <div class="tipo-rep-selector">
                             <label class="tipo-rep-option active" onclick="setTipoRepresentacao('incapaz')" id="opt-incapaz">
                                 <input type="radio" name="tipo-rep" value="incapaz" checked>
@@ -695,7 +695,7 @@
             </div>
 
             <div class="section-title" id="titulo-dados-pessoais">Dados Pessoais do Outorgante</div>
-            
+
             <div class="form-row">
                 <div class="form-col">
                     <div class="form-group">
@@ -861,7 +861,7 @@
 
             <div id="campos-contrato" class="doc-specific-fields">
                 <div class="doc-specific-title">📋 Dados Específicos - Contrato de Honorários</div>
-                
+
                 <div class="form-row">
                     <div class="form-col">
                         <div class="form-group">
@@ -878,7 +878,7 @@
                 </div>
 
                 <div class="section-title" style="font-size: 1rem; margin-top: 20px;">Forma de Pagamento</div>
-                
+
                 <div class="pagamento-options">
                     <div class="pagamento-option selected" onclick="selecionarPagamento('vista')" id="pag-vista">
                         <input type="radio" name="forma-pagamento" value="vista" checked onchange="atualizarCamposPagamento()">
@@ -887,7 +887,7 @@
                             <small>Valor único, sem parcelamento</small>
                         </label>
                     </div>
-                    
+
                     <div class="pagamento-option" onclick="selecionarPagamento('vista-exito')" id="pag-vista-exito">
                         <input type="radio" name="forma-pagamento" value="vista-exito" onchange="atualizarCamposPagamento()">
                         <label>
@@ -895,7 +895,7 @@
                             <small>Valor único + percentual sobre o proveito econômico final</small>
                         </label>
                     </div>
-                    
+
                     <div class="pagamento-option" onclick="selecionarPagamento('parcelado')" id="pag-parcelado">
                         <input type="radio" name="forma-pagamento" value="parcelado" onchange="atualizarCamposPagamento()">
                         <label>
@@ -903,7 +903,7 @@
                             <small>Entrada + saldo em até 10 parcelas mensais</small>
                         </label>
                     </div>
-                    
+
                     <div class="pagamento-option" onclick="selecionarPagamento('parcelado-exito')" id="pag-parcelado-exito">
                         <input type="radio" name="forma-pagamento" value="parcelado-exito" onchange="atualizarCamposPagamento()">
                         <label>
@@ -911,14 +911,22 @@
                             <small>Entrada + parcelas + percentual sobre o proveito final</small>
                         </label>
                     </div>
+
+                    <div class="pagamento-option" onclick="selecionarPagamento('somente-exito')" id="pag-somente-exito">
+                        <input type="radio" name="forma-pagamento" value="somente-exito" onchange="atualizarCamposPagamento()">
+                        <label>
+                            📈 Somente Honorários de Êxito
+                            <small>Sem valor inicial/parcelas, apenas percentual sobre o êxito da demanda</small>
+                        </label>
+                    </div>
                 </div>
 
                 <div id="detalhes-pagamento" class="pagamento-detalhes active">
-                    
-                    <div class="form-row">
+
+                    <div class="form-row" id="campo-valor-total">
                         <div class="form-col">
                             <div class="form-group">
-                                <label class="required">Valor Total dos Honorários (R$)</label>
+                                <label class="required">Valor Total dos Honorários Iniciais (R$)</label>
                                 <input type="text" id="cont-valor-total" placeholder="0,00" oninput="formatarMoeda(this)">
                             </div>
                         </div>
@@ -1042,7 +1050,7 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
-    
+
     <div class="debug-console" id="debug-console"></div>
 
     <script>
@@ -1055,11 +1063,11 @@
                 debugConsole.classList.remove('fade-out');
                 debugConsole.innerHTML += msg + '<br>';
                 debugConsole.scrollTop = debugConsole.scrollHeight;
-                
+
                 if (debugTimeout) {
                     clearTimeout(debugTimeout);
                 }
-                
+
                 debugTimeout = setTimeout(() => {
                     debugConsole.classList.add('fade-out');
                     setTimeout(() => {
@@ -1327,10 +1335,13 @@
 
         function atualizarCamposPagamento() {
             const forma = document.querySelector('input[name="forma-pagamento"]:checked').value;
-            const mostrarExito = forma === 'vista-exito' || forma === 'parcelado-exito';
+            const mostrarExito = forma === 'vista-exito' || forma === 'parcelado-exito' || forma === 'somente-exito';
             const mostrarParcelamento = forma === 'parcelado' || forma === 'parcelado-exito';
+            const mostrarValorTotal = forma !== 'somente-exito';
+
             document.getElementById('campo-exito').classList.toggle('hidden', !mostrarExito);
             document.getElementById('campo-parcelamento').classList.toggle('hidden', !mostrarParcelamento);
+            document.getElementById('campo-valor-total').classList.toggle('hidden', !mostrarValorTotal);
         }
 
         function aplicarMascaras() {
@@ -1345,7 +1356,7 @@
                     e.target.value = v;
                 });
             });
-            
+
             document.getElementById('emp-cnpj')?.addEventListener('input', (e) => {
                 let v = e.target.value.replace(/\D/g, '').substring(0, 14);
                 v = v.replace(/^(\d{2})(\d)/, '$1.$2');
@@ -1354,7 +1365,7 @@
                 v = v.replace(/(\d{4})(\d)/, '$1-$2');
                 e.target.value = v;
             });
-            
+
             ['cep', 'emp-cep'].forEach(id => {
                 document.getElementById(id)?.addEventListener('input', (e) => {
                     let v = e.target.value.replace(/\D/g, '').substring(0, 8);
@@ -1477,8 +1488,8 @@
                     deviceFingerprint: state.deviceFingerprint
                 };
             } catch (e) {
-                state.auditData = { 
-                    timestamp: new Date().toISOString(), 
+                state.auditData = {
+                    timestamp: new Date().toISOString(),
                     ip: 'N/A',
                     deviceFingerprint: state.deviceFingerprint
                 };
@@ -1518,12 +1529,22 @@
                 camposObrigatorios.push('hipo-renda', 'hipo-descricao');
             }
             if (state.documentos.includes('contrato')) {
-                camposObrigatorios.push('cont-processo', 'cont-valor-total');
                 const formaPagamento = document.querySelector('input[name="forma-pagamento"]:checked').value;
-                if (formaPagamento === 'vista-exito' || formaPagamento === 'parcelado-exito') {
+
+                // Só exige processo sempre
+                camposObrigatorios.push('cont-processo');
+
+                // Só exige o Valor Total se NÃO for "somente-exito"
+                if (formaPagamento !== 'somente-exito') {
+                    camposObrigatorios.push('cont-valor-total');
+                }
+
+                // Exige a porcentagem se for um dos modos com êxito
+                if (formaPagamento === 'vista-exito' || formaPagamento === 'parcelado-exito' || formaPagamento === 'somente-exito') {
                     camposObrigatorios.push('cont-exito');
                 }
             }
+
             let valido = true;
             camposObrigatorios.forEach(id => {
                 const el = document.getElementById(id);
@@ -1545,11 +1566,11 @@
                     debug('Validação falhou');
                     return;
                 }
-                
+
                 debug('Formulário válido, coletando dados...');
-                
+
                 const representa = document.getElementById('representa-terceiro')?.checked || false;
-                
+
                 const dados = {
                     representa,
                     tipoRepresentacao: representa ? state.tipoRepresentacao : null,
@@ -1573,7 +1594,7 @@
                         uf: document.getElementById('uf').value
                     }
                 };
-                
+
                 if (representa && state.tipoRepresentacao === 'incapaz') {
                     dados.representante = {
                         nome: document.getElementById('rep-nome').value,
@@ -1581,7 +1602,7 @@
                         qualificacao: document.getElementById('rep-qualificacao').value
                     };
                 }
-                
+
                 if (representa && state.tipoRepresentacao === 'empresa') {
                     dados.empresa = {
                         razao: document.getElementById('emp-razao').value,
@@ -1602,13 +1623,13 @@
                         }
                     };
                 }
-                
+
                 if (state.documentos.includes('hipossuficiencia')) {
                     const rendaEl = document.getElementById('hipo-renda');
                     const dependentesEl = document.getElementById('hipo-dependentes');
                     const descricaoEl = document.getElementById('hipo-descricao');
                     const processoEl = document.getElementById('hipo-processo');
-                    
+
                     dados.hipossuficiencia = {
                         renda: rendaEl ? rendaEl.value : '',
                         dependentes: dependentesEl ? dependentesEl.value : '0',
@@ -1622,7 +1643,7 @@
                         }
                     };
                 }
-                
+
                 if (state.documentos.includes('contrato')) {
                     const formaPagamento = document.querySelector('input[name="forma-pagamento"]:checked')?.value || 'vista';
                     dados.contrato = {
@@ -1637,21 +1658,21 @@
                         exito: document.getElementById('cont-exito')?.value || ''
                     };
                 }
-                
+
                 const usarAssinatura = document.getElementById('usar-assinatura-digital')?.checked || false;
-                
+
                 debug(`Gerando ${state.documentos.length} documento(s)...`);
-                
+
                 for (const tipo of state.documentos) {
                     debug(`Gerando ${tipo}...`);
                     await gerarPDF(tipo, dados, usarAssinatura);
                     await new Promise(r => setTimeout(r, 500));
                 }
-                
+
                 mostrarResultado();
                 mostrarToast('Documentos gerados com sucesso!', 'success');
                 debug('Concluído!');
-                
+
             } catch (error) {
                 debug('ERRO: ' + error.message);
                 console.error(error);
@@ -1661,59 +1682,65 @@
 
         async function gerarPDF(tipo, dados, usarAssinatura) {
             debug(`Criando PDF para ${tipo}...`);
-            
+
             try {
                 const { jsPDF } = window.jspdf;
                 if (!jsPDF) {
                     throw new Error('jsPDF não carregado');
                 }
-                
+
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const html = gerarHTML(tipo, dados, usarAssinatura);
-                
+
                 debug('Criando elemento temporário...');
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
-                temp.style.cssText = 'position:absolute;left:-9999px;width:210mm;';
+
+                // MUDANÇA: Ajustes para a nova resolução e cor de fundo branca garantida
+                temp.style.cssText = 'position:absolute;left:-9999px;width:190mm;padding:10mm;background:white;';
                 document.body.appendChild(temp);
-                
+
                 debug('Renderizando com html2canvas...');
-                const canvas = await html2canvas(temp, { 
-                    scale: 2, 
+                // MUDANÇA: Scale reduzido para 1.5
+                const canvas = await html2canvas(temp, {
+                    scale: 1.5,
                     useCORS: true,
-                    logging: false
+                    logging: false,
+                    backgroundColor: '#ffffff'
                 });
-                
+
                 debug('Adicionando imagem ao PDF...');
-                const imgData = canvas.toDataURL('image/png');
+                // MUDANÇA: Exportando em JPEG comprimido (75% de qualidade)
+                const imgData = canvas.toDataURL('image/jpeg', 0.75);
                 const imgWidth = 210;
                 const pageHeight = 297;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
+
                 let heightLeft = imgHeight;
                 let position = 0;
-                
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+                // MUDANÇA: Flag de compressão FAST
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                 heightLeft -= pageHeight;
-                
+
                 while (heightLeft >= 0) {
                     position = heightLeft - imgHeight;
                     pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                     heightLeft -= pageHeight;
                 }
-                
-                const nome = dados.representa && dados.empresa 
+
+                const nome = dados.representa && dados.empresa
                     ? dados.empresa.razao.replace(/\s+/g, '_')
                     : dados.outorgante.nome.replace(/\s+/g, '_');
-                    
+
                 const filename = `${tipo}_${nome}_${new Date().toISOString().split('T')[0]}.pdf`;
                 debug(`Salvando: ${filename}`);
                 pdf.save(filename);
-                
+
                 document.body.removeChild(temp);
                 debug('PDF gerado com sucesso');
-                
+
             } catch (error) {
                 debug('ERRO no PDF: ' + error.message);
                 throw error;
@@ -1724,9 +1751,9 @@
             const data = new Date().toLocaleDateString('pt-BR', {
                 day: '2-digit', month: 'long', year: 'numeric'
             });
-            
+
             let endereco, assinante, cpfAssinante, qualificacaoAssinante;
-            
+
             if (dados.representa && dados.empresa) {
                 endereco = `${dados.empresa.endereco.logradouro}, ${dados.empresa.endereco.numero}${dados.empresa.endereco.complemento ? ', ' + dados.empresa.endereco.complemento : ''}, ${dados.empresa.endereco.bairro}, ${dados.empresa.endereco.cidade}/${dados.empresa.endereco.uf}, CEP: ${dados.empresa.endereco.cep}`;
                 assinante = dados.empresa.representante.nome;
@@ -1751,7 +1778,6 @@
                 return info.join(' | ');
             }
 
-            // CORREÇÃO PRINCIPAL: Auditoria SEMPRE aparece com texto visível
             const auditoriaHTML = state.deviceFingerprint ? `
                 <div style="margin-top:15px;padding:10px;border:1px solid #333;text-align:left;display:inline-block;max-width:90%;">
                     <p style="font-size:8pt;color:#000;margin:0;line-height:1.4;font-family:'Times New Roman',serif;">
@@ -1789,7 +1815,7 @@
 
             function gerarClausulaPagamento() {
                 if (!dados.contrato) return '';
-                
+
                 const forma = dados.contrato.formaPagamento;
                 const valorTotal = dados.contrato.valorTotal;
                 const exito = dados.contrato.exito;
@@ -1797,18 +1823,18 @@
                 const parcelas = dados.contrato.parcelas;
                 const vencimento = dados.contrato.vencimento;
                 const valorParcela = dados.contrato.valorParcela;
-                
+
                 let clausula = '';
-                
+
                 clausula += `<h4 style="text-align:center;margin:15px 0 8px;text-transform:uppercase;font-size:11pt;">Dos Honorários</h4>`;
-                
+
                 if (forma === 'vista') {
                     clausula += `
                         <p style="text-align:justify;margin-bottom:8px;">
-                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor de <strong>${valorTotal}</strong>, 
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor de <strong>${valorTotal}</strong>,
                             à vista, no ato da assinatura deste contrato.
                         </p>`;
-                } 
+                }
                 else if (forma === 'vista-exito') {
                     clausula += `
                         <p style="text-align:justify;margin-bottom:8px;">
@@ -1818,26 +1844,26 @@
                             a) O valor de <strong>${valorTotal}</strong>, à vista, no ato da assinatura deste contrato;
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
-                            b) Honorários de êxito no percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo, 
+                            b) Honorários de êxito no percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo,
                             devidos apenas em caso de procedência do pedido ou acordo.
                         </p>`;
                 }
                 else if (forma === 'parcelado') {
                     const valorEntrada = entrada && entrada !== 'R$ 0,00' ? entrada : 'R$ 0,00';
                     const temEntrada = valorEntrada !== 'R$ 0,00';
-                    
+
                     clausula += `
                         <p style="text-align:justify;margin-bottom:8px;">
-                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor total de <strong>${valorTotal}</strong>, 
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO o valor total de <strong>${valorTotal}</strong>,
                             da seguinte forma:
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
-                            a) <strong>Entrada:</strong> ${temEntrada ? valorEntrada : 'Não há entrada'}, 
+                            a) <strong>Entrada:</strong> ${temEntrada ? valorEntrada : 'Não há entrada'},
                             ${temEntrada ? 'no ato da assinatura deste contrato' : 'sendo o valor integral parcelado'};
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
-                            b) <strong>Parcelamento:</strong> O saldo remanescente será pago em <strong>${parcelas}x</strong> parcelas mensais e consecutivas 
-                            de <strong>${valorParcela || 'a calcular'}</strong>, vencendo-se a primeira no dia <strong>${vencimento}</strong> do mês seguinte à assinatura, 
+                            b) <strong>Parcelamento:</strong> O saldo remanescente será pago em <strong>${parcelas}x</strong> parcelas mensais e consecutivas
+                            de <strong>${valorParcela || 'a calcular'}</strong>, vencendo-se a primeira no dia <strong>${vencimento}</strong> do mês seguinte à assinatura,
                             e as demais no mesmo dia dos meses subsequentes.
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
@@ -1847,29 +1873,43 @@
                 else if (forma === 'parcelado-exito') {
                     const valorEntrada = entrada && entrada !== 'R$ 0,00' ? entrada : 'R$ 0,00';
                     const temEntrada = valorEntrada !== 'R$ 0,00';
-                    
+
                     clausula += `
                         <p style="text-align:justify;margin-bottom:8px;">
                             <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO:
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
-                            a) <strong>Honorários contratuais:</strong> O valor de <strong>${valorTotal}</strong>, 
-                            ${temEntrada ? `sendo <strong>${valorEntrada}</strong> de entrada no ato da assinatura,` : 'sendo o valor integral parcelado,'} 
-                            e o saldo em <strong>${parcelas}x</strong> parcelas mensais de <strong>${valorParcela || 'a calcular'}</strong>, 
+                            a) <strong>Honorários contratuais:</strong> O valor de <strong>${valorTotal}</strong>,
+                            ${temEntrada ? `sendo <strong>${valorEntrada}</strong> de entrada no ato da assinatura,` : 'sendo o valor integral parcelado,'}
+                            e o saldo em <strong>${parcelas}x</strong> parcelas mensais de <strong>${valorParcela || 'a calcular'}</strong>,
                             vencendo-se a primeira no dia <strong>${vencimento}</strong> do mês seguinte;
                         </p>
                         <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
-                            b) <strong>Honorários de êxito:</strong> Percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo, 
+                            b) <strong>Honorários de êxito:</strong> Percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo,
                             devidos apenas em caso de procedência do pedido ou acordo, calculados sobre o valor líquido recebido pelo CONTRATANTE.
                         </p>`;
                 }
-                
-                clausula += `
-                    <p style="text-align:justify;margin-bottom:8px;">
-                        <strong>Cláusula 2ª-A.</strong> Em caso de atraso no pagamento de qualquer parcela, incidirá multa de 2% (dois por cento) 
-                        sobre o valor em atraso, além de juros de 1% (um por cento) ao mês e correção monetária pelo índice IGPM/FGV ou outro que venha a substituí-lo.
-                    </p>`;
-                
+                // MUDANÇA: Cláusula específica para Somente Êxito
+                else if (forma === 'somente-exito') {
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:8px;">
+                            <strong>Cláusula 2ª.</strong> Pelos serviços contratados, o CONTRATANTE pagará ao CONTRATADO exclusivamente <strong>honorários de êxito</strong>,
+                            no percentual de <strong>${exito}%</strong> sobre o proveito econômico final obtido no processo.
+                        </p>
+                        <p style="text-align:justify;margin-bottom:8px;padding-left:20px;">
+                            <strong>Parágrafo Único.</strong> O pagamento será devido apenas em caso de procedência do pedido ou acordo entabulado entre as partes,
+                            calculado sobre o valor líquido efetivamente recebido pelo CONTRATANTE. Em caso de insucesso da demanda, nenhum valor será devido a título de honorários contratuais.
+                        </p>`;
+                }
+
+                if (forma !== 'somente-exito') {
+                    clausula += `
+                        <p style="text-align:justify;margin-bottom:8px;">
+                            <strong>Cláusula 2ª-A.</strong> Em caso de atraso no pagamento de qualquer parcela, incidirá multa de 2% (dois por cento)
+                            sobre o valor em atraso, além de juros de 1% (um por cento) ao mês e correção monetária pelo índice IGPM/FGV ou outro que venha a substituí-lo.
+                        </p>`;
+                }
+
                 return clausula;
             }
 
