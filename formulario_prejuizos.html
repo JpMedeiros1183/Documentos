@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário de Prejuízos — Rescisão de Locação Comercial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #faf7f2;
+    --cream: #f3ede3;
+    --rule: #c8b89a;
+    --accent: #7a3b1e;
+    --accent-light: #e8d5c4;
+    --gold: #b8892a;
+    --warn: #8b2500;
+    --warn-bg: #fff5f0;
+    --success: #1a4a2e;
+    --success-bg: #eef7f1;
+    --gray: #7a6e62;
+    --line: #d8cfbf;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    section { break-inside: avoid; }
+    .form-header { padding: 24pt 0 16pt; }
+    input, textarea, select { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; }
+  }
+
+  /* LAYOUT */
+  .wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* HEADER */
+  .form-header {
+    text-align: center;
+    padding: 56px 0 40px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .form-header::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 0 auto 24px;
+  }
+
+  .form-header .label-top {
+    font-family: 'Source Serif 4', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .form-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .form-header .subtitle {
+    font-size: 15px;
+    color: var(--gray);
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+
+  .form-header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 2px;
+  }
+
+  /* AVISO */
+  .alert {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .alert .alert-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--warn);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .alert ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .alert ul li {
+    font-size: 13.5px;
+    color: #5a3020;
+    padding: 3px 0;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .alert ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--warn);
+    font-size: 12px;
+  }
+
+  /* SECTION */
+  section {
+    margin-bottom: 56px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-light);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 36px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+
+  /* FIELDS */
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 32px;
+  }
+
+  .field-grid.single { grid-template-columns: 1fr; }
+  .field-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field.span2 { grid-column: span 2; }
+
+  label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-family: 'Source Serif 4', serif;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--rule);
+    font-style: italic;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="email"],
+  select,
+  textarea {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 9px 12px;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(122, 59, 30, 0.08);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+
+  /* SUBSECTION */
+  .subsection {
+    margin-top: 32px;
+  }
+
+  .subsection-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .subsection-hint {
+    font-size: 12.5px;
+    color: var(--gray);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  /* TABLE */
+  .entry-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+
+  .entry-table thead th {
+    background: var(--cream);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  .entry-table tbody tr:nth-child(even) td {
+    background: #fdfaf6;
+  }
+
+  .entry-table tbody td {
+    border-bottom: 1px solid var(--line);
+    padding: 4px 6px;
+    vertical-align: middle;
+  }
+
+  .entry-table tbody td input {
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px dashed var(--line);
+    padding: 6px 8px;
+    font-size: 13.5px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .entry-table tbody td input:focus {
+    border-bottom-color: var(--accent);
+    box-shadow: none;
+  }
+
+  .add-row-btn {
+    background: none;
+    border: 1px dashed var(--rule);
+    color: var(--gray);
+    font-family: 'Source Serif 4', serif;
+    font-size: 12.5px;
+    padding: 7px 18px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+
+  .add-row-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .proof-note {
+    font-size: 12px;
+    color: var(--gold);
+    font-style: italic;
+    margin-top: 8px;
+    padding-left: 4px;
+  }
+
+  .proof-note::before { content: '📎 '; }
+
+  /* RESUMO */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .summary-table tr td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .summary-table tr td:last-child {
+    text-align: right;
+    font-weight: 600;
+    font-family: 'Source Serif 4', serif;
+    min-width: 140px;
+  }
+
+  .summary-table tr td input {
+    text-align: right;
+    font-weight: 600;
+    font-size: 14px;
+    width: 140px;
+    border: none;
+    border-bottom: 1px dashed var(--line);
+    background: transparent;
+    padding: 2px 4px;
+  }
+
+  .summary-table tr td input:focus {
+    border-bottom-color: var(--accent);
+    box-shadow: none;
+  }
+
+  .summary-table tr:hover td { background: var(--cream); }
+
+  .summary-total td {
+    background: var(--accent) !important;
+    color: white !important;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 16px !important;
+    border: none !important;
+  }
+
+  .summary-total td input {
+    color: white !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border-bottom-color: rgba(255,255,255,0.4) !important;
+    width: 160px !important;
+  }
+
+  /* CHECKLIST */
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 32px;
+    margin-top: 8px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .check-item:hover { background: var(--cream); border-color: var(--line); }
+
+  .check-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+
+  /* TESTEMUNHAS */
+  .witness-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+  }
+
+  .witness-table th {
+    background: var(--cream);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .witness-table td {
+    border-bottom: 1px solid var(--line);
+    padding: 4px 6px;
+  }
+
+  .witness-table td input {
+    border: none;
+    border-bottom: 1px dashed var(--line);
+    padding: 7px 8px;
+    font-size: 13.5px;
+    background: transparent;
+    width: 100%;
+    font-family: 'Source Serif 4', serif;
+  }
+
+  .witness-table td input:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  /* DECLARAÇÃO */
+  .declaration-box {
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 24px 28px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink);
+    font-style: italic;
+    margin-bottom: 32px;
+  }
+
+  .signature-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 24px;
+  }
+
+  .sig-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-weight: 600;
+  }
+
+  .sig-line {
+    border-top: 1px solid var(--ink);
+    padding-top: 8px;
+    font-size: 13px;
+    color: var(--gray);
+    text-align: center;
+    min-height: 40px;
+  }
+
+  /* FOOTER NOTE */
+  .footer-note {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--gray);
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* PRINT BTN */
+  .print-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .print-bar span {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    font-family: 'Source Serif 4', serif;
+  }
+
+  .print-bar-actions { display: flex; gap: 10px; }
+
+  .btn-print, .btn-clear {
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-print {
+    background: var(--gold);
+    color: white;
+  }
+
+  .btn-print:hover { background: #a07520; }
+
+  .btn-clear {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .btn-clear:hover { background: rgba(255,255,255,0.2); }
+
+  @media (max-width: 600px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field-grid.triple { grid-template-columns: 1fr; }
+    .field.span2 { grid-column: span 1; }
+    .checklist { grid-template-columns: 1fr; }
+    .signature-area { grid-template-columns: 1fr; }
+    .entry-table { font-size: 12px; }
+    .print-bar span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BARRA SUPERIOR -->
+<div class="print-bar no-print">
+  <span>Preencha o formulário e clique em Imprimir para salvar ou enviar ao advogado</span>
+  <div class="print-bar-actions">
+    <button class="btn-clear" onclick="if(confirm('Limpar todos os campos?')) limparFormulario()">Limpar tudo</button>
+    <button class="btn-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- CABEÇALHO -->
+  <div class="form-header">
+    <div class="label-top">Instrumento Particular</div>
+    <h1>Formulário de Levantamento<br>de Prejuízos</h1>
+    <div class="subtitle">Rescisão Antecipada de Contrato de Locação Comercial</div>
+    <span class="badge">Danos Emergentes &amp; Lucros Cessantes</span>
+  </div>
+
+  <!-- AVISO -->
+  <div class="alert">
+    <div class="alert-title">⚠ Orientações antes de preencher</div>
+    <ul>
+      <li>Preencha todos os campos com o máximo de detalhes possível.</li>
+      <li>Guarde todos os comprovantes: notas fiscais, recibos, contratos, extratos bancários, fotos e mensagens.</li>
+      <li>Este formulário serve de base para pedido judicial de ressarcimento de danos.</li>
+      <li>Consulte um advogado para orientação jurídica específica ao seu caso.</li>
+    </ul>
+  </div>
+
+  <!-- 1. IDENTIFICAÇÃO -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">1</span>
+      <span class="section-title">Identificação da Inquilina</span>
+    </div>
+    <div class="field-grid">
+      <div class="field span2">
+        <label>Nome completo</label>
+        <input type="text" placeholder="Nome completo conforme documento">
+      </div>
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" placeholder="000.000.000-00">
+      </div>
+      <div class="field">
+        <label>RG</label>
+        <input type="text" placeholder="Número do RG">
+      </div>
+      <div class="field span2">
+        <label>Endereço residencial</label>
+        <input type="text" placeholder="Rua, número, bairro, cidade — CEP">
+      </div>
+      <div class="field">
+        <label>Telefone / WhatsApp</label>
+        <input type="tel" placeholder="(00) 90000-0000">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" placeholder="seu@email.com.br">
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. CONTRATO -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">2</span>
+      <span class="section-title">Dados do Contrato de Locação</span>
+    </div>
+    <div class="field-grid">
+      <div class="field span2">
+        <label>Endereço do imóvel comercial</label>
+        <input type="text" placeholder="Endereço completo do ponto alugado">
+      </div>
+      <div class="field">
+        <label>Data de início do contrato</label>
+        <input type="date">
+      </div>
+      <div class="field">
+        <label>Data de término prevista</label>
+        <input type="date">
+      </div>
+      <div class="field">
+        <label>Data do pedido de devolução</label>
+        <input type="date">
+      </div>
+      <div class="field">
+        <label>Data em que foi desocupado</label>
+        <input type="date">
+      </div>
+      <div class="field">
+        <label>Valor do aluguel mensal <span class="hint">(R$)</span></label>
+        <input type="text" placeholder="R$ 0,00">
+      </div>
+      <div class="field">
+        <label>Havia cláusula de multa? <span class="hint">Se sim, qual valor</span></label>
+        <input type="text" placeholder="Sim / Não — descreva">
+      </div>
+      <div class="field">
+        <label>O pedido foi feito por escrito?</label>
+        <input type="text" placeholder="Sim / Não — como ocorreu">
+      </div>
+      <div class="field">
+        <label>Nome do proprietário / empresa</label>
+        <input type="text" placeholder="Nome completo ou razão social">
+      </div>
+      <div class="field span2">
+        <label>Descreva como ocorreu o pedido de devolução do imóvel</label>
+        <textarea placeholder="Ex.: A proprietária veio pessoalmente em [data] e disse que precisava do imóvel porque... Não houve notificação prévia formal..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. DANOS EMERGENTES -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">3</span>
+      <span class="section-title">Danos Emergentes — Prejuízos Diretos e Comprovados</span>
+    </div>
+
+    <!-- 3.1 Equipamentos -->
+    <div class="subsection">
+      <div class="subsection-title">3.1 Equipamentos, móveis e benfeitorias adquiridos para o ponto</div>
+      <div class="subsection-hint">Freezers, geladeiras, fogões, mesas, cadeiras, utensílios, reformas, instalações elétricas etc.</div>
+      <table class="entry-table" id="table-equip">
+        <thead>
+          <tr>
+            <th style="width:40%">Descrição do item</th>
+            <th>Valor pago (R$)</th>
+            <th>Saldo devedor (R$)</th>
+            <th>Parcelas restantes</th>
+            <th style="width:40px" class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="Ex.: Freezer horizontal 2 tampas"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="ex.: 18"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px" title="Remover">✕</button></td></tr>
+          <tr><td><input type="text" placeholder="Ex.: Geladeira duplex"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="ex.: 24"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px" title="Remover">✕</button></td></tr>
+          <tr><td><input type="text"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td><input type="text"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px" title="Remover">✕</button></td></tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn no-print" onclick="addRow('table-equip', 4)">+ Adicionar item</button>
+      <p class="proof-note">Comprovantes necessários: contratos de financiamento, carnês, notas fiscais, extratos bancários.</p>
+    </div>
+
+    <!-- 3.2 Estoque -->
+    <div class="subsection">
+      <div class="subsection-title">3.2 Estoque e mercadorias perdidas</div>
+      <div class="subsection-hint">Alimentos, bebidas e insumos que estragaram ou não puderam ser reaproveitados após a desocupação.</div>
+      <table class="entry-table" id="table-estoque">
+        <thead>
+          <tr>
+            <th style="width:35%">Produto / item</th>
+            <th>Quantidade</th>
+            <th>Valor unitário (R$)</th>
+            <th>Total (R$)</th>
+            <th style="width:40px" class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="Ex.: Bebidas geladas"></td><td><input type="text" placeholder="qtd."></td><td><input type="text" placeholder="R$" oninput="calcTotal(this)"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="text" placeholder="Ex.: Alimentos refrigerados"></td><td><input type="text" placeholder="qtd."></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="text" placeholder="Ex.: Insumos para caldos e sopas"></td><td><input type="text" placeholder="qtd."></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="R$"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn no-print" onclick="addRow('table-estoque', 4)">+ Adicionar item</button>
+      <p class="proof-note">Comprovantes: notas fiscais de compra, fotos dos produtos estragados, extratos de pagamento.</p>
+    </div>
+
+    <!-- 3.3 Encomendas -->
+    <div class="subsection">
+      <div class="subsection-title">3.3 Encomendas e pedidos confirmados não entregues</div>
+      <div class="subsection-hint">Registre os pedidos que já estavam agendados e não puderam ser cumpridos por causa da desocupação forçada.</div>
+      <table class="entry-table" id="table-enc">
+        <thead>
+          <tr>
+            <th>Data prevista</th>
+            <th style="width:35%">Descrição da encomenda</th>
+            <th>Cliente</th>
+            <th>Valor (R$)</th>
+            <th style="width:40px" class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="date"></td><td><input type="text" placeholder="Ex.: 80 marmitas de almoço"></td><td><input type="text" placeholder="Cliente A"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="date"></td><td><input type="text" placeholder="Ex.: Caldos para evento"></td><td><input type="text" placeholder="Cliente B"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="date"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn no-print" onclick="addRow('table-enc', 4)">+ Adicionar encomenda</button>
+      <p class="proof-note">Comprovantes: mensagens de WhatsApp, e-mails, caderno de pedidos, registros de pagamento antecipado.</p>
+    </div>
+
+    <!-- 3.4 Outras despesas -->
+    <div class="subsection">
+      <div class="subsection-title">3.4 Outras despesas diretas causadas pela desocupação</div>
+      <div class="subsection-hint">Mudança, armazenagem, rescisão com fornecedores, taxas de desligamento de serviços, honorários etc.</div>
+      <table class="entry-table" id="table-outras">
+        <thead>
+          <tr>
+            <th style="width:55%">Descrição da despesa</th>
+            <th>Data</th>
+            <th>Valor (R$)</th>
+            <th style="width:40px" class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="Ex.: Frete de mudança dos equipamentos"></td><td><input type="date"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="text" placeholder="Ex.: Armazenagem de freezers"></td><td><input type="date"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+          <tr><td><input type="text"></td><td><input type="date"></td><td><input type="text" placeholder="R$"></td><td class="no-print"><button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px">✕</button></td></tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn no-print" onclick="addRow('table-outras', 3)">+ Adicionar despesa</button>
+      <p class="proof-note">Comprovantes: recibos, contratos rescindidos, notas fiscais de serviços.</p>
+    </div>
+  </section>
+
+  <!-- 4. LUCROS CESSANTES -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">4</span>
+      <span class="section-title">Lucros Cessantes — Renda que Deixou de Receber</span>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">4.1 Faturamento médio do negócio</div>
+      <div class="subsection-hint">Estime com base nos últimos 3 meses de funcionamento. Quanto mais documentado, mais forte é o pedido.</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Faturamento médio diário <span class="hint">R$ — média de dias úteis</span></label>
+          <input type="text" placeholder="R$ 0,00">
+        </div>
+        <div class="field">
+          <label>Faturamento médio mensal <span class="hint">R$ — últimos 3 meses</span></label>
+          <input type="text" placeholder="R$ 0,00">
+        </div>
+        <div class="field">
+          <label>Lucro líquido médio mensal <span class="hint">R$ — descontados os custos</span></label>
+          <input type="text" placeholder="R$ 0,00">
+        </div>
+        <div class="field">
+          <label>Dias de funcionamento por semana</label>
+          <input type="text" placeholder="Ex.: 5 dias (seg a sex)">
+        </div>
+        <div class="field span2">
+          <label>Como calculou esses valores? <span class="hint">Descreva a metodologia</span></label>
+          <textarea placeholder="Ex.: Somei os recebimentos via PIX dos últimos 3 meses no extrato bancário e dividi por 90 dias..."></textarea>
+        </div>
+      </div>
+      <p class="proof-note">Comprovantes: caderno de caixa, extratos PIX / bancários, notas fiscais de venda, declaração de MEI ou ME.</p>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">4.2 Projeção de lucros cessantes</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Meses sem renda estimados</label>
+          <input type="text" placeholder="Ex.: 4 meses">
+        </div>
+        <div class="field">
+          <label>Lucro cessante estimado total <span class="hint">R$</span></label>
+          <input type="text" placeholder="R$ 0,00">
+        </div>
+        <div class="field span2">
+          <label>Justificativa da estimativa</label>
+          <textarea placeholder="Ex.: Necessitarei de aprox. 4 meses para encontrar novo ponto, reformar e retomar as atividades. Tenho clientes fixos que aguardam a reabertura..."></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. RESUMO -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">5</span>
+      <span class="section-title">Resumo Financeiro dos Prejuízos</span>
+    </div>
+    <table class="summary-table">
+      <tr>
+        <td>Equipamentos / financiamentos (saldo devedor)</td>
+        <td><input type="text" placeholder="R$ 0,00"></td>
+      </tr>
+      <tr>
+        <td>Estoque e mercadorias perdidas</td>
+        <td><input type="text" placeholder="R$ 0,00"></td>
+      </tr>
+      <tr>
+        <td>Encomendas não entregues</td>
+        <td><input type="text" placeholder="R$ 0,00"></td>
+      </tr>
+      <tr>
+        <td>Outras despesas diretas</td>
+        <td><input type="text" placeholder="R$ 0,00"></td>
+      </tr>
+      <tr>
+        <td>Lucros cessantes</td>
+        <td><input type="text" placeholder="R$ 0,00"></td>
+      </tr>
+      <tr class="summary-total">
+        <td>TOTAL GERAL DOS PREJUÍZOS</td>
+        <td><input type="text" placeholder="R$ 0,00" style="color:white;font-weight:700"></td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- 6. PROVAS E TESTEMUNHAS -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">6</span>
+      <span class="section-title">Testemunhas e Provas Disponíveis</span>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">6.1 Testemunhas que podem confirmar os prejuízos</div>
+      <table class="witness-table" id="table-test">
+        <thead>
+          <tr>
+            <th style="width:35%">Nome da testemunha</th>
+            <th style="width:25%">Telefone</th>
+            <th>Relação com a situação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="Nome completo"></td><td><input type="text" placeholder="(00) 90000-0000"></td><td><input type="text" placeholder="Ex.: cliente fixo, fornecedor, vizinho do ponto"></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title" style="margin-bottom:14px">6.2 Documentos e provas que você possui</div>
+      <div class="checklist">
+        <label class="check-item"><input type="checkbox"> Contrato de locação assinado</label>
+        <label class="check-item"><input type="checkbox"> Comprovantes de pagamento do aluguel</label>
+        <label class="check-item"><input type="checkbox"> Notificação de rescisão por escrito</label>
+        <label class="check-item"><input type="checkbox"> Contrato / carnê de financiamento de equipamentos</label>
+        <label class="check-item"><input type="checkbox"> Notas fiscais de compra de mercadorias</label>
+        <label class="check-item"><input type="checkbox"> Fotos dos produtos estragados</label>
+        <label class="check-item"><input type="checkbox"> Registros de encomendas (WhatsApp, caderno)</label>
+        <label class="check-item"><input type="checkbox"> Extratos bancários / PIX com histórico de vendas</label>
+        <label class="check-item"><input type="checkbox"> Declaração de MEI ou ME</label>
+        <label class="check-item"><input type="checkbox"> Fotos do estabelecimento montado e em operação</label>
+        <label class="check-item"><input type="checkbox"> Mensagens de clientes confirmando pedidos</label>
+        <label class="check-item"><input type="checkbox"> Comprovante de CNPJ / alvará de funcionamento</label>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Outros documentos disponíveis</label>
+        <input type="text" placeholder="Descreva outros comprovantes que você possui...">
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. DECLARAÇÃO -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">7</span>
+      <span class="section-title">Declaração e Assinatura</span>
+    </div>
+    <div class="declaration-box">
+      Declaro que as informações acima são verdadeiras e que os valores indicados refletem os prejuízos reais sofridos em razão da rescisão antecipada do contrato de locação do imóvel comercial, comprometendo-me a apresentar os comprovantes correspondentes quando solicitado pela parte contrária ou pelo Poder Judiciário.
+    </div>
+    <div class="field-grid" style="margin-bottom:32px">
+      <div class="field">
+        <label>Local</label>
+        <input type="text" placeholder="Cidade — Estado">
+      </div>
+      <div class="field">
+        <label>Data</label>
+        <input type="date">
+      </div>
+    </div>
+    <div class="signature-area">
+      <div class="sig-field">
+        <label>Assinatura da Inquilina</label>
+        <div class="sig-line">&nbsp;</div>
+      </div>
+      <div class="sig-field">
+        <label>Nome por extenso</label>
+        <div class="sig-line">&nbsp;</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Este formulário não substitui assessoria jurídica profissional.<br>
+    Recomenda-se consultar um advogado para avaliar os direitos e as medidas cabíveis no caso concreto.
+  </div>
+
+</div>
+
+<script>
+function addRow(tableId, cols) {
+  const tbody = document.querySelector('#' + tableId + ' tbody');
+  const tr = document.createElement('tr');
+  for (let i = 0; i < cols; i++) {
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = i === 1 && tableId === 'table-enc' ? 'date' : 'text';
+    if (i === cols - 1) inp.placeholder = 'R$';
+    td.appendChild(inp);
+    tr.appendChild(td);
+  }
+  const tdBtn = document.createElement('td');
+  tdBtn.className = 'no-print';
+  tdBtn.innerHTML = '<button onclick="removeRow(this)" style="background:none;border:none;color:#c0a090;cursor:pointer;font-size:16px" title="Remover">✕</button>';
+  tr.appendChild(tdBtn);
+  tbody.appendChild(tr);
+  tr.querySelector('input').focus();
+}
+
+function removeRow(btn) {
+  const row = btn.closest('tr');
+  const tbody = row.closest('tbody');
+  if (tbody.querySelectorAll('tr').length > 1) {
+    row.remove();
+  } else {
+    row.querySelectorAll('input').forEach(i => i.value = '');
+  }
+}
+
+function limparFormulario() {
+  document.querySelectorAll('input[type="text"], input[type="date"], input[type="tel"], input[type="email"], input[type="number"], textarea').forEach(el => el.value = '');
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+}
+</script>
+</body>
+</html>
