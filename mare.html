@@ -231,33 +231,14 @@
     </script>
 </head>
 <body>
-    <button class="close-btn" onclick="exitApp()" title="Fechar">✕</button>
+    <a class="close-btn" href="about:blank" title="Fechar">✕</a>
     <button class="install-btn" id="installBtn" onclick="installApp()" title="Instalar app" style="display:flex!important;visibility:visible!important;opacity:1!important;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v13M7 11l5 5 5-5M4 20h16"/>
         </svg>
     </button>
     <script>
-        function exitApp() {
-            // Sair da tela cheia primeiro
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            
-            // Tentar fechar a janela
-            setTimeout(() => {
-                window.close();
-                // Se não fechou (PWA instalado), minimizar via history
-                setTimeout(() => {
-                    if (!document.hidden) {
-                        history.back();
-                        setTimeout(() => {
-                            // Último recurso: ir para tela inicial do Android
-                            window.location.href = 'intent://com.android.launcher#Intent;scheme=android-app;end';
-                        }, 300);
-                    }
-                }, 300);
-            }, 200);
-        }
+
         function installApp() {
             if (window._deferredPrompt) {
                 window._deferredPrompt.prompt();
