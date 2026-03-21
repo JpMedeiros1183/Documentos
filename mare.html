@@ -239,9 +239,24 @@
     </button>
     <script>
         function exitApp() {
+            // Sair da tela cheia primeiro
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            setTimeout(() => window.close(), 200);
+            
+            // Tentar fechar a janela
+            setTimeout(() => {
+                window.close();
+                // Se não fechou (PWA instalado), minimizar via history
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        history.back();
+                        setTimeout(() => {
+                            // Último recurso: ir para tela inicial do Android
+                            window.location.href = 'intent://com.android.launcher#Intent;scheme=android-app;end';
+                        }, 300);
+                    }
+                }, 300);
+            }, 200);
         }
         function installApp() {
             if (window._deferredPrompt) {
