@@ -256,7 +256,20 @@
 </head>
 <body>
     <button class="close-btn" onclick="exitApp()" title="Fechar">✕</button>
-    <button class="install-btn" id="installBtn" onclick="installApp()" title="Instalar app">⬇️</button>
+    <button class="install-btn" id="installBtn" onclick="installApp()" title="Instalar app">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v13M7 11l5 5 5-5M4 20h16"/>
+        </svg>
+    </button>
+    <script>
+        // Esconde o botão se já está rodando como PWA instalado
+        if (window.matchMedia('(display-mode: fullscreen)').matches ||
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true) {
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.display = 'none';
+        }
+    </script>
     <script>
         function exitApp() {
             if (document.exitFullscreen) document.exitFullscreen();
