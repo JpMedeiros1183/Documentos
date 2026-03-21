@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mares-buzios-v2';
+const CACHE_NAME = 'mares-buzios-v3';
 const FILES = [
   '/Documentos/mare.html',
   '/Documentos/manifest.json',

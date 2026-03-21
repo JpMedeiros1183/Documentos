@@ -206,27 +206,13 @@
         // PWA install
 
         window._deferredPrompt = null;
-
-        // Captura o prompt de instalação
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             window._deferredPrompt = e;
-            // Garante que o botão está visível
-            const btn = document.getElementById('installBtn');
-            if (btn) btn.style.display = 'flex';
         });
-
-        // Some só depois de instalar
         window.addEventListener('appinstalled', () => {
-            const btn = document.getElementById('installBtn');
-            if (btn) btn.style.display = 'none';
+            document.getElementById('installBtn').style.display = 'none';
             window._deferredPrompt = null;
-        });
-
-        // Garante visibilidade assim que o DOM carrega
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('installBtn');
-            if (btn) btn.style.setProperty('display', 'flex', 'important');
         });
 
         // Tela cheia ao primeiro toque
@@ -246,7 +232,7 @@
 </head>
 <body>
     <button class="close-btn" onclick="exitApp()" title="Fechar">✕</button>
-    <button class="install-btn" id="installBtn" onclick="installApp()" title="Instalar app">
+    <button class="install-btn" id="installBtn" onclick="installApp()" title="Instalar app" style="display:flex!important;visibility:visible!important;opacity:1!important;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v13M7 11l5 5 5-5M4 20h16"/>
         </svg>
