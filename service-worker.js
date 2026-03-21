@@ -1,6 +1,6 @@
 const CACHE_NAME = 'mares-buzios-v1';
 const FILES = [
-  './index_obfuscated.html',
+  './mare.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

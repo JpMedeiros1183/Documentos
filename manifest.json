@@ -2,7 +2,7 @@
   "name": "Marés Búzios",
   "short_name": "Marés",
   "description": "Previsão de marés - Praia de Búzios/RN",
-  "start_url": "./index_obfuscated.html",
+  "start_url": "./mare.html",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#1e3c72",
