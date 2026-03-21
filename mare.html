@@ -206,13 +206,27 @@
         // PWA install
 
         window._deferredPrompt = null;
+
+        // Captura o prompt de instalação
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             window._deferredPrompt = e;
+            // Garante que o botão está visível
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.display = 'flex';
         });
+
+        // Some só depois de instalar
         window.addEventListener('appinstalled', () => {
-            document.getElementById('installBtn').style.display = 'none';
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.display = 'none';
             window._deferredPrompt = null;
+        });
+
+        // Garante visibilidade assim que o DOM carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.setProperty('display', 'flex', 'important');
         });
 
         // Tela cheia ao primeiro toque
