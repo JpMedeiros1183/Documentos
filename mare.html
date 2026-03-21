@@ -253,7 +253,18 @@
                     }
                 });
             } else {
-                alert('Para instalar:\nMenu do Chrome (⋮) → "Adicionar à tela inicial"');
+                const ua = navigator.userAgent.toLowerCase();
+                let msg = 'Para instalar como app:';
+                if (ua.includes('opr') || ua.includes('opera')) {
+                    msg += '\n\nOpera: Menu (≡) → "Adicionar à tela inicial"';
+                } else if (ua.includes('firefox')) {
+                    msg += '\n\nFirefox: Menu (⋮) → "Instalar"';
+                } else if (ua.includes('safari') && !ua.includes('chrome')) {
+                    msg += '\n\niOS Safari: Botão compartilhar (□↑) → "Adicionar à Tela de Início"';
+                } else {
+                    msg += '\n\nChrome: Menu (⋮) → "Adicionar à tela inicial"';
+                }
+                alert(msg);
             }
         }
     </script>
