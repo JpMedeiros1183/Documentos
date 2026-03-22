@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPS Definitivo</title>
+    <title>GPS iGo Style</title>
     
-    <!-- CSS do Leaflet (Obrigatório para o mapa aparecer) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-    <!-- Script para girar o carro -->
-    <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
-
     <style>
         body { margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; background: #fff; }
         
-        /* O MAPA DEVE OCUPAR TUDO */
         #map { 
             height: 100vh; 
             width: 100vw; 
@@ -24,29 +19,33 @@
             z-index: 1; 
         }
 
-        /* Painel de Controle */
-        #ui-panel {
+        /* Ajuste fino para rotação não bugar a tela */
+        .leaflet-map-pane {
+            transform-origin: center center !important;
+        }
+
+        #ui-container {
             position: absolute;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000; /* Fica acima do mapa */
+            z-index: 1000;
             width: 90%;
-            max-width: 350px;
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
+            max-width: 360px;
             transition: transform 0.3s ease;
+            pointer-events: none; /* Deixa clicar no mapa através das bordas */
         }
 
-        /* Botão Flutuante */
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            pointer-events: auto; /* Reativa cliques no painel */
+        }
+
         .fab {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
             width: 60px;
             height: 60px;
             background: #007bff;
@@ -58,7 +57,12 @@
             cursor: pointer;
             border: 4px solid white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin: 0 auto 10px auto;
+            color: white;
+            pointer-events: auto;
         }
+
+        .panel-hidden { display: none; }
 
         h2 { margin: 10px 0; font-size: 18px; color: #333; }
         
@@ -75,8 +79,7 @@
         }
 
         .btn-green { background-color: #28a745; }
-        .btn-red { background-color: #dc3545; display: none; }
-        .btn-info { background-color: #6c757d; font-size: 14px; }
+        .btn-red { background-color: #dc3545; }
 
         #status-box {
             background: #f1f3f5;
@@ -87,7 +90,6 @@
             color: #495057;
         }
 
-        /* Velocímetro */
         #speedometer {
             position: absolute;
             bottom: 30px;
@@ -107,83 +109,73 @@
 </head>
 <body>
 
-    <!-- O Mapa fica aqui -->
     <div id="map"></div>
 
-    <!-- Painel -->
-    <div id="ui-panel">
-        <div class="fab" onclick="togglePanel()">🚗</div>
-        
-        <h2>Navegador Web</h2>
-        
-        <div id="status-box">👆 Toque no mapa para escolher o destino</div>
+    <div id="ui-container">
+        <div id="fab" class="fab" onclick="togglePanel()">🚗</div>
+        <div id="main-panel" class="panel">
+            <h2>Navegador iGo</h2>
+            <div id="status-box">👆 Toque no mapa para definir destino</div>
 
-        <button id="btn-start" class="btn-green" onclick="startGPS()">INICIAR GPS</button>
-        <button id="btn-stop" class="btn-red" onclick="stopGPS()">PARAR NAVEGAÇÃO</button>
-        <button class="btn-info" onclick="alert('1. Toque no mapa para marcar o destino.\n2. Clique em Iniciar GPS.\n3. Permita a localização.')">❓ Ajuda</button>
+            <div id="setup-controls">
+                <button class="btn-green" onclick="startGPS()">INICIAR NAVEGAÇÃO</button>
+            </div>
+            <div id="nav-controls" style="display:none;">
+                <button class="btn-red" onclick="stopGPS()">PARAR</button>
+            </div>
+        </div>
     </div>
 
     <div id="speedometer">0 km/h</div>
 
-    <!-- JS do Leaflet -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // 1. Inicializar o Mapa
-        // Coordenadas iniciais (Natal, RN como exemplo, mas vai mudar pro seu GPS)
-        var map = L.map('map').setView([-5.7945, -35.2110], 13);
+        // 1. Inicializar Mapa
+        var map = L.map('map', { zoomControl: false, fadeAnimation: false }).setView([-5.7945, -35.2110], 13);
 
-        // 2. Carregar as Imagens do Mapa (Usando CartoDB Positron - Tema Claro e Estável)
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
 
-        // Variáveis de controle
         var carMarker = null;
         var destMarker = null;
         var routeLine = null;
         var watchId = null;
         var destCoords = null;
+        var isNavigating = false;
 
-        // Função para Minimizar/Maximizar Painel
+        // 2. Interface
         function togglePanel() {
-            var panel = document.getElementById('ui-panel');
-            if (panel.style.transform === "translate(-50%, -150%)") {
-                panel.style.transform = "translateX(-50%)";
+            var panel = document.getElementById('main-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
             } else {
-                panel.style.transform = "translate(-50%, -150%)";
+                panel.style.display = 'none';
             }
-            // Correção bug visual do leaflet ao mudar tamanho
             setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
-        // 3. Clicar no Mapa para definir Destino
+        // 3. Definir Destino
         map.on('click', function(e) {
             destCoords = [e.latlng.lat, e.latlng.lng];
-            
             if (destMarker) map.removeLayer(destMarker);
             if (routeLine) map.removeLayer(routeLine);
 
-            destMarker = L.marker(destCoords).addTo(map)
-                .bindPopup("Destino Marcado!")
-                .openPopup();
-            
-            document.getElementById('status-box').innerText = "✅ Destino marcado! Agora clique em INICIAR GPS.";
-            document.getElementById('status-box').style.background = "#d4edda";
+            destMarker = L.marker(destCoords).addTo(map).bindPopup("Destino").openPopup();
+            document.getElementById('status-box').innerText = "✅ Destino marcado!";
         });
 
         // 4. Iniciar GPS
         function startGPS() {
-            if (!navigator.geolocation) {
-                alert("Seu navegador não suporta GPS.");
-                return;
-            }
-
-            document.getElementById('btn-start').style.display = 'none';
-            document.getElementById('btn-stop').style.display = 'block';
+            if (!navigator.geolocation) return alert("GPS não suportado");
+            isNavigating = true;
+            document.getElementById('setup-controls').style.display = 'none';
+            document.getElementById('nav-controls').style.display = 'block';
             document.getElementById('status-box').innerText = "📡 Buscando satélites...";
+            togglePanel(); // Minimiza
 
             watchId = navigator.geolocation.watchPosition(updatePosition, handleError, {
                 enableHighAccuracy: true,
@@ -192,80 +184,81 @@
             });
         }
 
-        // 5. Atualizar Posição
+        // 5. Lógica de Rotação e Movimento
         function updatePosition(pos) {
             var lat = pos.coords.latitude;
             var lon = pos.coords.longitude;
             var speed = pos.coords.speed;
-            var heading = pos.coords.heading;
+            // Heading (direção) vem em graus (0 a 360). Se for null, mantém o anterior
+            var heading = pos.coords.heading !== null ? pos.coords.heading : 0; 
 
-            // Atualiza Velocidade
+            // Velocímetro
             var kmh = speed ? (speed * 3.6).toFixed(0) : 0;
             document.getElementById('speedometer').innerText = kmh + " km/h";
 
-            // Cria ou Move o Carro
+            // Criar Carro
             if (!carMarker) {
+                // Ícone apontando para CIMA (0 graus)
                 var carIcon = L.icon({
-                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3097/3097180.png',
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3097/3097180.png', 
                     iconSize: [40, 40],
                     iconAnchor: [20, 20]
                 });
-                carMarker = L.marker([lat, lon], {icon: carIcon, rotationAngle: 0}).addTo(map);
-                
-                // Centraliza o mapa na primeira vez
-                map.setView([lat, lon], 16);
-                document.getElementById('status-box').innerText = "📍 GPS Encontrado! Calculando rota...";
+                carMarker = L.marker([lat, lon], {icon: carIcon}).addTo(map);
+                map.setView([lat, lon], 17); // Zoom próximo
             } else {
                 carMarker.setLatLng([lat, lon]);
-                if (heading !== null) {
-                    carMarker.setRotationAngle(heading);
+            }
+
+            if (isNavigating) {
+                // 1. Manter o carro sempre no centro da tela
+                map.panTo([lat, lon], {animate: true, duration: 0.5});
+
+                // 2. Girar o MAPA (Sentido anti-horário baseado na direção)
+                // Ex: Se estou indo para Leste (90deg), o mapa gira -90deg para o Leste ficar em cima
+                var mapPane = map.getPane('mapPane');
+                mapPane.style.transform = `translateZ(0) rotate(${-heading}deg)`;
+
+                // 3. Girar o CARRO (Sentido horário para compensar e ficar reto)
+                carMarker.setRotationAngle(heading);
+
+                // 4. Girar o DESTINO (Para não ficar de cabeça para baixo)
+                if (destMarker) {
+                    destMarker.setRotationAngle(heading);
                 }
             }
 
-            // Se tiver destino, traça a rota
+            // Traçar Rota
             if (destCoords && !routeLine) {
                 calculateRoute(lat, lon, destCoords[0], destCoords[1]);
             }
         }
 
-        // 6. Calcular Rota (OSRM)
         async function calculateRoute(startLat, startLon, endLat, endLon) {
             try {
                 var url = `https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
                 var response = await fetch(url);
                 var data = await response.json();
-
                 if (data.code === 'Ok') {
                     routeLine = L.geoJSON(data.routes[0].geometry, {
-                        style: { color: '#007bff', weight: 6, opacity: 0.8 }
+                        style: { color: '#007bff', weight: 6 }
                     }).addTo(map);
-                    
-                    // Ajusta zoom para ver a rota
-                    map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
-                    document.getElementById('status-box').innerText = "✅ Rota traçada! Siga a linha azul.";
-                } else {
-                    document.getElementById('status-box').innerText = "⚠️ Não foi possível traçar rota.";
+                    document.getElementById('status-box').innerText = "✅ Rota traçada!";
                 }
-            } catch (e) {
-                console.error(e);
-                document.getElementById('status-box').innerText = "⚠️ Erro de conexão na rota.";
-            }
+            } catch (e) { console.error(e); }
         }
 
         function handleError(err) {
-            var msg = "❌ Erro no GPS";
-            if (err.code === 1) msg = "❌ Permissão Negada! Verifique as configurações do site.";
-            document.getElementById('status-box').innerText = msg;
-            document.getElementById('status-box').style.background = "#f8d7da";
+            document.getElementById('status-box').innerText = "❌ Erro GPS: " + err.message;
         }
 
         function stopGPS() {
+            isNavigating = false;
+            // Reseta rotação
+            map.getPane('mapPane').style.transform = 'translateZ(0) rotate(0deg)';
             if (watchId) navigator.geolocation.clearWatch(watchId);
             location.reload();
         }
-
-        // Força o mapa a se redrawar caso tenha carregado errado
-        setTimeout(function(){ map.invalidateSize(); }, 1000);
     </script>
 </body>
 </html>
