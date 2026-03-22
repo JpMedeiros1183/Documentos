@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GPS Toque & Vá</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; background: #eef; }
+        #map { height: 100vh; width: 100%; z-index: 1; cursor: crosshair; }
+
+        /* Painel */
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 360px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #007bff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        h3 { margin: 5px 0 15px 0; color: #333; }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .btn-start { background: #28a745; }
+        .btn-stop { background: #dc3545; display: none; }
+        .btn-help { background: #6c757d; font-size: 14px; margin-top: 10px;}
+
+        #status {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+            border-left: 5px solid #ccc;
+        }
+
+        #speed-box {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 999;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Painel -->
+    <div id="ui-panel">
+        <div class="toggle-btn" onclick="togglePanel()">🚗</div>
+        
+        <h3>Navegador Simples</h3>
+        
+        <div id="status">👆 Toque no mapa para definir o destino</div>
+
+        <button id="btn-start" class="btn-start" onclick="startGPS()">INICIAR GPS</button>
+        <button id="btn-stop" class="btn-stop" onclick="stopGPS()">PARAR</button>
+        
+        <button class="btn-help" onclick="alert('1. Toque no mapa onde quer ir.\n2. Clique em Iniciar GPS.\n3. Se pedir permissão, clique em PERMITIR.')">❓ Ajuda</button>
+    </div>
+
+    <div id="speed-box">0 km/h</div>
+    <div id="map"></div>
+
+    <script>
+        // --- MAPA (Tema Claro) ---
+        var map = L.map('map', { zoomControl: false }).setView([-5.7945, -35.2110], 14);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Variáveis
+        var carMarker = null;
+        var destMarker = null;
+        var routeLine = null;
+        var watchId = null;
+        var destCoords = null;
+
+        // --- FUNÇÃO DE TOCAR NO MAPA ---
+        map.on('click', function(e) {
+            destCoords = [e.latlng.lat, e.latlng.lng];
+            
+            // Remove marcador anterior se houver
+            if (destMarker) map.removeLayer(destMarker);
+            if (routeLine) map.removeLayer(routeLine);
+
+            // Cria novo marcador de destino
+            destMarker = L.marker(destCoords).addTo(map)
+                .bindPopup("Destino Definido!")
+                .openPopup();
+            
+            document.getElementById('status').innerHTML = "✅ Destino marcado! Agora inicie o GPS.";
+            document.getElementById('status').style.borderLeftColor = "#28a745";
+        });
+
+        function togglePanel() {
+            var panel = document.getElementById('ui-panel');
+            if (panel.style.transform === "translate(-50%, -150%)") {
+                panel.style.transform = "translateX(-50%)";
+            } else {
+                panel.style.transform = "translate(-50%, -150%)";
+            }
+        }
+
+        function startGPS() {
+            if (!navigator.geolocation) {
+                alert("Seu navegador não suporta GPS.");
+                return;
+            }
+
+            document.getElementById('btn-start').style.display = 'none';
+            document.getElementById('btn-stop').style.display = 'block';
+            document.getElementById('status').innerText = "📡 Buscando satélites...";
+
+            watchId = navigator.geolocation.watchPosition(updatePos, errorPos, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        }
+
+        function updatePos(pos) {
+            var lat = pos.coords.latitude;
+            var lon = pos.coords.longitude;
+            var speed = pos.coords.speed;
+            var heading = pos.coords.heading;
+
+            // Velocímetro
+            var kmh = speed ? (speed * 3.6).toFixed(0) : 0;
+            document.getElementById('speed-box').innerText = kmh + " km/h";
+
+            // Criar/Atualizar Carro
+            if (!carMarker) {
+                var carIcon = L.icon({
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3097/3097180.png',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20]
+                });
+                carMarker = L.marker([lat, lon], {icon: carIcon, rotationAngle: 0}).addTo(map);
+                map.setView([lat, lon], 16);
+                document.getElementById('status').innerText = "📍 GPS Ativo. Calculando rota...";
+            } else {
+                carMarker.setLatLng([lat, lon]);
+                if (heading !== null) carMarker.setRotationAngle(heading);
+            }
+
+            // Se tiver destino marcado, traçar rota
+            if (destCoords && !routeLine) {
+                calcRoute(lat, lon, destCoords[0], destCoords[1]);
+            }
+        }
+
+        async function calcRoute(lat1, lon1, lat2, lon2) {
+            try {
+                var url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`;
+                var res = await fetch(url);
+                var data = await res.json();
+
+                if (data.code === 'Ok') {
+                    routeLine = L.geoJSON(data.routes[0].geometry, {
+                        style: {color: 'blue', weight: 6}
+                    }).addTo(map);
+                    document.getElementById('status').innerText = "✅ Rota traçada! Siga a linha azul.";
+                }
+            } catch (e) {
+                console.log("Erro rota", e);
+            }
+        }
+
+        function errorPos(err) {
+            var msg = "❌ Erro GPS";
+            if (err.code === 1) msg = "❌ Permissão Negada! Vá em Configurações > Apps > Chrome > Permissões > Localização > Permitir.";
+            document.getElementById('status').innerText = msg;
+            document.getElementById('status').style.borderLeftColor = "red";
+        }
+
+        function stopGPS() {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            location.reload();
+        }
+    </script>
+</body>
+</html>
