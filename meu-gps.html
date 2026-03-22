@@ -177,6 +177,11 @@
         <div class="hud-label">km/h</div>
     </div>
     <button id="btn-center" onclick="resumeFollow()">📍</button>
+    <button id="btn-calib" onclick="openCalibration()" title="Calibrar bússola" style="
+        background:rgba(255,255,255,0.97); backdrop-filter:blur(12px);
+        border:none; border-radius:50%; width:50px; height:50px; font-size:20px;
+        cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.15); pointer-events:auto;
+        display:none; align-items:center; justify-content:center;">🧭</button>
     <div id="route-info" class="hud-card">
         <div class="hud-value" id="dist-value">—</div>
         <div class="hud-label">do destino</div>
@@ -229,33 +234,61 @@ var arrivedNotified = false;
 var carArrowEl      = document.getElementById('car-arrow');
 
 // ── Sensores de orientação (giroscópio + magnetômetro) ────
-// O S23 fornece heading via DeviceOrientationEvent.
-// "webkitCompassHeading" é o azimute magnético (0=Norte, 90=Leste)
-// já compensado pelo giroscópio — muito mais suave que GPS.heading.
-// Em Android, usamos alpha com correção de declinação.
-var sensorHeading    = null;   // heading vindo dos sensores
+var sensorHeading    = null;
 var sensorActive     = false;
-var orientationAlpha = null;   // última leitura bruta
-var compassOffset    = 0;      // correção para transformar alpha em azimute
+var compassOffset    = 0;   // offset de calibração (declinação magnética + manual)
+var declinationFetched = false;
+
+// Carregar offset salvo
+try { compassOffset = parseFloat(localStorage.getItem('compassOffset') || '0') || 0; } catch(e){}
+
+// ── Declinação magnética (NOAA World Magnetic Model) ──────
+// Busca automaticamente na primeira fix de GPS.
+// A declinação em Tibau do Sul/RN é aprox. -21° (varia com o ano).
+// Corrige o azimute do magnetômetro para o norte geográfico real.
+async function fetchDeclination(lat, lon) {
+    if (declinationFetched) return;
+    declinationFetched = true;
+    try {
+        var today = new Date();
+        var url = 'https://www.ngdc.noaa.gov/geomag-web/calculators/calculateDeclination'
+            + '?lat1=' + lat.toFixed(4)
+            + '&lon1=' + lon.toFixed(4)
+            + '&startYear='  + today.getFullYear()
+            + '&startMonth=' + (today.getMonth() + 1)
+            + '&startDay='   + today.getDate()
+            + '&resultFormat=json';
+
+        var data = await fetch(url).then(r => r.json());
+        var decl = data.result && data.result[0] && data.result[0].declination;
+
+        if (decl !== undefined && !isNaN(decl)) {
+            // declinação negativa = norte mag está a OESTE do norte geog.
+            // Para corrigir o azimute: heading_verdadeiro = heading_mag + declinação
+            compassOffset = decl;
+            try { localStorage.setItem('compassOffset', compassOffset); } catch(e) {}
+            setStatus('🧭', 'Declinação: ' + decl.toFixed(1) + '° — bússola corrigida');
+            setTimeout(function() {
+                if (isNavigating) setStatus('🚗', 'GPS ativo — navegando');
+            }, 3000);
+        }
+    } catch(e) {
+        console.warn('Declinação magnética não disponível, usando offset salvo.');
+    }
+}
 
 function startSensors() {
-    // iOS 13+ exige permissão explícita
     if (typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
-            .then(function(state) {
-                if (state === 'granted') bindOrientation();
-            })
+            .then(function(state) { if (state === 'granted') bindOrientation(); })
             .catch(console.error);
     } else {
-        // Android / outros — sem necessidade de permissão
         bindOrientation();
     }
 }
 
 function bindOrientation() {
-    // Preferir "deviceorientationabsolute" (mais preciso, norte magnético real)
-    // Fallback para "deviceorientation" se não disponível
     var evtAbsolute = 'ondeviceorientationabsolute' in window;
     window.addEventListener(
         evtAbsolute ? 'deviceorientationabsolute' : 'deviceorientation',
@@ -264,30 +297,121 @@ function bindOrientation() {
 }
 
 function onOrientation(e) {
-    // webkitCompassHeading: disponível no iOS, já é azimute correto
+    var alpha = e.alpha, beta = e.beta, gamma = e.gamma;
+    if (alpha === null || alpha === undefined) return;
+
+    // iOS: webkitCompassHeading já é azimute compensado pelo hardware
     if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
-        sensorHeading = e.webkitCompassHeading;
+        sensorHeading = (e.webkitCompassHeading + compassOffset + 360) % 360;
         sensorActive  = true;
         return;
     }
 
-    // Android: e.alpha = rotação em torno do eixo Z em graus [0-360]
-    // absolute=true significa já referenciado ao norte magnético
-    if (e.alpha !== null && e.alpha !== undefined) {
-        orientationAlpha = e.alpha;
-        // alpha=0 no Android costuma ser norte quando absolute=true
-        // Converter para azimute: azimute = (360 - alpha) % 360
-        sensorHeading = (360 - e.alpha + compassOffset) % 360;
-        sensorActive  = true;
+    // Android — compensação de tilt para qualquer orientação do celular.
+    //
+    // O padrão W3C define os eixos assim:
+    //   alpha = yaw   (rotação em torno de Z, 0–360°)
+    //   beta  = pitch (inclinação frente/trás, -180..180°)
+    //   gamma = roll  (inclinação lateral, -90..90°)
+    //
+    // Celular DEITADO (paisagem/flat): beta≈0, gamma≈0 → alpha = azimute direto
+    // Celular EM PÉ (retrato):        beta≈90           → eixos trocam
+    //
+    // A fórmula correta usa a matriz de rotação completa para projetar
+    // o vetor [0,1,0] (norte no plano do dispositivo) no plano horizontal,
+    // levando em conta a orientação atual da tela.
+
+    var aRad = alpha * Math.PI / 180;
+    var bRad = beta  * Math.PI / 180;
+    var gRad = gamma * Math.PI / 180;
+
+    var sinA = Math.sin(aRad), cosA = Math.cos(aRad);
+    var sinB = Math.sin(bRad), cosB = Math.cos(bRad);
+    var sinG = Math.sin(gRad), cosG = Math.cos(gRad);
+
+    // Componentes do vetor norte após rotação ZXY completa
+    var Vx = cosA * sinG * sinB + sinA * cosG * sinB - cosA * cosB * sinG + sinA * sinG;
+    var Vy = sinA * sinG * sinB - cosA * cosG * sinB + sinA * cosB * sinG + cosA * sinG;
+
+    // Detectar orientação da tela para corrigir eixos
+    var orient = (screen.orientation && screen.orientation.angle) ||
+                 window.orientation || 0;
+
+    var heading;
+    if (Math.abs(orient) === 90 || Math.abs(orient) === 270) {
+        // Paisagem
+        heading = Math.atan2(Vy, Vx) * 180 / Math.PI;
+    } else {
+        // Retrato (modo normal do S23 em pé)
+        // Em retrato, beta≈90 — trocar papel de beta e gamma
+        var Nx =  cosA * sinB + sinA * cosB * sinG;
+        var Ny = -sinA * sinB + cosA * cosB * sinG;
+        heading = Math.atan2(-Nx, Ny) * 180 / Math.PI;
     }
+
+    if (heading < 0) heading += 360;
+
+    sensorHeading = (heading + compassOffset + 360) % 360;
+    sensorActive  = true;
 }
 
-// Filtro de suavização exponencial para evitar tremido
+// ── Fusão inteligente: GPS heading em movimento, bússola parado ──
+// Quando o carro está acima de 8 km/h o GPS heading é mais fiel
+// (sem interferência magnética do motor/carroceria).
+// Abaixo disso a bússola é melhor pois o GPS heading fica instável.
+var lastGpsHeading = null;
+var lastGpsSpeed   = 0;
+
+function getFusedHeading(gpsHeading, gpsSpeed) {
+    lastGpsSpeed = gpsSpeed || 0;
+    if (gpsHeading !== null && !isNaN(gpsHeading)) lastGpsHeading = gpsHeading;
+
+    var kmh = lastGpsSpeed * 3.6;
+
+    if (kmh >= 8 && lastGpsHeading !== null) {
+        // Em movimento: GPS heading — não sofre interferência magnética
+        return lastGpsHeading;
+    } else if (sensorActive && sensorHeading !== null) {
+        // Parado ou devagar: bússola + giroscópio
+        return sensorHeading;
+    } else if (lastGpsHeading !== null) {
+        return lastGpsHeading;
+    }
+    return null;
+}
+
+// Filtro de suavização exponencial
 var smoothHeading = 0;
 function smoothAngle(current, target, factor) {
-    // Interpola pelo caminho mais curto no círculo
     var diff = ((target - current + 540) % 360) - 180;
     return (current + diff * factor + 360) % 360;
+}
+
+// ── Calibração de bússola ─────────────────────────────────
+// Permite corrigir o erro sistemático do magnetômetro.
+// O usuário aponta o carro para o norte, toca "Calibrar norte"
+// e o app salva o offset necessário.
+function openCalibration() {
+    var cur = sensorHeading !== null ? sensorHeading : 0;
+    var offset = prompt(
+        'CALIBRAÇÃO DA BÚSSOLA\n\n' +
+        'Aponte o celular para o NORTE geográfico, depois toque OK.\n\n' +
+        'Leitura atual da bússola: ' + Math.round(cur) + '°\n' +
+        'Offset atual: ' + Math.round(compassOffset) + '°\n\n' +
+        'Digite um offset manual (ou deixe 0 para auto-calibrar apontando para o norte):',
+        '0'
+    );
+    if (offset === null) return;
+    var val = parseFloat(offset);
+    if (!isNaN(val)) {
+        compassOffset = val;
+    } else {
+        // Auto: offset = quanto falta para chegar a 0 (norte)
+        compassOffset = (360 - (cur - compassOffset)) % 360;
+        if (compassOffset > 180) compassOffset -= 360;
+    }
+    try { localStorage.setItem('compassOffset', compassOffset); } catch(e){}
+    setStatus('🧭', 'Bússola calibrada. Offset: ' + Math.round(compassOffset) + '°');
 }
 
 // ── Ícone de destino ──────────────────────────────────────
@@ -330,6 +454,7 @@ function startGPS() {
     isNavigating = true; isFollowing = true; arrivedNotified = false;
     document.getElementById('btn-start').style.display = 'none';
     document.getElementById('btn-stop').style.display  = 'block';
+    document.getElementById('btn-calib').style.display = 'flex';
     setStatus('📡', 'Aguardando sinal GPS...');
 
     // Ativar sensores de orientação (giroscópio/magnetômetro)
@@ -356,6 +481,7 @@ function stopGPS() {
     carArrowEl.style.display = 'none';
     document.getElementById('btn-stop').style.display  = 'none';
     document.getElementById('btn-start').style.display = 'block';
+    document.getElementById('btn-calib').style.display = 'none';
     document.getElementById('btn-center').classList.remove('visible');
     document.getElementById('speed-value').textContent = '0';
     document.getElementById('route-info').style.display = 'none';
@@ -378,46 +504,42 @@ function resumeFollow() {
 function onPosition(pos) {
     var lat   = pos.coords.latitude;
     var lon   = pos.coords.longitude;
-    var speed = pos.coords.speed;
+    var speed = pos.coords.speed || 0;
+    var gpsH  = (pos.coords.heading !== null && !isNaN(pos.coords.heading))
+                ? pos.coords.heading : null;
 
-    // Fusão de sensores:
-    // - Se giroscópio/magnetômetro estiver ativo: usa ele (suave, ~30Hz)
-    // - Se não: tenta heading do GPS
-    // - Fallback: bearing calculado entre duas posições
-    var heading;
-    if (sensorActive && sensorHeading !== null) {
-        heading = sensorHeading; // mais preciso e suave
-    } else if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
-        heading = pos.coords.heading;
-    } else {
-        heading = lastPos ? calcBearing(lastPos.lat, lastPos.lon, lat, lon) : lastHeading;
+    // Na primeira posição: buscar declinação magnética da NOAA para esta lat/lon
+    if (!declinationFetched) fetchDeclination(lat, lon);
+
+    // Anti-jitter: GPS heading só é confiável se movendo
+    if (lastPos && haversine(lastPos.lat, lastPos.lon, lat, lon) < 1) gpsH = null;
+
+    // Heading fundido: GPS em movimento rápido, bússola parado/devagar
+    var heading = getFusedHeading(gpsH, speed);
+
+    // Fallback: bearing calculado entre posições
+    if (heading === null) {
+        heading = lastPos ? calcBearing(lastPos.lat, lastPos.lon, lat, lon) : smoothHeading;
     }
 
-    // Anti-jitter: se parado, mantém último heading
-    if (lastPos && haversine(lastPos.lat, lastPos.lon, lat, lon) < 2 && !sensorActive) {
-        heading = lastHeading;
-    }
-
-    lastHeading = heading;
-    lastPos     = { lat, lon };
+    lastPos = { lat, lon };
 
     // Velocímetro
     document.getElementById('speed-value').textContent =
-        (speed && speed > 0.5) ? Math.round(speed * 3.6) : 0;
+        speed > 0.5 ? Math.round(speed * 3.6) : 0;
 
     if (isFollowing) {
         map.setView([lat, lon], map.getZoom(), { animate: false });
         updateCarArrow(lat, lon);
-        // O bearing loop já aplica setBearing continuamente via sensores
         if (!sensorActive) {
             smoothHeading = smoothAngle(smoothHeading, heading, 0.3);
             map.setBearing(smoothHeading);
         }
     }
 
-    if (lastPos && !document.getElementById('btn-stop').style.display === 'none') {
-        setStatus('🚗', 'GPS ativo — navegando');
-    }
+    var kmh = Math.round(speed * 3.6);
+    var src  = (kmh >= 8) ? '🛰️ GPS' : (sensorActive ? '🧭 bússola' : '📍');
+    setStatus('🚗', `Navegando · ${kmh} km/h · ${src}`);
 
     if (destCoords && !routeLine) calculateRoute(lat, lon);
 
@@ -480,12 +602,16 @@ function clearRoute() {
 }
 
 // ── Busca de endereço ─────────────────────────────────────
-// Estratégia em cascata:
-// 1. Nominatim estruturado (rua + número separados) — mais preciso para números
-// 2. Nominatim texto livre — fallback
-// 3. Photon (índice OSM diferente, boa cobertura BR) — segundo fallback
-// Os três rodam em paralelo e os resultados são mesclados,
-// priorizando os que têm house_number confirmado.
+// Prioridade:
+//   1. Google Geocoding API (se chave configurada) — cobertura total BR
+//   2. Nominatim estruturado (rua + número separados)
+//   3. Photon (índice OSM alternativo)
+// O Google é o único que resolve números de imóvel no Brasil com
+// precisão. Cadastre uma chave em console.cloud.google.com → 
+// APIs & Services → Geocoding API (gratuito até 40.000 req/mês).
+
+// Cole sua chave do Google aqui (ou deixe vazio para usar só OSM):
+var GOOGLE_API_KEY = '';
 
 async function searchAddress() {
     var query = document.getElementById('search-input').value.trim();
@@ -498,110 +624,146 @@ async function searchAddress() {
     statusEl.style.display  = 'block';
     statusEl.textContent    = 'Buscando...';
 
-    try {
-        // Tentar extrair número do endereço digitado
-        // Ex: "Rua das Flores 123 Natal" → street="Rua das Flores", number="123", city="Natal"
-        var parsed   = parseAddressQuery(query);
-        var results  = [];
+    var results = [];
 
-        // Busca 1: Nominatim estruturado (street + housenumber separados)
-        // Muito mais preciso para localizar número exato
-        if (parsed.number) {
-            try {
-                var structUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=br'
-                    + '&street=' + encodeURIComponent(parsed.number + ' ' + parsed.street)
-                    + (parsed.city ? '&city=' + encodeURIComponent(parsed.city) : '')
-                    + '&state=' + encodeURIComponent(parsed.state || 'Rio Grande do Norte');
-                var r1 = await fetch(structUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
-                results = results.concat(r1.map(x => ({...x, _src: 'structured'})));
-            } catch(e) {}
-        }
-
-        // Busca 2: Nominatim texto livre (sempre roda)
+    // ── 1. Google Geocoding (melhor para números no Brasil) ──
+    if (GOOGLE_API_KEY) {
         try {
-            var freeUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=br&q='
-                        + encodeURIComponent(query);
-            var r2 = await fetch(freeUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
-            results = results.concat(r2.map(x => ({...x, _src: 'free'})));
-        } catch(e) {}
-
-        // Busca 3: Photon — índice OSM independente, boa cobertura BR
-        try {
-            var photonUrl = 'https://photon.komoot.io/api/?limit=5&lang=pt&q='
-                          + encodeURIComponent(query);
-            var r3 = await fetch(photonUrl).then(r => r.json());
-            if (r3.features) {
-                r3.features.forEach(function(f) {
-                    var p = f.properties || {};
+            var gUrl = 'https://maps.googleapis.com/maps/api/geocode/json'
+                + '?address=' + encodeURIComponent(query + ', Brasil')
+                + '&region=br&language=pt-BR'
+                + '&key=' + GOOGLE_API_KEY;
+            var gData = await fetch(gUrl).then(r => r.json());
+            if (gData.status === 'OK') {
+                gData.results.forEach(function(item) {
+                    var loc  = item.geometry.location;
+                    var comp = item.address_components || [];
+                    var get  = function(type) {
+                        var c = comp.find(function(x) { return x.types.includes(type); });
+                        return c ? c.long_name : '';
+                    };
                     results.push({
-                        lat: f.geometry.coordinates[1],
-                        lon: f.geometry.coordinates[0],
+                        lat: loc.lat, lon: loc.lng,
                         address: {
-                            road:         p.street || p.name || '',
-                            house_number: p.housenumber || '',
-                            suburb:       p.district || p.suburb || '',
-                            city:         p.city || p.town || p.village || '',
-                            state:        p.state || ''
+                            road:         get('route'),
+                            house_number: get('street_number'),
+                            suburb:       get('sublocality') || get('neighborhood'),
+                            city:         get('administrative_area_level_2') || get('locality'),
+                            state:        get('administrative_area_level_1')
                         },
-                        _src: 'photon'
+                        _formatted: item.formatted_address,
+                        _src: 'google'
                     });
                 });
             }
+        } catch(e) { console.warn('Google geocoding falhou:', e); }
+    }
+
+    // ── 2. Nominatim estruturado ──
+    var parsed = parseAddressQuery(query);
+    if (parsed.number) {
+        try {
+            var sUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=br'
+                + '&street=' + encodeURIComponent(parsed.number + ' ' + parsed.street)
+                + (parsed.city ? '&city=' + encodeURIComponent(parsed.city) : '')
+                + '&state=' + encodeURIComponent(parsed.state || 'Rio Grande do Norte');
+            var r1 = await fetch(sUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
+            results = results.concat(r1.map(x => ({...x, _src:'nom-struct'})));
         } catch(e) {}
+    }
 
-        statusEl.style.display = 'none';
+    // ── 3. Nominatim texto livre ──
+    try {
+        var fUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=br&q='
+            + encodeURIComponent(query);
+        var r2 = await fetch(fUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
+        results = results.concat(r2.map(x => ({...x, _src:'nom-free'})));
+    } catch(e) {}
 
-        if (results.length === 0) {
-            statusEl.style.display = 'block';
-            statusEl.textContent   = 'Nenhum resultado encontrado.';
-            return;
+    // ── 4. Photon ──
+    try {
+        var pUrl = 'https://photon.komoot.io/api/?limit=4&lang=pt&q=' + encodeURIComponent(query);
+        var r3   = await fetch(pUrl).then(r => r.json());
+        if (r3.features) {
+            r3.features.forEach(function(f) {
+                var p = f.properties || {};
+                results.push({
+                    lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0],
+                    address: {
+                        road:         p.street || p.name || '',
+                        house_number: p.housenumber || '',
+                        suburb:       p.district || p.suburb || '',
+                        city:         p.city || p.town || p.village || '',
+                        state:        p.state || ''
+                    },
+                    _src: 'photon'
+                });
+            });
         }
+    } catch(e) {}
 
-        // Deduplicar por proximidade (~50m) e ordenar:
-        // primeiro os que têm número confirmado
-        results = deduplicateResults(results);
-        results.sort(function(a, b) {
-            var aHasNum = !!(a.address && a.address.house_number);
-            var bHasNum = !!(b.address && b.address.house_number);
-            return (bHasNum ? 1 : 0) - (aHasNum ? 1 : 0);
-        });
+    statusEl.style.display = 'none';
 
-        resultsEl.style.display = 'block';
-        results.slice(0, 7).forEach(function(item) {
-            var div  = document.createElement('div');
-            div.className = 'sri';
-            var addr = item.address || {};
-
-            var line1Parts = [];
-            if (addr.road)         line1Parts.push(addr.road);
-            if (addr.house_number) line1Parts.push(addr.house_number);
-
-            var line2Parts = [];
-            if (addr.suburb) line2Parts.push(addr.suburb);
-            line2Parts.push(addr.city || addr.town || addr.village || '');
-            if (addr.state) line2Parts.push(addr.state);
-
-            var line1 = line1Parts.filter(Boolean).join(', ');
-            var line2 = line2Parts.filter(Boolean).join(', ');
-
-            if (line1) {
-                div.innerHTML = '<strong style="display:block;color:#111;font-size:13px">'
-                    + escHtml(line1) + '</strong>'
-                    + '<span style="color:#888;font-size:12px">' + escHtml(line2) + '</span>';
-            } else {
-                div.textContent = item.display_name || line2;
-            }
-
-            var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
-            div.onclick = function() {
-                selectResult(lat, lon, (line1 ? line1 + ', ' : '') + line2);
-            };
-            resultsEl.appendChild(div);
-        });
-
-    } catch(e) {
+    if (results.length === 0) {
         statusEl.style.display = 'block';
-        statusEl.textContent   = 'Erro ao buscar endereço.';
+        statusEl.textContent   = 'Nenhum resultado encontrado.';
+        return;
+    }
+
+    // Deduplicar e ordenar: Google/com número primeiro
+    results = deduplicateResults(results);
+    results.sort(function(a, b) {
+        var score = function(x) {
+            var s = 0;
+            if (x._src === 'google') s += 10;
+            if (x.address && x.address.house_number) s += 5;
+            return s;
+        };
+        return score(b) - score(a);
+    });
+
+    resultsEl.style.display = 'block';
+    results.slice(0, 7).forEach(function(item) {
+        var div  = document.createElement('div');
+        div.className = 'sri';
+        var addr = item.address || {};
+
+        // Se tiver formatted_address do Google, usa ela como linha 2
+        var line1Parts = [];
+        if (addr.road)         line1Parts.push(addr.road);
+        if (addr.house_number) line1Parts.push(addr.house_number);
+
+        var line2Parts = [];
+        if (addr.suburb) line2Parts.push(addr.suburb);
+        line2Parts.push(addr.city || '');
+        if (addr.state) line2Parts.push(addr.state);
+
+        var line1 = line1Parts.filter(Boolean).join(', ');
+        var line2 = item._formatted
+            ? item._formatted.replace(', Brasil', '')
+            : line2Parts.filter(Boolean).join(', ');
+
+        var srcBadge = item._src === 'google'
+            ? '<span style="font-size:10px;color:#0a84ff;font-weight:700;margin-left:4px">Google</span>'
+            : '';
+
+        div.innerHTML = '<strong style="display:block;color:#111;font-size:13px">'
+            + escHtml(line1 || line2) + srcBadge + '</strong>'
+            + (line1 ? '<span style="color:#888;font-size:12px">' + escHtml(line2) + '</span>' : '');
+
+        var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
+        div.onclick = function() {
+            selectResult(lat, lon, (line1 ? line1 + ' — ' : '') + line2);
+        };
+        resultsEl.appendChild(div);
+    });
+
+    // Se não tem chave Google, sugerir configurar
+    if (!GOOGLE_API_KEY && results.every(function(r) { return !r.address || !r.address.house_number; })) {
+        var tip = document.createElement('div');
+        tip.style.cssText = 'padding:10px 14px;font-size:11px;color:#aaa;border-top:1px solid #f0f0f0';
+        tip.textContent = '💡 Para localizar números de imóvel com precisão, configure a chave do Google Maps no código.';
+        resultsEl.appendChild(tip);
     }
 }
 
@@ -610,16 +772,13 @@ function parseAddressQuery(q) {
     var numberMatch = q.match(/\b(\d{1,6})\b/);
     var number      = numberMatch ? numberMatch[1] : '';
     var street      = q.replace(/\b\d{1,6}\b/, '').replace(/,\s*,/g, ',').trim().replace(/,\s*$/, '').trim();
-
-    // Tentar detectar cidade após vírgula ou ao final
-    var cityMatch = street.match(/,\s*([^,]+)$/);
-    var city      = cityMatch ? cityMatch[1].trim() : '';
+    var cityMatch   = street.match(/,\s*([^,]+)$/);
+    var city        = cityMatch ? cityMatch[1].trim() : '';
     if (city) street = street.replace(/,\s*[^,]+$/, '').trim();
-
-    return { street: street, number: number, city: city, state: '' };
+    return { street, number, city, state: '' };
 }
 
-// Remove duplicatas muito próximas (~50m)
+// Remove duplicatas próximas (~50m)
 function deduplicateResults(arr) {
     var seen = [];
     return arr.filter(function(item) {
