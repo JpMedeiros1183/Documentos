@@ -16,12 +16,8 @@
             position: absolute; 
             top: 0; 
             left: 0; 
-            z-index: 1; 
-        }
-
-        /* Ajuste fino para rotação não bugar a tela */
-        .leaflet-map-pane {
-            transform-origin: center center !important;
+            z-index: 1;
+            transition: transform 0.3s ease-out;
         }
 
         #ui-container {
@@ -33,7 +29,7 @@
             width: 90%;
             max-width: 360px;
             transition: transform 0.3s ease;
-            pointer-events: none; /* Deixa clicar no mapa através das bordas */
+            pointer-events: none;
         }
 
         .panel {
@@ -42,7 +38,7 @@
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
-            pointer-events: auto; /* Reativa cliques no painel */
+            pointer-events: auto;
         }
 
         .fab {
@@ -105,11 +101,37 @@
             z-index: 999;
             border: 2px solid #333;
         }
+
+        /* Seta indicadora no centro */
+        #direction-arrow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            z-index: 998;
+            pointer-events: none;
+            display: none;
+        }
+
+        #direction-arrow svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
+
+    <!-- Seta indicando direção do carro (fica no centro) -->
+    <div id="direction-arrow">
+        <svg viewBox="0 0 100 100">
+            <polygon points="50,10 20,90 50,70 80,90" fill="#007bff" stroke="white" stroke-width="3"/>
+        </svg>
+    </div>
 
     <div id="ui-container">
         <div id="fab" class="fab" onclick="togglePanel()">🚗</div>
@@ -132,12 +154,16 @@
 
     <script>
         // 1. Inicializar Mapa
-        var map = L.map('map', { zoomControl: false, fadeAnimation: false }).setView([-5.7945, -35.2110], 13);
+        var map = L.map('map', { 
+            zoomControl: false, 
+            fadeAnimation: false
+        }).setView([-5.7945, -35.2110], 13);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
-            maxZoom: 19
+            maxZoom: 22,
+            minZoom: 3
         }).addTo(map);
 
         var carMarker = null;
@@ -146,6 +172,8 @@
         var watchId = null;
         var destCoords = null;
         var isNavigating = false;
+        var currentHeading = 0;
+        var lastValidHeading = 0;
 
         // 2. Interface
         function togglePanel() {
@@ -163,6 +191,7 @@
             destCoords = [e.latlng.lat, e.latlng.lng];
             if (destMarker) map.removeLayer(destMarker);
             if (routeLine) map.removeLayer(routeLine);
+            routeLine = null;
 
             destMarker = L.marker(destCoords).addTo(map).bindPopup("Destino").openPopup();
             document.getElementById('status-box').innerText = "✅ Destino marcado!";
@@ -175,7 +204,8 @@
             document.getElementById('setup-controls').style.display = 'none';
             document.getElementById('nav-controls').style.display = 'block';
             document.getElementById('status-box').innerText = "📡 Buscando satélites...";
-            togglePanel(); // Minimiza
+            document.getElementById('direction-arrow').style.display = 'block';
+            togglePanel();
 
             watchId = navigator.geolocation.watchPosition(updatePosition, handleError, {
                 enableHighAccuracy: true,
@@ -184,54 +214,73 @@
             });
         }
 
-        // 5. Lógica de Rotação e Movimento
+        // 5. Lógica de Rotação e Movimento CORRIGIDA
         function updatePosition(pos) {
             var lat = pos.coords.latitude;
             var lon = pos.coords.longitude;
             var speed = pos.coords.speed;
-            // Heading (direção) vem em graus (0 a 360). Se for null, mantém o anterior
-            var heading = pos.coords.heading !== null ? pos.coords.heading : 0; 
+            var heading = pos.coords.heading;
+
+            // Se não tem heading do GPS, calcula baseado na última posição
+            if (heading === null || heading === undefined) {
+                if (carMarker) {
+                    var prevLatLng = carMarker.getLatLng();
+                    heading = calculateBearing(prevLatLng.lat, prevLatLng.lng, lat, lon);
+                } else {
+                    heading = lastValidHeading;
+                }
+            } else {
+                lastValidHeading = heading;
+            }
 
             // Velocímetro
             var kmh = speed ? (speed * 3.6).toFixed(0) : 0;
             document.getElementById('speedometer').innerText = kmh + " km/h";
 
-            // Criar Carro
+            // Criar Carro (invisível, só para controle de posição)
             if (!carMarker) {
-                // Ícone apontando para CIMA (0 graus)
-                var carIcon = L.icon({
-                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3097/3097180.png', 
-                    iconSize: [40, 40],
-                    iconAnchor: [20, 20]
+                var carIcon = L.divIcon({
+                    className: 'car-marker',
+                    html: '<div style="width:20px;height:20px;background:transparent;"></div>',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
                 });
-                carMarker = L.marker([lat, lon], {icon: carIcon}).addTo(map);
-                map.setView([lat, lon], 17); // Zoom próximo
+                carMarker = L.marker([lat, lon], {icon: carIcon, zIndexOffset: 1000}).addTo(map);
+                // Zoom 19 para visão próxima das ruas
+                map.setView([lat, lon], 19);
             } else {
                 carMarker.setLatLng([lat, lon]);
             }
 
-            if (isNavigating) {
-                // 1. Manter o carro sempre no centro da tela
-                map.panTo([lat, lon], {animate: true, duration: 0.5});
+            if (isNavigating && heading !== null) {
+                currentHeading = heading;
+                
+                // 1. Manter o carro no centro
+                map.panTo([lat, lon], {animate: true, duration: 0.3});
 
-                // 2. Girar o MAPA (Sentido anti-horário baseado na direção)
-                // Ex: Se estou indo para Leste (90deg), o mapa gira -90deg para o Leste ficar em cima
-                var mapPane = map.getPane('mapPane');
-                mapPane.style.transform = `translateZ(0) rotate(${-heading}deg)`;
-
-                // 3. Girar o CARRO (Sentido horário para compensar e ficar reto)
-                carMarker.setRotationAngle(heading);
-
-                // 4. Girar o DESTINO (Para não ficar de cabeça para baixo)
-                if (destMarker) {
-                    destMarker.setRotationAngle(heading);
-                }
+                // 2. Girar o MAPA para que a direção do carro fique para CIMA
+                var mapContainer = document.getElementById('map');
+                mapContainer.style.transform = `rotate(${-heading}deg)`;
             }
 
             // Traçar Rota
             if (destCoords && !routeLine) {
                 calculateRoute(lat, lon, destCoords[0], destCoords[1]);
             }
+        }
+
+        // Calcular ângulo entre dois pontos (bearing)
+        function calculateBearing(lat1, lng1, lat2, lng2) {
+            var dLon = (lng2 - lng1) * Math.PI / 180;
+            var lat1Rad = lat1 * Math.PI / 180;
+            var lat2Rad = lat2 * Math.PI / 180;
+            
+            var y = Math.sin(dLon) * Math.cos(lat2Rad);
+            var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+                    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+            
+            var bearing = Math.atan2(y, x) * 180 / Math.PI;
+            return (bearing + 360) % 360;
         }
 
         async function calculateRoute(startLat, startLon, endLat, endLon) {
@@ -241,7 +290,7 @@
                 var data = await response.json();
                 if (data.code === 'Ok') {
                     routeLine = L.geoJSON(data.routes[0].geometry, {
-                        style: { color: '#007bff', weight: 6 }
+                        style: { color: '#007bff', weight: 8, opacity: 0.9 }
                     }).addTo(map);
                     document.getElementById('status-box').innerText = "✅ Rota traçada!";
                 }
@@ -255,7 +304,8 @@
         function stopGPS() {
             isNavigating = false;
             // Reseta rotação
-            map.getPane('mapPane').style.transform = 'translateZ(0) rotate(0deg)';
+            document.getElementById('map').style.transform = 'rotate(0deg)';
+            document.getElementById('direction-arrow').style.display = 'none';
             if (watchId) navigator.geolocation.clearWatch(watchId);
             location.reload();
         }
