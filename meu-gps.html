@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPS iGo Style</title>
+    <title>GPS com Pesquisa</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -16,8 +16,11 @@
             position: absolute; 
             top: 0; 
             left: 0; 
-            z-index: 1;
-            transition: transform 0.3s ease-out;
+            z-index: 1; 
+        }
+
+        .leaflet-map-pane {
+            transform-origin: center center !important;
         }
 
         #ui-container {
@@ -27,7 +30,7 @@
             transform: translateX(-50%);
             z-index: 1000;
             width: 90%;
-            max-width: 360px;
+            max-width: 380px;
             transition: transform 0.3s ease;
             pointer-events: none;
         }
@@ -35,10 +38,12 @@
         .panel {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
             pointer-events: auto;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .fab {
@@ -62,7 +67,55 @@
 
         h2 { margin: 10px 0; font-size: 18px; color: #333; }
         
-        button {
+        /* Estilo da Barra de Pesquisa */
+        .search-box {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-btn {
+            padding: 12px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Lista de Resultados */
+        #search-results {
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            display: none;
+        }
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+        }
+        .result-item:hover {
+            background: #f0f0f0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        button.action-btn {
             width: 100%;
             padding: 15px;
             margin-top: 10px;
@@ -76,6 +129,7 @@
 
         .btn-green { background-color: #28a745; }
         .btn-red { background-color: #dc3545; }
+        .btn-info { background-color: #6c757d; font-size: 14px; }
 
         #status-box {
             background: #f1f3f5;
@@ -102,45 +156,43 @@
             border: 2px solid #333;
         }
 
-        /* Seta indicadora no centro */
-        #direction-arrow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            z-index: 998;
-            pointer-events: none;
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
             display: none;
+            margin: 10px auto;
         }
-
-        #direction-arrow svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
 
-    <!-- Seta indicando direção do carro (fica no centro) -->
-    <div id="direction-arrow">
-        <svg viewBox="0 0 100 100">
-            <polygon points="50,10 20,90 50,70 80,90" fill="#007bff" stroke="white" stroke-width="3"/>
-        </svg>
-    </div>
-
     <div id="ui-container">
-        <div id="fab" class="fab" onclick="togglePanel()">🚗</div>
+        <div id="fab" class="fab" onclick="togglePanel()"></div>
         <div id="main-panel" class="panel">
-            <h2>Navegador iGo</h2>
-            <div id="status-box">👆 Toque no mapa para definir destino</div>
+            <h2>📍 Navegador GPS</h2>
+            
+            <!-- BARRA DE PESQUISA -->
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Ex: Shopping, Rua, Posto...">
+                <button class="search-btn" onclick="searchAddress()">🔍</button>
+            </div>
+            <div id="loader" class="loader"></div>
+            <div id="search-results"></div>
+            <!-- FIM BARRA DE PESQUISA -->
+
+            <div id="status-box">👆 Toque no mapa ou pesquise acima</div>
 
             <div id="setup-controls">
                 <button class="btn-green" onclick="startGPS()">INICIAR NAVEGAÇÃO</button>
+                <button class="btn-info" onclick="alert('1. Pesquise um endereço ou toque no mapa.\n2. Clique em Iniciar Navegação.\n3. O mapa girará e seguirá você.')">❓ Ajuda</button>
             </div>
             <div id="nav-controls" style="display:none;">
                 <button class="btn-red" onclick="stopGPS()">PARAR</button>
@@ -154,16 +206,12 @@
 
     <script>
         // 1. Inicializar Mapa
-        var map = L.map('map', { 
-            zoomControl: false, 
-            fadeAnimation: false
-        }).setView([-5.7945, -35.2110], 13);
+        var map = L.map('map', { zoomControl: false, fadeAnimation: false }).setView([-5.7945, -35.2110], 13);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
-            maxZoom: 22,
-            minZoom: 3
+            maxZoom: 19
         }).addTo(map);
 
         var carMarker = null;
@@ -172,8 +220,6 @@
         var watchId = null;
         var destCoords = null;
         var isNavigating = false;
-        var currentHeading = 0;
-        var lastValidHeading = 0;
 
         // 2. Interface
         function togglePanel() {
@@ -186,25 +232,87 @@
             setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
-        // 3. Definir Destino
+        // 3. PESQUISA DE ENDEREÇOS (NOVO)
+        async function searchAddress() {
+            var query = document.getElementById('search-input').value;
+            if (!query) return alert("Digite algo para pesquisar!");
+
+            var loader = document.getElementById('loader');
+            var resultsDiv = document.getElementById('search-results');
+            
+            loader.style.display = 'block';
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+
+            try {
+                // Adiciona "Brasil" para melhorar a busca se não estiver especificado
+                if (!query.toLowerCase().includes('brasil')) {
+                    query += ", Brasil";
+                }
+
+                var response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                var data = await response.json();
+
+                loader.style.display = 'none';
+
+                if (data.length > 0) {
+                    resultsDiv.style.display = 'block';
+                    data.forEach(item => {
+                        var div = document.createElement('div');
+                        div.className = 'result-item';
+                        // Tenta pegar um nome mais amigável
+                        var displayName = item.name || item.display_name.split(',')[0];
+                        div.innerText = displayName;
+                        div.onclick = () => selectDestination(item.lat, item.lon, item.display_name);
+                        resultsDiv.appendChild(div);
+                    });
+                } else {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = '<div class="result-item">Nenhum resultado encontrado.</div>';
+                }
+            } catch (e) {
+                loader.style.display = 'none';
+                alert("Erro na conexão de pesquisa. Verifique sua internet.");
+            }
+        }
+
+        // Selecionar destino da pesquisa
+        function selectDestination(lat, lon, name) {
+            destCoords = [parseFloat(lat), parseFloat(lon)];
+            
+            if (destMarker) map.removeLayer(destMarker);
+            if (routeLine) map.removeLayer(routeLine);
+
+            destMarker = L.marker(destCoords).addTo(map)
+                .bindPopup("📍 " + name)
+                .openPopup();
+            
+            map.setView(destCoords, 15);
+            
+            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('status-box').innerText = "✅ Destino definido: " + name.split(',')[0];
+            document.getElementById('status-box').style.background = "#d4edda";
+        }
+
+        // 4. Definir Destino pelo Toque
         map.on('click', function(e) {
             destCoords = [e.latlng.lat, e.latlng.lng];
             if (destMarker) map.removeLayer(destMarker);
             if (routeLine) map.removeLayer(routeLine);
-            routeLine = null;
 
             destMarker = L.marker(destCoords).addTo(map).bindPopup("Destino").openPopup();
-            document.getElementById('status-box').innerText = "✅ Destino marcado!";
+            document.getElementById('status-box').innerText = "✅ Destino marcado no mapa!";
+            document.getElementById('status-box').style.background = "#d4edda";
+            document.getElementById('search-results').style.display = 'none';
         });
 
-        // 4. Iniciar GPS
+        // 5. Iniciar GPS
         function startGPS() {
             if (!navigator.geolocation) return alert("GPS não suportado");
             isNavigating = true;
             document.getElementById('setup-controls').style.display = 'none';
             document.getElementById('nav-controls').style.display = 'block';
             document.getElementById('status-box').innerText = "📡 Buscando satélites...";
-            document.getElementById('direction-arrow').style.display = 'block';
             togglePanel();
 
             watchId = navigator.geolocation.watchPosition(updatePosition, handleError, {
@@ -214,73 +322,43 @@
             });
         }
 
-        // 5. Lógica de Rotação e Movimento CORRIGIDA
+        // 6. Lógica de Rotação e Movimento
         function updatePosition(pos) {
             var lat = pos.coords.latitude;
             var lon = pos.coords.longitude;
             var speed = pos.coords.speed;
-            var heading = pos.coords.heading;
+            var heading = pos.coords.heading !== null ? pos.coords.heading : 0;
 
-            // Se não tem heading do GPS, calcula baseado na última posição
-            if (heading === null || heading === undefined) {
-                if (carMarker) {
-                    var prevLatLng = carMarker.getLatLng();
-                    heading = calculateBearing(prevLatLng.lat, prevLatLng.lng, lat, lon);
-                } else {
-                    heading = lastValidHeading;
-                }
-            } else {
-                lastValidHeading = heading;
-            }
-
-            // Velocímetro
             var kmh = speed ? (speed * 3.6).toFixed(0) : 0;
             document.getElementById('speedometer').innerText = kmh + " km/h";
 
-            // Criar Carro (invisível, só para controle de posição)
             if (!carMarker) {
-                var carIcon = L.divIcon({
-                    className: 'car-marker',
-                    html: '<div style="width:20px;height:20px;background:transparent;"></div>',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
+                var carIcon = L.icon({
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3097/3097180.png', 
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20]
                 });
-                carMarker = L.marker([lat, lon], {icon: carIcon, zIndexOffset: 1000}).addTo(map);
-                // Zoom 19 para visão próxima das ruas
-                map.setView([lat, lon], 19);
+                carMarker = L.marker([lat, lon], {icon: carIcon}).addTo(map);
+                map.setView([lat, lon], 17);
             } else {
                 carMarker.setLatLng([lat, lon]);
             }
 
-            if (isNavigating && heading !== null) {
-                currentHeading = heading;
-                
-                // 1. Manter o carro no centro
-                map.panTo([lat, lon], {animate: true, duration: 0.3});
+            if (isNavigating) {
+                map.panTo([lat, lon], {animate: true, duration: 0.5});
 
-                // 2. Girar o MAPA para que a direção do carro fique para CIMA
-                var mapContainer = document.getElementById('map');
-                mapContainer.style.transform = `rotate(${-heading}deg)`;
+                var mapPane = map.getPane('mapPane');
+                mapPane.style.transform = `translateZ(0) rotate(${-heading}deg)`;
+
+                carMarker.setRotationAngle(heading);
+                if (destMarker) {
+                    destMarker.setRotationAngle(heading);
+                }
             }
 
-            // Traçar Rota
             if (destCoords && !routeLine) {
                 calculateRoute(lat, lon, destCoords[0], destCoords[1]);
             }
-        }
-
-        // Calcular ângulo entre dois pontos (bearing)
-        function calculateBearing(lat1, lng1, lat2, lng2) {
-            var dLon = (lng2 - lng1) * Math.PI / 180;
-            var lat1Rad = lat1 * Math.PI / 180;
-            var lat2Rad = lat2 * Math.PI / 180;
-            
-            var y = Math.sin(dLon) * Math.cos(lat2Rad);
-            var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
-                    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
-            
-            var bearing = Math.atan2(y, x) * 180 / Math.PI;
-            return (bearing + 360) % 360;
         }
 
         async function calculateRoute(startLat, startLon, endLat, endLon) {
@@ -290,9 +368,10 @@
                 var data = await response.json();
                 if (data.code === 'Ok') {
                     routeLine = L.geoJSON(data.routes[0].geometry, {
-                        style: { color: '#007bff', weight: 8, opacity: 0.9 }
+                        style: { color: '#007bff', weight: 6 }
                     }).addTo(map);
                     document.getElementById('status-box').innerText = "✅ Rota traçada!";
+                    map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
                 }
             } catch (e) { console.error(e); }
         }
@@ -303,12 +382,17 @@
 
         function stopGPS() {
             isNavigating = false;
-            // Reseta rotação
-            document.getElementById('map').style.transform = 'rotate(0deg)';
-            document.getElementById('direction-arrow').style.display = 'none';
+            map.getPane('mapPane').style.transform = 'translateZ(0) rotate(0deg)';
             if (watchId) navigator.geolocation.clearWatch(watchId);
             location.reload();
         }
+
+        // Permitir buscar apertando Enter
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchAddress();
+            }
+        });
     </script>
 </body>
 </html>
