@@ -228,6 +228,68 @@ var lastHeading     = 0;
 var arrivedNotified = false;
 var carArrowEl      = document.getElementById('car-arrow');
 
+// ── Sensores de orientação (giroscópio + magnetômetro) ────
+// O S23 fornece heading via DeviceOrientationEvent.
+// "webkitCompassHeading" é o azimute magnético (0=Norte, 90=Leste)
+// já compensado pelo giroscópio — muito mais suave que GPS.heading.
+// Em Android, usamos alpha com correção de declinação.
+var sensorHeading    = null;   // heading vindo dos sensores
+var sensorActive     = false;
+var orientationAlpha = null;   // última leitura bruta
+var compassOffset    = 0;      // correção para transformar alpha em azimute
+
+function startSensors() {
+    // iOS 13+ exige permissão explícita
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(function(state) {
+                if (state === 'granted') bindOrientation();
+            })
+            .catch(console.error);
+    } else {
+        // Android / outros — sem necessidade de permissão
+        bindOrientation();
+    }
+}
+
+function bindOrientation() {
+    // Preferir "deviceorientationabsolute" (mais preciso, norte magnético real)
+    // Fallback para "deviceorientation" se não disponível
+    var evtAbsolute = 'ondeviceorientationabsolute' in window;
+    window.addEventListener(
+        evtAbsolute ? 'deviceorientationabsolute' : 'deviceorientation',
+        onOrientation, true
+    );
+}
+
+function onOrientation(e) {
+    // webkitCompassHeading: disponível no iOS, já é azimute correto
+    if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
+        sensorHeading = e.webkitCompassHeading;
+        sensorActive  = true;
+        return;
+    }
+
+    // Android: e.alpha = rotação em torno do eixo Z em graus [0-360]
+    // absolute=true significa já referenciado ao norte magnético
+    if (e.alpha !== null && e.alpha !== undefined) {
+        orientationAlpha = e.alpha;
+        // alpha=0 no Android costuma ser norte quando absolute=true
+        // Converter para azimute: azimute = (360 - alpha) % 360
+        sensorHeading = (360 - e.alpha + compassOffset) % 360;
+        sensorActive  = true;
+    }
+}
+
+// Filtro de suavização exponencial para evitar tremido
+var smoothHeading = 0;
+function smoothAngle(current, target, factor) {
+    // Interpola pelo caminho mais curto no círculo
+    var diff = ((target - current + 540) % 360) - 180;
+    return (current + diff * factor + 360) % 360;
+}
+
 // ── Ícone de destino ──────────────────────────────────────
 var destIcon = L.divIcon({
     className: '',
@@ -269,15 +331,27 @@ function startGPS() {
     document.getElementById('btn-start').style.display = 'none';
     document.getElementById('btn-stop').style.display  = 'block';
     setStatus('📡', 'Aguardando sinal GPS...');
+
+    // Ativar sensores de orientação (giroscópio/magnetômetro)
+    startSensors();
+
     watchId = navigator.geolocation.watchPosition(onPosition, onGPSError, {
         enableHighAccuracy: true, timeout: 15000, maximumAge: 0
     });
+
+    // Loop de atualização suave do bearing (~30fps)
+    // Atualiza o mapa com o heading dos sensores continuamente,
+    // não só quando o GPS devolve posição (que é lento, 1-2s)
+    startBearingLoop();
 }
 
 function stopGPS() {
     isNavigating = false;
     if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-    // Resetar bearing do mapa para norte
+    stopBearingLoop();
+    window.removeEventListener('deviceorientationabsolute', onOrientation, true);
+    window.removeEventListener('deviceorientation',         onOrientation, true);
+    sensorActive = false; sensorHeading = null;
     map.setBearing(0);
     carArrowEl.style.display = 'none';
     document.getElementById('btn-stop').style.display  = 'none';
@@ -302,17 +376,28 @@ function resumeFollow() {
 
 // ── Callback GPS ──────────────────────────────────────────
 function onPosition(pos) {
-    var lat     = pos.coords.latitude;
-    var lon     = pos.coords.longitude;
-    var speed   = pos.coords.speed;
-    var heading = pos.coords.heading;
+    var lat   = pos.coords.latitude;
+    var lon   = pos.coords.longitude;
+    var speed = pos.coords.speed;
 
-    if (heading === null || heading === undefined || isNaN(heading)) {
+    // Fusão de sensores:
+    // - Se giroscópio/magnetômetro estiver ativo: usa ele (suave, ~30Hz)
+    // - Se não: tenta heading do GPS
+    // - Fallback: bearing calculado entre duas posições
+    var heading;
+    if (sensorActive && sensorHeading !== null) {
+        heading = sensorHeading; // mais preciso e suave
+    } else if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
+        heading = pos.coords.heading;
+    } else {
         heading = lastPos ? calcBearing(lastPos.lat, lastPos.lon, lat, lon) : lastHeading;
     }
-    if (lastPos && haversine(lastPos.lat, lastPos.lon, lat, lon) < 2) {
+
+    // Anti-jitter: se parado, mantém último heading
+    if (lastPos && haversine(lastPos.lat, lastPos.lon, lat, lon) < 2 && !sensorActive) {
         heading = lastHeading;
     }
+
     lastHeading = heading;
     lastPos     = { lat, lon };
 
@@ -321,15 +406,18 @@ function onPosition(pos) {
         (speed && speed > 0.5) ? Math.round(speed * 3.6) : 0;
 
     if (isFollowing) {
-        // 1. Centralizar o mapa no carro
         map.setView([lat, lon], map.getZoom(), { animate: false });
-        // 2. Girar o mapa via API do plugin — labels ficam legíveis
-        map.setBearing(heading);
-        // 3. Atualizar posição da seta na tela
         updateCarArrow(lat, lon);
+        // O bearing loop já aplica setBearing continuamente via sensores
+        if (!sensorActive) {
+            smoothHeading = smoothAngle(smoothHeading, heading, 0.3);
+            map.setBearing(smoothHeading);
+        }
     }
 
-    if (!isNavigating) { setStatus('🚗', 'GPS ativo — navegando'); isNavigating = true; }
+    if (lastPos && !document.getElementById('btn-stop').style.display === 'none') {
+        setStatus('🚗', 'GPS ativo — navegando');
+    }
 
     if (destCoords && !routeLine) calculateRoute(lat, lon);
 
@@ -338,6 +426,25 @@ function onPosition(pos) {
         updateDistDisplay(dist);
         if (dist < 30 && !arrivedNotified) { arrivedNotified = true; showToast(); }
     }
+}
+
+// ── Loop de bearing suave (usa sensores a ~30fps) ─────────
+var bearingRafId = null;
+
+function startBearingLoop() {
+    function loop() {
+        if (sensorActive && sensorHeading !== null && isFollowing && lastPos) {
+            smoothHeading = smoothAngle(smoothHeading, sensorHeading, 0.12);
+            map.setBearing(smoothHeading);
+            updateCarArrow(lastPos.lat, lastPos.lon);
+        }
+        bearingRafId = requestAnimationFrame(loop);
+    }
+    bearingRafId = requestAnimationFrame(loop);
+}
+
+function stopBearingLoop() {
+    if (bearingRafId) { cancelAnimationFrame(bearingRafId); bearingRafId = null; }
 }
 
 function onGPSError(err) {
@@ -372,45 +479,162 @@ function clearRoute() {
     if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
 }
 
-// ── Busca de endereço (Nominatim) ─────────────────────────
+// ── Busca de endereço ─────────────────────────────────────
+// Estratégia em cascata:
+// 1. Nominatim estruturado (rua + número separados) — mais preciso para números
+// 2. Nominatim texto livre — fallback
+// 3. Photon (índice OSM diferente, boa cobertura BR) — segundo fallback
+// Os três rodam em paralelo e os resultados são mesclados,
+// priorizando os que têm house_number confirmado.
+
 async function searchAddress() {
     var query = document.getElementById('search-input').value.trim();
     if (!query) return;
+
     var resultsEl = document.getElementById('search-results');
     var statusEl  = document.getElementById('search-status');
     resultsEl.style.display = 'none';
     resultsEl.innerHTML     = '';
     statusEl.style.display  = 'block';
     statusEl.textContent    = 'Buscando...';
+
     try {
-        var url  = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q='
-                   + encodeURIComponent(query);
-        var data = await fetch(url, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
+        // Tentar extrair número do endereço digitado
+        // Ex: "Rua das Flores 123 Natal" → street="Rua das Flores", number="123", city="Natal"
+        var parsed   = parseAddressQuery(query);
+        var results  = [];
+
+        // Busca 1: Nominatim estruturado (street + housenumber separados)
+        // Muito mais preciso para localizar número exato
+        if (parsed.number) {
+            try {
+                var structUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=br'
+                    + '&street=' + encodeURIComponent(parsed.number + ' ' + parsed.street)
+                    + (parsed.city ? '&city=' + encodeURIComponent(parsed.city) : '')
+                    + '&state=' + encodeURIComponent(parsed.state || 'Rio Grande do Norte');
+                var r1 = await fetch(structUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
+                results = results.concat(r1.map(x => ({...x, _src: 'structured'})));
+            } catch(e) {}
+        }
+
+        // Busca 2: Nominatim texto livre (sempre roda)
+        try {
+            var freeUrl = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=br&q='
+                        + encodeURIComponent(query);
+            var r2 = await fetch(freeUrl, {headers:{'Accept-Language':'pt-BR,pt'}}).then(r => r.json());
+            results = results.concat(r2.map(x => ({...x, _src: 'free'})));
+        } catch(e) {}
+
+        // Busca 3: Photon — índice OSM independente, boa cobertura BR
+        try {
+            var photonUrl = 'https://photon.komoot.io/api/?limit=5&lang=pt&q='
+                          + encodeURIComponent(query);
+            var r3 = await fetch(photonUrl).then(r => r.json());
+            if (r3.features) {
+                r3.features.forEach(function(f) {
+                    var p = f.properties || {};
+                    results.push({
+                        lat: f.geometry.coordinates[1],
+                        lon: f.geometry.coordinates[0],
+                        address: {
+                            road:         p.street || p.name || '',
+                            house_number: p.housenumber || '',
+                            suburb:       p.district || p.suburb || '',
+                            city:         p.city || p.town || p.village || '',
+                            state:        p.state || ''
+                        },
+                        _src: 'photon'
+                    });
+                });
+            }
+        } catch(e) {}
+
         statusEl.style.display = 'none';
-        if (!data || data.length === 0) {
+
+        if (results.length === 0) {
             statusEl.style.display = 'block';
             statusEl.textContent   = 'Nenhum resultado encontrado.';
             return;
         }
+
+        // Deduplicar por proximidade (~50m) e ordenar:
+        // primeiro os que têm número confirmado
+        results = deduplicateResults(results);
+        results.sort(function(a, b) {
+            var aHasNum = !!(a.address && a.address.house_number);
+            var bHasNum = !!(b.address && b.address.house_number);
+            return (bHasNum ? 1 : 0) - (aHasNum ? 1 : 0);
+        });
+
         resultsEl.style.display = 'block';
-        data.forEach(function(item) {
+        results.slice(0, 7).forEach(function(item) {
             var div  = document.createElement('div');
             div.className = 'sri';
             var addr = item.address || {};
-            var parts = [];
-            if (addr.road)         parts.push(addr.road);
-            if (addr.house_number) parts.push(addr.house_number);
-            if (addr.suburb)       parts.push(addr.suburb);
-            parts.push(addr.city || addr.town || addr.village || '');
-            if (addr.state)        parts.push(addr.state);
-            div.textContent = parts.filter(Boolean).join(', ') || item.display_name;
-            div.onclick = function() { selectResult(parseFloat(item.lat), parseFloat(item.lon), div.textContent); };
+
+            var line1Parts = [];
+            if (addr.road)         line1Parts.push(addr.road);
+            if (addr.house_number) line1Parts.push(addr.house_number);
+
+            var line2Parts = [];
+            if (addr.suburb) line2Parts.push(addr.suburb);
+            line2Parts.push(addr.city || addr.town || addr.village || '');
+            if (addr.state) line2Parts.push(addr.state);
+
+            var line1 = line1Parts.filter(Boolean).join(', ');
+            var line2 = line2Parts.filter(Boolean).join(', ');
+
+            if (line1) {
+                div.innerHTML = '<strong style="display:block;color:#111;font-size:13px">'
+                    + escHtml(line1) + '</strong>'
+                    + '<span style="color:#888;font-size:12px">' + escHtml(line2) + '</span>';
+            } else {
+                div.textContent = item.display_name || line2;
+            }
+
+            var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
+            div.onclick = function() {
+                selectResult(lat, lon, (line1 ? line1 + ', ' : '') + line2);
+            };
             resultsEl.appendChild(div);
         });
+
     } catch(e) {
         statusEl.style.display = 'block';
         statusEl.textContent   = 'Erro ao buscar endereço.';
     }
+}
+
+// Tenta separar "Rua X, 123, Cidade" em partes
+function parseAddressQuery(q) {
+    var numberMatch = q.match(/\b(\d{1,6})\b/);
+    var number      = numberMatch ? numberMatch[1] : '';
+    var street      = q.replace(/\b\d{1,6}\b/, '').replace(/,\s*,/g, ',').trim().replace(/,\s*$/, '').trim();
+
+    // Tentar detectar cidade após vírgula ou ao final
+    var cityMatch = street.match(/,\s*([^,]+)$/);
+    var city      = cityMatch ? cityMatch[1].trim() : '';
+    if (city) street = street.replace(/,\s*[^,]+$/, '').trim();
+
+    return { street: street, number: number, city: city, state: '' };
+}
+
+// Remove duplicatas muito próximas (~50m)
+function deduplicateResults(arr) {
+    var seen = [];
+    return arr.filter(function(item) {
+        var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
+        if (isNaN(lat) || isNaN(lon)) return false;
+        for (var i = 0; i < seen.length; i++) {
+            if (haversine(lat, lon, seen[i][0], seen[i][1]) < 50) return false;
+        }
+        seen.push([lat, lon]);
+        return true;
+    });
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function selectResult(lat, lon, label) {
