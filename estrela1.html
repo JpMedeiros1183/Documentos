@@ -38,7 +38,7 @@ body{margin:0;padding:20px 12px 40px;background:#e9eef3;color:#1e2a3e;font-famil
 .msg{text-align:center;color:#64748b;padding:24px 16px;font-weight:bold;}
 .footer{text-align:center;padding:18px;background:#f8fafc;border-top:1px solid #e6edf5}
 .footer a{text-decoration:none;color:#1f6392;font-weight:700}
-.watermark{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;padding:6px 8px;border-radius:10px;font-size:10px;line-height:1.3;pointer-events:none}
+.watermark{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;padding:6px 8px;border-radius:10px;font-size:10px;line-height:1.3;pointer-events:none;z-index:99998;}
 .notice-bar{margin:12px 16px 0;background:#fff4e5;color:#7a4b00;border:1px solid #f3d19c;border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;font-weight:600}
 .security-overlay{position:fixed;inset:0;background:rgba(10,15,25,.94);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:99999;opacity:0;pointer-events:none;transition:opacity .2s ease}
 .security-overlay.show{opacity:1;pointer-events:auto}
@@ -58,20 +58,47 @@ body.blur-sensitive .app{filter:blur(14px);pointer-events:none}
 .gate-btn.secondary{background:#eef2f7;color:#344054}
 .locked-content{filter:blur(12px);pointer-events:none;user-select:none}
 @media print{body *{visibility:hidden !important} body::before{content:'IMPRESSÃO BLOQUEADA — Processo em segredo de justiça'; visibility:visible !important; display:block; position:fixed; inset:0; padding:40px 20px; background:#fff; color:#000; font:700 22px/1.4 Arial,sans-serif; text-align:center}}
+
+/* Estilos da Tela de Login */
+.login-screen {position:fixed; inset:0; background:#1f2f3c; z-index:99999999; display:flex; align-items:center; justify-content:center; padding:20px;}
+.login-screen.hidden {display:none;}
+.login-card {background:#fff; padding:32px 24px; border-radius:20px; width:100%; max-width:380px; text-align:center; box-shadow:0 16px 40px rgba(0,0,0,0.4);}
+.login-icon {font-size:40px; margin-bottom:10px;}
+.login-card h2 {margin:0 0 8px; color:#1e2a3e; font-size:22px;}
+.login-card p {margin:0 0 20px; color:#64748b; font-size:14px; line-height:1.5;}
+.login-card input {width:100%; padding:14px; border:2px solid #dde5ee; border-radius:12px; font-size:16px; margin-bottom:16px; text-align:center; outline:none; transition:border-color 0.2s;}
+.login-card input:focus {border-color:#174ea6;}
+.login-card button {width:100%; padding:14px; background:#174ea6; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; transition:background 0.2s;}
+.login-card button:hover {background:#123a7c;}
+.login-error {color:#c43b2b; font-size:13px; font-weight:bold; margin-top:12px; display:none;}
 </style>
 </head>
 <body class="protected">
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon">🔒</div>
+    <h2>Acesso Restrito</h2>
+    <p>Insira a credencial de acesso para visualizar o demonstrativo financeiro.</p>
+    <input type="password" id="pwdInput" placeholder="Senha" />
+    <button type="button" id="loginBtn">Acessar</button>
+    <div class="login-error" id="loginError">Senha incorreta.</div>
+  </div>
+</div>
+
 <div class="security-overlay" id="securityOverlay"><div class="security-box"><h3>Acesso restrito</h3><p>Este processo tramita em segredo de justiça. Copiar, imprimir, salvar ou capturar a tela é desencorajado e poderá ser registado.</p></div></div>
-<div class="gate" id="gateOverlay">
+<div class="gate hidden" id="gateOverlay">
   <div class="gate-card">
     <h1 class="gate-title">Aviso de sigilo judicial</h1>
     <p class="gate-text">Este conteúdo contém dados protegidos por <strong>segredo de justiça</strong>. É proibido copiar, repassar, salvar, imprimir ou realizar capturas de tela sem autorização. O acesso é estritamente pessoal.</p>
+    <p class="gate-text"><strong>IP de origem identificado:</strong> <span class="client-ip-display">Buscando...</span></p>
     <div class="gate-actions">
       <button class="gate-btn primary" id="acceptGate" type="button">Li e estou ciente</button>
       <button class="gate-btn secondary" id="leaveGate" type="button">Sair</button>
     </div>
   </div>
 </div>
+
 <div class="app locked-content" id="appContent">
   <div class="header">
     <div class="tit">E*** B*** M***</div>
@@ -81,227 +108,261 @@ body.blur-sensitive .app{filter:blur(14px);pointer-events:none}
     <button class="tab itau active" id="btnItau" type="button">Itaú</button>
     <button class="tab caixa" id="btnCaixa" type="button">Caixa</button>
   </div>
-  <div class="notice-bar">Aviso: processo em segredo de justiça. Não copie, não repasse, não imprima, não salve e não realize capturas de tela deste conteúdo.</div>
+  <div class="notice-bar">Aviso: processo em segredo de justiça. Não copie, não repasse, não imprima, não salve e não realize capturas de tela deste conteúdo. IP visível na marca d'água.</div>
   <div class="content" id="mainContent">
-    <div class="msg">A carregar e processar dados do arquivo extratos.csv...</div>
+    <div class="msg">A carregar e processar dados...</div>
   </div>
   <div class="footer"><a href="https://www.medeirosealbuquerqueadv.com.br" target="_blank" rel="noopener noreferrer">Escritório Medeiros &amp; Albuquerque Advogados</a></div>
 </div>
 
 <script>
 (function(){
+  // --- VARIÁVEIS GLOBAIS ---
   var bank = 'itau';
   var dataStore = { itau: {}, caixa: {} };
   var nomesMeses = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+  var userIP = "IP não identificado";
 
-  // 1. Constrói a matriz limpa de meses para garantir que a timeline fique perfeita de 2018 a 2023
-  for(var y = 2018; y <= 2023; y++){
-    for(var m = 1; m <= 12; m++){
-      var mesFormatado = ('0' + m).slice(-2);
-      var key = mesFormatado + '/' + y;
-      dataStore.itau[key] = [];
-      dataStore.caixa[key] = [];
+  // --- FUNÇÃO DE BUSCA DO IP ---
+  function fetchIP() {
+    fetch('https://api.ipify.org?format=json')
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        userIP = data.ip;
+        var displays = document.querySelectorAll('.client-ip-display');
+        for(var i=0; i<displays.length; i++) { displays[i].textContent = userIP; }
+      })
+      .catch(function(e) {
+        console.warn("Bloqueador de anúncios pode ter impedido a leitura do IP.");
+      });
+  }
+
+  // --- SISTEMA DE LOGIN SIMPLES ---
+  var loginInput = document.getElementById('pwdInput');
+  var loginBtn = document.getElementById('loginBtn');
+  var loginError = document.getElementById('loginError');
+
+  function attemptLogin() {
+    if(loginInput.value === 'estrela') {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('gateOverlay').classList.remove('hidden'); // Mostra a porta de sigilo
+      startApplication(); // Roda a lógica de puxar os dados
+    } else {
+      loginError.style.display = 'block';
+      loginInput.value = '';
+      loginInput.focus();
     }
   }
 
-  // 2. Função para processar o texto do CSV
-  function processaCsv(csvString) {
-    var linhas = csvString.split('\n');
-    for(var i = 0; i < linhas.length; i++) {
-      var linha = linhas[i].trim();
-      if (!linha || linha.toLowerCase().indexOf('data') === 0) continue;
-      
-      var cols = linha.split(';');
-      if (cols.length >= 4) {
-        var dataStr = cols[0].trim();
-        var bankStr = cols[1].trim().toUpperCase();
-        var descStr = cols[2].trim();
-        var valStr = cols[3].trim();
+  loginBtn.addEventListener('click', attemptLogin);
+  loginInput.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') attemptLogin();
+  });
 
-        var partes = dataStr.split('/');
-        if (partes.length === 3) {
-          var mes = parseInt(partes[1], 10);
-          var ano = parseInt(partes[2], 10);
-          
-          if (ano >= 2018 && ano <= 2023 && mes >= 1 && mes <= 12) {
-            var mesFormatado = ('0' + mes).slice(-2);
-            var key = mesFormatado + '/' + ano;
-            var bankKey = bankStr.indexOf('ITAU') !== -1 ? 'itau' : 'caixa';
+  // --- LÓGICA PRINCIPAL DO SISTEMA ---
+  function startApplication() {
+    // 1. Constrói matriz
+    for(var y = 2018; y <= 2023; y++){
+      for(var m = 1; m <= 12; m++){
+        var mesFormatado = ('0' + m).slice(-2);
+        var key = mesFormatado + '/' + y;
+        dataStore.itau[key] = [];
+        dataStore.caixa[key] = [];
+      }
+    }
+
+    // 2. Processa CSV
+    function processaCsv(csvString) {
+      var linhas = csvString.split('\n');
+      for(var i = 0; i < linhas.length; i++) {
+        var linha = linhas[i].trim();
+        if (!linha || linha.toLowerCase().indexOf('data') === 0) continue;
+        
+        var cols = linha.split(';');
+        if (cols.length >= 4) {
+          var dataStr = cols[0].trim();
+          var bankStr = cols[1].trim().toUpperCase();
+          var descStr = cols[2].trim();
+          var valStr = cols[3].trim();
+
+          var partes = dataStr.split('/');
+          if (partes.length === 3) {
+            var mes = parseInt(partes[1], 10);
+            var ano = parseInt(partes[2], 10);
             
-            var isDebit = valStr.toUpperCase().indexOf('D') !== -1 || valStr.indexOf('-') !== -1;
-            var numStr = valStr.replace(/[^0-9,]/g, '').replace(',', '.');
-            var valorReal = parseFloat(numStr);
-            if (isDebit) valorReal = -Math.abs(valorReal);
+            if (ano >= 2018 && ano <= 2023 && mes >= 1 && mes <= 12) {
+              var mesF = ('0' + mes).slice(-2);
+              var key = mesF + '/' + ano;
+              var bankKey = bankStr.indexOf('ITAU') !== -1 ? 'itau' : 'caixa';
+              
+              var isDebit = valStr.toUpperCase().indexOf('D') !== -1 || valStr.indexOf('-') !== -1;
+              var numStr = valStr.replace(/[^0-9,]/g, '').replace(',', '.');
+              var valorReal = parseFloat(numStr);
+              if (isDebit) valorReal = -Math.abs(valorReal);
 
-            if (dataStore[bankKey] && dataStore[bankKey][key]) {
-              dataStore[bankKey][key].push({
-                date: dataStr,
-                desc: descStr,
-                amount: valorReal
-              });
+              if (dataStore[bankKey] && dataStore[bankKey][key]) {
+                dataStore[bankKey][key].push({ date: dataStr, desc: descStr, amount: valorReal });
+              }
             }
           }
         }
       }
     }
-  }
 
-  function byId(id){ return document.getElementById(id); }
-  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function money(v){
-    var n = Number(v||0);
-    return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-  }
-  
-  // 3. Renderiza os dados na tela
-  function render(){
-    var wrap = byId('mainContent');
-    var dataset = dataStore[bank] || {};
-    var chavesDatas = Object.keys(dataset); 
+    // Utilitários UI
+    function byId(id){ return document.getElementById(id); }
+    function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function money(v){
+      var n = Number(v||0);
+      return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    }
     
-    var html = '';
-    chavesDatas.forEach(function(chaveData, idx){
-      var items = dataset[chaveData];
-      var isEmpty = items.length === 0;
+    // 3. Renderiza na tela
+    function render(){
+      var wrap = byId('mainContent');
+      var dataset = dataStore[bank] || {};
+      var chavesDatas = Object.keys(dataset); 
       
-      var partes = chaveData.split('/');
-      var nomeExibicao = nomesMeses[parseInt(partes[0], 10)] + ' de ' + partes[1];
+      var html = '';
+      chavesDatas.forEach(function(chaveData, idx){
+        var items = dataset[chaveData];
+        var isEmpty = items.length === 0;
+        
+        var partes = chaveData.split('/');
+        var nomeExibicao = nomesMeses[parseInt(partes[0], 10)] + ' de ' + partes[1];
+        
+        html += '<div class="month">';
+        html += '<div class="month-head" data-target="m'+idx+'">';
+        html += '<span>'+esc(nomeExibicao)+'</span>';
+        html += '<span class="month-right">';
+        html += isEmpty ? '<span class="badge partial">sem lançamentos</span>' : '<span class="badge ok">'+items.length+' lanç.</span>';
+        html += '<span class="chev">▾</span>';
+        html += '</span></div>';
+        
+        html += '<div class="month-body'+(idx===0?' open':'')+'" id="m'+idx+'">';
+        if(isEmpty){
+          html += '<div class="empty">Nenhum lançamento foi encontrado para este mês.</div>';
+        } else {
+          items.forEach(function(item){
+            var cls = Number(item.amount) < 0 ? 'debit' : 'credit';
+            html += '<div class="row">';
+            html += '<div class="left"><div class="date">'+esc(item.date||'')+'</div><div class="desc">'+esc(item.desc||'')+'</div></div>';
+            html += '<div class="value '+cls+'">'+(Number(item.amount)<0?'- ':'')+money(Math.abs(Number(item.amount||0)))+'</div>';
+            html += '</div>';
+          });
+        }
+        html += '</div></div>';
+      });
       
-      html += '<div class="month">';
-      html += '<div class="month-head" data-target="m'+idx+'">';
-      html += '<span>'+esc(nomeExibicao)+'</span>';
-      html += '<span class="month-right">';
-      html += isEmpty ? '<span class="badge partial">sem lançamentos</span>' : '<span class="badge ok">'+items.length+' lanç.</span>';
-      html += '<span class="chev">▾</span>';
-      html += '</span></div>';
+      wrap.innerHTML = html;
       
-      html += '<div class="month-body'+(idx===0?' open':'')+'" id="m'+idx+'">';
-      if(isEmpty){
-        html += '<div class="empty">Nenhum lançamento foi encontrado para este mês.</div>';
-      } else {
-        items.forEach(function(item){
-          var cls = Number(item.amount) < 0 ? 'debit' : 'credit';
-          html += '<div class="row">';
-          html += '<div class="left"><div class="date">'+esc(item.date||'')+'</div><div class="desc">'+esc(item.desc||'')+'</div></div>';
-          html += '<div class="value '+cls+'">'+(Number(item.amount)<0?'- ':'')+money(Math.abs(Number(item.amount||0)))+'</div>';
-          html += '</div>';
+      var headers = document.querySelectorAll('.month-head');
+      for(var i=0; i<headers.length; i++) {
+        headers[i].addEventListener('click', function(){
+          var body = byId(this.getAttribute('data-target'));
+          if(body) { body.classList.toggle('open'); this.parentNode.classList.toggle('open'); }
         });
       }
-      html += '</div></div>';
-    });
+      
+      if(bank === 'itau') {
+        byId('resumeInfo').textContent = 'Itaú · Ag 1339 · CC 16890-6';
+      } else {
+        byId('resumeInfo').textContent = 'Caixa · Ag 33 · Op 001 · CC 13608-2';
+      }
+    }
     
-    wrap.innerHTML = html;
+    // Inicia Fetch
+    fetch('extratos.csv')
+      .then(function(response) {
+        if (!response.ok) throw new Error('Falha na rede');
+        return response.text();
+      })
+      .then(function(csvText) {
+        processaCsv(csvText);
+        render(); 
+      })
+      .catch(function(error) {
+        byId('mainContent').innerHTML = '<div class="msg" style="color:#b42318;">Erro: O arquivo "extratos.csv" não foi encontrado no repositório.</div>';
+      });
+
+    // Abas
+    byId('btnItau').addEventListener('click', function(){ bank='itau'; this.classList.add('active'); byId('btnCaixa').classList.remove('active'); render(); });
+    byId('btnCaixa').addEventListener('click', function(){ bank='caixa'; this.classList.add('active'); byId('btnItau').classList.remove('active'); render(); });
+
+    // Proteções
+    function showSecurityNotice(message, hold){
+      var overlay = byId('securityOverlay');
+      if(!overlay) return;
+      var p = overlay.querySelector('p');
+      if(p && message) p.textContent = message;
+      overlay.classList.add('show');
+      clearTimeout(showSecurityNotice._t);
+      if(!hold){ showSecurityNotice._t = setTimeout(function(){ overlay.classList.remove('show'); }, 1800); }
+    }
     
-    var headers = document.querySelectorAll('.month-head');
-    for(var i=0; i<headers.length; i++) {
-      headers[i].addEventListener('click', function(){
-        var body = byId(this.getAttribute('data-target'));
-        if(body) {
-          body.classList.toggle('open');
-          this.parentNode.classList.toggle('open');
+    function hardenProtection(){
+      document.addEventListener('contextmenu', function(e){ e.preventDefault(); showSecurityNotice('Clique direito desativado. Processo em segredo de justiça.'); });
+      ['copy','cut','paste','dragstart','selectstart'].forEach(function(evt){
+        document.addEventListener(evt, function(e){ e.preventDefault(); showSecurityNotice('Ação bloqueada para proteção do conteúdo sigiloso.'); });
+      });
+      document.addEventListener('keydown', function(e){
+        var key = (e.key || '').toLowerCase();
+        var blockedCombo = (e.ctrlKey || e.metaKey) && ['p','s','c','u','x','a'].indexOf(key) >= 0;
+        var blockedKey = key === 'printscreen' || e.keyCode === 44 || key === 'f12';
+        if(blockedCombo || blockedKey){
+          e.preventDefault(); e.stopPropagation();
+          try{ navigator.clipboard && navigator.clipboard.writeText && navigator.clipboard.writeText(''); }catch(_e){}
+          document.body.classList.add('blur-sensitive');
+          showSecurityNotice('Atalho bloqueado. Impressão, salvamento, cópia e tentativas de capturas estão desativados neste documento.', true);
+          setTimeout(function(){ if(!document.hidden) document.body.classList.remove('blur-sensitive'); var overlay = byId('securityOverlay'); var gate = byId('gateOverlay'); if(overlay && gate && gate.classList.contains('hidden')) overlay.classList.remove('show'); }, 2200);
         }
+      }, true);
+      window.addEventListener('beforeprint', function(){
+        showSecurityNotice('Impressão bloqueada. Este conteúdo é sigiloso.', true);
+        setTimeout(function(){ window.stop && window.stop(); }, 0);
+      });
+      window.addEventListener('afterprint', function(){
+        var overlay = byId('securityOverlay'); if(overlay) overlay.classList.remove('show');
+      });
+      document.addEventListener('visibilitychange', function(){
+        if(document.hidden){ document.body.classList.add('blur-sensitive'); } else { document.body.classList.remove('blur-sensitive'); }
       });
     }
+
+    function unlockContent(){
+      var app = byId('appContent');
+      if(app) app.classList.remove('locked-content');
+      var gate = byId('gateOverlay');
+      if(gate) gate.classList.add('hidden');
+      var overlay = byId('securityOverlay');
+      if(overlay) overlay.classList.remove('show');
+    }
     
-    if(bank === 'itau') {
-      byId('resumeInfo').textContent = 'Itaú · Ag 1339 · CC 16890-6';
-    } else {
-      byId('resumeInfo').textContent = 'Caixa · Ag 33 · Op 001 · CC 13608-2';
+    function initGate(){
+      var accept = byId('acceptGate');
+      var leave = byId('leaveGate');
+      if(accept) accept.addEventListener('click', unlockContent);
+      if(leave) leave.addEventListener('click', function(){ window.location.href = "about:blank"; });
     }
-  }
-  
-  // 4. Busca o arquivo CSV no GitHub (mesma pasta do index.html)
-  fetch('extratos.csv')
-    .then(function(response) {
-      if (!response.ok) throw new Error('Falha na rede ao carregar o CSV');
-      return response.text();
-    })
-    .then(function(csvText) {
-      processaCsv(csvText);
-      render(); // Carrega e desenha a tela depois de ler o CSV
-    })
-    .catch(function(error) {
-      byId('mainContent').innerHTML = '<div class="msg" style="color:#b42318;">Erro: O arquivo "extratos.csv" não foi encontrado no repositório. Por favor, certifique-se de que ele foi enviado junto com este arquivo HTML e possui esse nome exato.</div>';
-    });
 
-  // Controladores de Aba
-  byId('btnItau').addEventListener('click', function(){ bank='itau'; this.classList.add('active'); byId('btnCaixa').classList.remove('active'); render(); });
-  byId('btnCaixa').addEventListener('click', function(){ bank='caixa'; this.classList.add('active'); byId('btnItau').classList.remove('active'); render(); });
-
-  // Funções de Proteção e UI
-  function showSecurityNotice(message, hold){
-    var overlay = byId('securityOverlay');
-    if(!overlay) return;
-    var p = overlay.querySelector('p');
-    if(p && message) p.textContent = message;
-    overlay.classList.add('show');
-    clearTimeout(showSecurityNotice._t);
-    if(!hold){
-      showSecurityNotice._t = setTimeout(function(){ overlay.classList.remove('show'); }, 1800);
-    }
-  }
-  
-  function hardenProtection(){
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); showSecurityNotice('Clique direito desativado. Processo em segredo de justiça.'); });
-    ['copy','cut','paste','dragstart','selectstart'].forEach(function(evt){
-      document.addEventListener(evt, function(e){ e.preventDefault(); showSecurityNotice('Ação bloqueada para proteção do conteúdo sigiloso.'); });
-    });
-    document.addEventListener('keydown', function(e){
-      var key = (e.key || '').toLowerCase();
-      var blockedCombo = (e.ctrlKey || e.metaKey) && ['p','s','c','u','x','a'].indexOf(key) >= 0;
-      var blockedKey = key === 'printscreen' || e.keyCode === 44 || key === 'f12';
-      if(blockedCombo || blockedKey){
-        e.preventDefault();
-        e.stopPropagation();
-        try{ navigator.clipboard && navigator.clipboard.writeText && navigator.clipboard.writeText(''); }catch(_e){}
-        document.body.classList.add('blur-sensitive');
-        showSecurityNotice('Atalho bloqueado. Impressão, salvamento, cópia e tentativas de capturas estão desativados neste documento.', true);
-        setTimeout(function(){ if(!document.hidden) document.body.classList.remove('blur-sensitive'); var overlay = byId('securityOverlay'); var gate = byId('gateOverlay'); if(overlay && gate && gate.classList.contains('hidden')) overlay.classList.remove('show'); }, 2200);
-      }
-    }, true);
-    window.addEventListener('beforeprint', function(){
-      showSecurityNotice('Impressão bloqueada. Este conteúdo é sigiloso.', true);
-      setTimeout(function(){ window.stop && window.stop(); }, 0);
-    });
-    window.addEventListener('afterprint', function(){
-      var overlay = byId('securityOverlay'); if(overlay) overlay.classList.remove('show');
-    });
-    document.addEventListener('visibilitychange', function(){
-      if(document.hidden){
-        document.body.classList.add('blur-sensitive');
-      } else {
-        document.body.classList.remove('blur-sensitive');
-      }
-    });
+    hardenProtection();
+    initGate();
+    
+    // Marca d'água dinâmica
+    (function(){
+      var wm = document.createElement('div');
+      wm.className = 'watermark';
+      wm.innerHTML = 'Segredo de justiça<br>IP: <span class="client-ip-display">Buscando...</span><br>'+new Date().toLocaleString('pt-BR');
+      document.body.appendChild(wm);
+      // Atualiza o IP na marca d'água, caso a requisição IP tenha terminado antes da criação da div
+      var displays = document.querySelectorAll('.client-ip-display');
+      for(var i=0; i<displays.length; i++) { displays[i].textContent = userIP; }
+    })();
   }
 
-  function unlockContent(){
-    var app = byId('appContent');
-    if(app) app.classList.remove('locked-content');
-    var gate = byId('gateOverlay');
-    if(gate) gate.classList.add('hidden');
-    var overlay = byId('securityOverlay');
-    if(overlay) overlay.classList.remove('show');
-  }
-  
-  function initGate(){
-    var gate = byId('gateOverlay');
-    var accept = byId('acceptGate');
-    var leave = byId('leaveGate');
-    if(accept) accept.addEventListener('click', unlockContent);
-    if(leave) leave.addEventListener('click', function(){ history.back(); });
-    if(gate) gate.classList.remove('hidden');
-  }
+  // Inicializa o processo de captura de IP assim que a página carrega
+  fetchIP();
 
-  hardenProtection();
-  initGate();
-  
-  (function(){
-    var wm = document.createElement('div');
-    wm.className = 'watermark';
-    wm.innerHTML = 'Segredo de justiça<br>'+new Date().toLocaleString('pt-BR');
-    document.body.appendChild(wm);
-  })();
 })();
 </script>
 </body>
