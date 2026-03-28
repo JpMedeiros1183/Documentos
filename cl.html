@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Entrevista — Acidente de Trabalho</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ee;
+    --card: #ffffff;
+    --accent: #1a3a2a;
+    --accent2: #2d6a4a;
+    --text: #1c1c1c;
+    --muted: #6b7280;
+    --border: #d6d0c8;
+    --input-bg: #faf9f7;
+    --highlight: #e8f5ee;
+    --danger: #b91c1c;
+    --section-num: #c9b99a;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 4rem;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 32px;
+    background: var(--bg);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+  .header-inner { max-width: 740px; margin: auto; }
+  .firm-tag {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #a3c4b0;
+    margin-bottom: .6rem;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: .5rem;
+  }
+  header p {
+    font-size: 14px;
+    color: #a3c4b0;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    max-width: 740px;
+    margin: 2rem auto 0;
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .prog-seg {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background .4s;
+  }
+  .prog-seg.done { background: var(--accent2); }
+  .prog-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+
+  /* MAIN */
+  main { max-width: 740px; margin: 2rem auto 0; padding: 0 1.5rem; }
+
+  /* SECTION */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 2rem 1.75rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0ece6;
+  }
+  .sec-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--section-num);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .sec-info h2 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .sec-info p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* GRID */
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row.full { grid-template-columns: 1fr; }
+  @media (max-width: 560px) {
+    .row, .row.col3 { grid-template-columns: 1fr; }
+  }
+
+  /* FIELD */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .req { color: var(--danger); margin-left: 2px; }
+  input[type=text], input[type=email], input[type=date],
+  input[type=number], input[type=tel], select, textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px #2d6a4a22;
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  .hint { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+
+  /* RADIO / CHECK */
+  .opt-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .opt-group.col { flex-direction: column; gap: 6px; }
+  .opt-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 14px; color: var(--text);
+    cursor: pointer;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    transition: border-color .2s, background .2s;
+    line-height: 1.4;
+  }
+  .opt-item input { margin-top: 2px; accent-color: var(--accent2); flex-shrink: 0; }
+  .opt-item:has(input:checked) {
+    border-color: var(--accent2);
+    background: var(--highlight);
+    color: var(--accent);
+  }
+  .opt-item span { flex: 1; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: #f0ece6; margin: 1.25rem 0; }
+
+  /* REQUIRED NOTE */
+  .required-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* SUBMIT */
+  .submit-area {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+  .submit-area p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .btn-send {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 28px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    text-decoration: none;
+  }
+  .btn-send:hover { background: #1ebe5d; }
+  .btn-send:active { transform: scale(0.97); }
+  .btn-send svg { flex-shrink: 0; }
+
+  /* VALIDATION */
+  input.invalid, select.invalid, textarea.invalid {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px #b91c1c22;
+  }
+  .err-msg {
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 2px;
+    display: none;
+  }
+  .err-msg.show { display: block; }
+  .toast {
+    position: fixed;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--danger);
+    color: #fff;
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: all .3s;
+    pointer-events: none;
+    z-index: 9999;
+    max-width: 320px;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2.5rem;
+  }
+  footer strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="firm-tag">Medeiros e Albuquerque Advocacia · OAB/RN 15.441</div>
+    <h1>Ficha de Entrevista<br>Acidente de Trabalho</h1>
+    <p>Preencha com cuidado. Suas respostas ajudarão o advogado a analisar seus direitos trabalhistas. Ao final, envie pelo WhatsApp.</p>
+  </div>
+</header>
+
+<div class="progress-bar" id="progressBar">
+  <div class="prog-seg" id="p1"></div>
+  <div class="prog-seg" id="p2"></div>
+  <div class="prog-seg" id="p3"></div>
+  <div class="prog-seg" id="p4"></div>
+  <div class="prog-seg" id="p5"></div>
+  <div class="prog-seg" id="p6"></div>
+  <div class="prog-seg" id="p7"></div>
+  <span class="prog-label" id="progLabel">0 de 7 seções</span>
+</div>
+
+<main>
+
+<p class="required-note"><span style="color:var(--danger)">*</span> Campos obrigatórios</p>
+
+<!-- SEÇÃO 1 -->
+<div class="section" id="sec1">
+  <div class="section-header">
+    <div class="sec-num">01</div>
+    <div class="sec-info">
+      <h2>Dados pessoais</h2>
+      <p>Informações de identificação do cliente.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Nome completo <span class="req">*</span></label>
+      <input type="text" id="nome" placeholder="Seu nome completo" required>
+      <span class="err-msg" id="err-nome">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>Data de nascimento <span class="req">*</span></label>
+      <input type="date" id="nascimento" required>
+      <span class="err-msg" id="err-nascimento">Campo obrigatório</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>CPF <span class="req">*</span></label>
+      <input type="text" id="cpf" placeholder="000.000.000-00" required>
+      <span class="err-msg" id="err-cpf">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>PIS / PASEP</label>
+      <input type="text" id="pis" placeholder="000.00000.00-0">
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Telefone / WhatsApp <span class="req">*</span></label>
+      <input type="tel" id="telefone" placeholder="(84) 99999-9999" required>
+      <span class="err-msg" id="err-telefone">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com">
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Endereço completo</label>
+      <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade/UF">
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 2 -->
+<div class="section" id="sec2">
+  <div class="section-header">
+    <div class="sec-num">02</div>
+    <div class="sec-info">
+      <h2>Vínculo empregatício</h2>
+      <p>Dados da empresa e do contrato de trabalho.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Nome da empresa <span class="req">*</span></label>
+      <input type="text" id="empresa" placeholder="Razão social ou nome fantasia" required>
+      <span class="err-msg" id="err-empresa">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>CNPJ da empresa</label>
+      <input type="text" id="cnpj" placeholder="00.000.000/0001-00">
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Cargo / função exercida <span class="req">*</span></label>
+      <input type="text" id="cargo" placeholder="Ex: eletricista, técnico" required>
+      <span class="err-msg" id="err-cargo">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>Último salário (R$)</label>
+      <input type="number" id="salario" placeholder="Ex: 1800,00" min="0" step="0.01">
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Data de admissão <span class="req">*</span></label>
+      <input type="date" id="admissao" required>
+      <span class="err-msg" id="err-admissao">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>Último dia trabalhado</label>
+      <input type="date" id="ultDia">
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="row full">
+    <div class="field">
+      <label>Situação atual do contrato <span class="req">*</span></label>
+      <div class="opt-group" id="situacao">
+        <label class="opt-item"><input type="radio" name="situacao" value="Ainda empregado / afastado pelo INSS"><span>Ainda empregado / afastado</span></label>
+        <label class="opt-item"><input type="radio" name="situacao" value="Demitido sem justa causa"><span>Demitido sem justa causa</span></label>
+        <label class="opt-item"><input type="radio" name="situacao" value="Pedido de demissão"><span>Pedido de demissão</span></label>
+        <label class="opt-item"><input type="radio" name="situacao" value="Rescisão indireta pleiteada"><span>Rescisão indireta</span></label>
+        <label class="opt-item"><input type="radio" name="situacao" value="Outra situação"><span>Outra situação</span></label>
+      </div>
+      <span class="err-msg" id="err-situacao">Selecione uma opção</span>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Descreva as atividades que exercia no trabalho</label>
+      <textarea id="atividades" placeholder="Ex: instalação de fiação elétrica, levantamento de equipamentos, trabalho em altura, esforços repetitivos..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 3 -->
+<div class="section" id="sec3">
+  <div class="section-header">
+    <div class="sec-num">03</div>
+    <div class="sec-info">
+      <h2>O acidente ou adoecimento</h2>
+      <p>Como, quando e onde a lesão ocorreu ou se desenvolveu.</p>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Natureza do evento <span class="req">*</span></label>
+      <div class="opt-group" id="natureza">
+        <label class="opt-item"><input type="radio" name="natureza" value="Acidente típico (queda, pancada, esmagamento, etc.)"><span>Acidente típico</span></label>
+        <label class="opt-item"><input type="radio" name="natureza" value="Doença ocupacional / esforço repetitivo"><span>Doença ocupacional / LER/DORT</span></label>
+        <label class="opt-item"><input type="radio" name="natureza" value="Acidente de trajeto (percurso casa-trabalho)"><span>Acidente de trajeto</span></label>
+        <label class="opt-item"><input type="radio" name="natureza" value="Ainda não definido"><span>Ainda não definido</span></label>
+      </div>
+      <span class="err-msg" id="err-natureza">Selecione uma opção</span>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <div class="field">
+      <label>Data aproximada do acidente / início dos sintomas <span class="req">*</span></label>
+      <input type="date" id="dtAcidente" required>
+      <span class="err-msg" id="err-dtAcidente">Campo obrigatório</span>
+    </div>
+    <div class="field">
+      <label>Local onde ocorreu</label>
+      <input type="text" id="localAcidente" placeholder="Ex: obra na Av. tal, Parnamirim/RN">
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Descreva detalhadamente como o acidente ou adoecimento ocorreu <span class="req">*</span></label>
+      <textarea id="descAcidente" placeholder="O que você estava fazendo, o que aconteceu, como a lesão surgiu ou se desenvolveu com o tempo..." style="min-height:110px" required></textarea>
+      <span class="err-msg" id="err-descAcidente">Campo obrigatório</span>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="row full">
+    <div class="field">
+      <label>Havia testemunhas do acidente ou dos sintomas no trabalho?</label>
+      <div class="opt-group" id="testemunhas">
+        <label class="opt-item"><input type="radio" name="testemunhas" value="Sim, havia testemunhas"><span>Sim</span></label>
+        <label class="opt-item"><input type="radio" name="testemunhas" value="Não havia testemunhas"><span>Não</span></label>
+        <label class="opt-item"><input type="radio" name="testemunhas" value="Não sabe informar sobre testemunhas"><span>Não sei</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Nome(s) da(s) testemunha(s) e contato (se souber)</label>
+      <input type="text" id="nomeTes" placeholder="Ex: João Silva — (84) 99999-9999">
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 4 -->
+<div class="section" id="sec4">
+  <div class="section-header">
+    <div class="sec-num">04</div>
+    <div class="sec-info">
+      <h2>CAT e benefício INSS</h2>
+      <p>Comunicação do acidente e situação previdenciária.</p>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>A empresa emitiu a CAT (Comunicação de Acidente de Trabalho)?</label>
+      <div class="opt-group" id="cat">
+        <label class="opt-item"><input type="radio" name="cat" value="Sim, a empresa emitiu a CAT"><span>Sim</span></label>
+        <label class="opt-item"><input type="radio" name="cat" value="Não foi emitida CAT"><span>Não</span></label>
+        <label class="opt-item"><input type="radio" name="cat" value="Não sabe se foi emitida CAT"><span>Não sei</span></label>
+      </div>
+      <p class="hint">Se a empresa não emitiu, o próprio trabalhador, o sindicato ou o médico podem emitir.</p>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="row full">
+    <div class="field">
+      <label>Recebeu ou recebe benefício do INSS?</label>
+      <div class="opt-group" id="inss">
+        <label class="opt-item"><input type="radio" name="inss" value="Sim — Auxílio-doença comum (B31)"><span>Sim — Auxílio-doença comum (B31)</span></label>
+        <label class="opt-item"><input type="radio" name="inss" value="Sim — Auxílio-doença acidentário (B91)"><span>Sim — Auxílio acidentário (B91)</span></label>
+        <label class="opt-item"><input type="radio" name="inss" value="Requerido mas negado pelo INSS"><span>Requerido, mas negado</span></label>
+        <label class="opt-item"><input type="radio" name="inss" value="Não requereu benefício INSS"><span>Não requerido</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <div class="field">
+      <label>Número do benefício (se houver)</label>
+      <input type="text" id="numBenef" placeholder="Ex: 638.783.021-8">
+    </div>
+    <div class="field">
+      <label>Período de recebimento</label>
+      <input type="text" id="perBenef" placeholder="Ex: mar/2022 a dez/2022">
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 5 -->
+<div class="section" id="sec5">
+  <div class="section-header">
+    <div class="sec-num">05</div>
+    <div class="sec-info">
+      <h2>Tratamento médico e sequelas</h2>
+      <p>Histórico de atendimento e limitações decorrentes da lesão.</p>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Realizou cirurgia em decorrência da lesão?</label>
+      <div class="opt-group" id="cirurgia">
+        <label class="opt-item"><input type="radio" name="cirurgia" value="Sim, realizou cirurgia"><span>Sim</span></label>
+        <label class="opt-item"><input type="radio" name="cirurgia" value="Não realizou cirurgia"><span>Não</span></label>
+        <label class="opt-item"><input type="radio" name="cirurgia" value="Cirurgia indicada mas não realizada"><span>Indicada, mas não realizada</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Situação atual do tratamento</label>
+      <div class="opt-group" id="tratamento">
+        <label class="opt-item"><input type="radio" name="tratamento" value="Em fisioterapia"><span>Em fisioterapia</span></label>
+        <label class="opt-item"><input type="radio" name="tratamento" value="Acompanhamento médico regular"><span>Acompanhamento médico</span></label>
+        <label class="opt-item"><input type="radio" name="tratamento" value="Recebeu alta médica"><span>Alta médica</span></label>
+        <label class="opt-item"><input type="radio" name="tratamento" value="Sem tratamento (dificuldade de acesso)"><span>Sem tratamento</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Possui limitações físicas permanentes ou sequelas?</label>
+      <textarea id="sequelas" placeholder="Ex: dificuldade de elevar o braço acima do ombro, dor crônica ao carregar peso, impossibilidade de retornar à função anterior..."></textarea>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Gastos com saúde decorrentes da lesão</label>
+      <textarea id="gastos" placeholder="Relate valores aproximados com consultas, exames, fisioterapia, medicamentos. Informe se foi custeado pelo plano, INSS ou do próprio bolso..."></textarea>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Quais documentos médicos você possui? (marque todos que tiver)</label>
+      <div class="opt-group col" id="docs">
+        <label class="opt-item"><input type="checkbox" name="docs" value="Atestados médicos"><span>Atestados médicos</span></label>
+        <label class="opt-item"><input type="checkbox" name="docs" value="Laudos de exames (Raios-X, ultrassom, ressonância)"><span>Laudos de exames (Raios-X, ultrassom, ressonância)</span></label>
+        <label class="opt-item"><input type="checkbox" name="docs" value="Receitas e prescrições médicas"><span>Receitas / prescrições</span></label>
+        <label class="opt-item"><input type="checkbox" name="docs" value="Relatório médico / laudo pericial"><span>Relatório médico / laudo pericial</span></label>
+        <label class="opt-item"><input type="checkbox" name="docs" value="Comunicado de Acidente de Trabalho (CAT)"><span>CAT emitida</span></label>
+        <label class="opt-item"><input type="checkbox" name="docs" value="Notas fiscais de gastos médicos"><span>Notas fiscais de gastos</span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 6 -->
+<div class="section" id="sec6">
+  <div class="section-header">
+    <div class="sec-num">06</div>
+    <div class="sec-info">
+      <h2>Conduta da empresa</h2>
+      <p>Como o empregador reagiu ao acidente e às limitações do trabalhador.</p>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>A empresa fornecia EPI (Equipamento de Proteção Individual) adequado?</label>
+      <div class="opt-group" id="epi">
+        <label class="opt-item"><input type="radio" name="epi" value="Sim, sempre fornecia EPI adequado"><span>Sim, sempre</span></label>
+        <label class="opt-item"><input type="radio" name="epi" value="Às vezes / EPI incompleto ou inadequado"><span>Às vezes / incompleto</span></label>
+        <label class="opt-item"><input type="radio" name="epi" value="Não fornecia EPI"><span>Não fornecia</span></label>
+        <label class="opt-item"><input type="radio" name="epi" value="Não se aplica (lesão não relacionada a EPI)"><span>Não se aplica</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Após o acidente, a empresa tomou alguma providência? (marque todas que ocorreram)</label>
+      <div class="opt-group col" id="conduta">
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Encaminhou ao médico ou plano de saúde"><span>Encaminhou ao médico / plano de saúde</span></label>
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Pagou salário integralmente durante o afastamento"><span>Pagou salário durante afastamento</span></label>
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Acompanhou o tratamento e a recuperação"><span>Acompanhou o tratamento</span></label>
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Ignorou o acidente / não tomou providência alguma"><span>Ignorou / não tomou providência</span></label>
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Pressionou para não registrar o acidente ou não emitir CAT"><span>Pressionou para não registrar ou não emitir CAT</span></label>
+        <label class="opt-item"><input type="checkbox" name="conduta" value="Demitiu durante ou logo após o afastamento"><span>Demitiu durante ou logo após o afastamento</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Houve pagamento das verbas rescisórias?</label>
+      <div class="opt-group" id="verbas">
+        <label class="opt-item"><input type="radio" name="verbas" value="Sim, com homologação / TRCT assinado"><span>Sim, com homologação</span></label>
+        <label class="opt-item"><input type="radio" name="verbas" value="Sim, mas sem homologação formal"><span>Sim, sem homologação</span></label>
+        <label class="opt-item"><input type="radio" name="verbas" value="Pagamento parcial / verbas incompletas"><span>Parcial / incompleto</span></label>
+        <label class="opt-item"><input type="radio" name="verbas" value="Não pagou nada"><span>Não pagou nada</span></label>
+        <label class="opt-item"><input type="radio" name="verbas" value="Ainda empregado (não se aplica)"><span>Ainda empregado</span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 7 -->
+<div class="section" id="sec7">
+  <div class="section-header">
+    <div class="sec-num">07</div>
+    <div class="sec-info">
+      <h2>Pretensão e expectativas</h2>
+      <p>O que o cliente espera conseguir com a ação trabalhista.</p>
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>O que você espera com a reclamação trabalhista? (marque todos que desejar) <span class="req">*</span></label>
+      <div class="opt-group col" id="pretensao">
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Reconhecimento formal do acidente de trabalho / nexo causal"><span>Reconhecimento do acidente de trabalho</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Reintegração ao emprego"><span>Reintegração ao emprego</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Indenização substitutiva pela violação da estabilidade acidentária (12 meses)"><span>Indenização pela estabilidade acidentária</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Levantamento do FGTS + multa de 40%"><span>FGTS + multa de 40%</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Verbas rescisórias não pagas ou pagas incorretamente"><span>Verbas rescisórias não pagas</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Indenização por danos morais (sofrimento, humilhação, descaso)"><span>Danos morais</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Indenização por danos materiais (gastos médicos, lucros cessantes)"><span>Danos materiais (gastos, lucros cessantes)</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Indenização por danos estéticos ou funcionais permanentes"><span>Danos estéticos / sequela permanente</span></label>
+        <label class="opt-item"><input type="checkbox" name="pretensao" value="Pensão mensal por incapacidade parcial permanente"><span>Pensão mensal vitalícia (incapacidade permanente)</span></label>
+      </div>
+      <span class="err-msg" id="err-pretensao">Selecione ao menos uma opção</span>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Você tem ideia do valor que espera receber?</label>
+      <input type="text" id="valorEsp" placeholder="Ex: só quero cobrir os gastos / valor justo pelo sofrimento / não sei">
+    </div>
+  </div>
+  <div class="row full">
+    <div class="field">
+      <label>Já procurou outro advogado ou sindicato sobre este caso?</label>
+      <div class="opt-group" id="advAntes">
+        <label class="opt-item"><input type="radio" name="advAntes" value="Sim, já procurou outro advogado ou sindicato"><span>Sim</span></label>
+        <label class="opt-item"><input type="radio" name="advAntes" value="Não, primeira consulta jurídica"><span>Não — é a primeira consulta</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="row full" style="margin-top:14px">
+    <div class="field">
+      <label>Observações adicionais — informações que queira registrar</label>
+      <textarea id="obs" placeholder="Qualquer detalhe relevante não contemplado acima. Pode escrever à vontade." style="min-height:100px"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ENVIO -->
+<div class="submit-area">
+  <p>Ao clicar em enviar, todas as suas respostas serão formatadas e enviadas diretamente ao advogado via WhatsApp. Nenhum dado é armazenado neste formulário.</p>
+  <button class="btn-send" onclick="enviarWhatsApp()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.112 1.527 5.836L.057 23.5l5.796-1.524A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.374l-.36-.214-3.727.979.995-3.638-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+    Enviar ficha ao advogado
+  </button>
+</div>
+
+<footer>
+  <p>Medeiros e Albuquerque Advocacia · OAB/RN 15.441 · <strong>Formulário confidencial</strong></p>
+  <p style="margin-top:4px">Os dados informados são utilizados exclusivamente para análise jurídica do seu caso.</p>
+</footer>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WA_NUMBER = '5584998226048';
+
+function v(id){ return (document.getElementById(id)||{}).value||''; }
+function radio(name){ const el=document.querySelector(`input[name="${name}"]:checked`); return el?el.value:'Não informado'; }
+function checks(name){ return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e=>e.value).join(', ')||'Nenhum selecionado'; }
+
+function validate(){
+  const required = [
+    {id:'nome', label:'Nome completo'},
+    {id:'nascimento', label:'Data de nascimento'},
+    {id:'cpf', label:'CPF'},
+    {id:'telefone', label:'Telefone'},
+    {id:'empresa', label:'Nome da empresa'},
+    {id:'cargo', label:'Cargo / função'},
+    {id:'admissao', label:'Data de admissão'},
+    {id:'dtAcidente', label:'Data do acidente'},
+    {id:'descAcidente', label:'Descrição do acidente'},
+  ];
+  const radioRequired = [
+    {name:'situacao', id:'err-situacao', label:'Situação do contrato'},
+    {name:'natureza', id:'err-natureza', label:'Natureza do evento'},
+  ];
+
+  let ok = true;
+  let firstErr = null;
+
+  required.forEach(f=>{
+    const el = document.getElementById(f.id);
+    const err = document.getElementById('err-'+f.id);
+    if(!el.value.trim()){
+      el.classList.add('invalid');
+      if(err) err.classList.add('show');
+      if(!firstErr) firstErr = el;
+      ok = false;
+    } else {
+      el.classList.remove('invalid');
+      if(err) err.classList.remove('show');
+    }
+  });
+
+  radioRequired.forEach(f=>{
+    const sel = document.querySelector(`input[name="${f.name}"]:checked`);
+    const err = document.getElementById(f.id);
+    if(!sel){
+      if(err) err.classList.add('show');
+      if(!firstErr) firstErr = document.getElementById(f.id.replace('err-',''));
+      ok = false;
+    } else {
+      if(err) err.classList.remove('show');
+    }
+  });
+
+  const pretensao = document.querySelectorAll('input[name="pretensao"]:checked');
+  const errPret = document.getElementById('err-pretensao');
+  if(pretensao.length === 0){
+    errPret.classList.add('show');
+    ok = false;
+  } else {
+    errPret.classList.remove('show');
+  }
+
+  if(!ok && firstErr){
+    firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+    showToast('Preencha os campos obrigatórios destacados em vermelho.');
+  }
+  return ok;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function enviarWhatsApp(){
+  if(!validate()) return;
+
+  const lines = [
+    '📋 *FICHA DE ENTREVISTA — ACIDENTE DE TRABALHO*',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    '*1. DADOS PESSOAIS*',
+    `• Nome: ${v('nome')}`,
+    `• Nascimento: ${v('nascimento')}`,
+    `• CPF: ${v('cpf')}`,
+    `• PIS/PASEP: ${v('pis')||'Não informado'}`,
+    `• Telefone: ${v('telefone')}`,
+    `• E-mail: ${v('email')||'Não informado'}`,
+    `• Endereço: ${v('endereco')||'Não informado'}`,
+    '',
+    '*2. VÍNCULO EMPREGATÍCIO*',
+    `• Empresa: ${v('empresa')}`,
+    `• CNPJ: ${v('cnpj')||'Não informado'}`,
+    `• Cargo: ${v('cargo')}`,
+    `• Salário: R$ ${v('salario')||'Não informado'}`,
+    `• Admissão: ${v('admissao')}`,
+    `• Último dia trabalhado: ${v('ultDia')||'Não informado'}`,
+    `• Situação do contrato: ${radio('situacao')}`,
+    `• Atividades exercidas: ${v('atividades')||'Não informado'}`,
+    '',
+    '*3. ACIDENTE / ADOECIMENTO*',
+    `• Natureza: ${radio('natureza')}`,
+    `• Data/início: ${v('dtAcidente')}`,
+    `• Local: ${v('localAcidente')||'Não informado'}`,
+    `• Descrição: ${v('descAcidente')}`,
+    `• Testemunhas: ${radio('testemunhas')}`,
+    `• Contato testemunha: ${v('nomeTes')||'Não informado'}`,
+    '',
+    '*4. CAT E BENEFÍCIO INSS*',
+    `• CAT emitida: ${radio('cat')}`,
+    `• Benefício INSS: ${radio('inss')}`,
+    `• Nº do benefício: ${v('numBenef')||'Não informado'}`,
+    `• Período: ${v('perBenef')||'Não informado'}`,
+    '',
+    '*5. TRATAMENTO E SEQUELAS*',
+    `• Cirurgia: ${radio('cirurgia')}`,
+    `• Tratamento atual: ${radio('tratamento')}`,
+    `• Sequelas/limitações: ${v('sequelas')||'Não informado'}`,
+    `• Gastos com saúde: ${v('gastos')||'Não informado'}`,
+    `• Documentos disponíveis: ${checks('docs')}`,
+    '',
+    '*6. CONDUTA DA EMPRESA*',
+    `• EPI fornecido: ${radio('epi')}`,
+    `• Providências tomadas: ${checks('conduta')}`,
+    `• Verbas rescisórias: ${radio('verbas')}`,
+    '',
+    '*7. PRETENSÃO*',
+    `• O que espera: ${checks('pretensao')}`,
+    `• Valor esperado: ${v('valorEsp')||'Não informado'}`,
+    `• Consulta anterior: ${radio('advAntes')}`,
+    `• Observações: ${v('obs')||'Nenhuma'}`,
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    `_Enviado em: ${new Date().toLocaleString('pt-BR')}_`
+  ];
+
+  const msg = encodeURIComponent(lines.join('\n'));
+  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+}
+
+// Progress bar
+function updateProgress(){
+  const secs = [
+    ()=> v('nome') && v('cpf'),
+    ()=> v('empresa') && v('cargo') && radio('situacao') !== 'Não informado',
+    ()=> radio('natureza') !== 'Não informado' && v('dtAcidente') && v('descAcidente'),
+    ()=> radio('cat') !== 'Não informado' || radio('inss') !== 'Não informado',
+    ()=> radio('cirurgia') !== 'Não informado' || radio('tratamento') !== 'Não informado',
+    ()=> radio('epi') !== 'Não informado' || radio('verbas') !== 'Não informado',
+    ()=> document.querySelectorAll('input[name="pretensao"]:checked').length > 0,
+  ];
+  let done = 0;
+  secs.forEach((fn,i)=>{
+    const seg = document.getElementById('p'+(i+1));
+    if(fn()){ seg.classList.add('done'); done++; }
+    else { seg.classList.remove('done'); }
+  });
+  document.getElementById('progLabel').textContent = `${done} de 7 seções`;
+}
+
+document.addEventListener('input', updateProgress);
+document.addEventListener('change', updateProgress);
+updateProgress();
+</script>
+</body>
+</html>
