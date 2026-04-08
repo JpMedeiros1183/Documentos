@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrevista Rescisão Completa :: Medeiros e Albuquerque Adv.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    input, select, textarea { @apply w-full border border-gray-400 rounded px-3 py-2; }
+    label { @apply font-semibold text-gray-800 block mt-5 first:mt-0; }
+    legend { @apply text-xl font-bold text-blue-900 bg-gray-50 px-4 py-2 rounded-t-lg; }
+    fieldset { @apply border-2 border-gray-300 rounded-lg p-6 mt-8 bg-white shadow; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+
+<div class="bg-blue-950 text-white py-10 text-center">
+  <h1 class="text-4xl font-bold">MEDEIROS E ALBUQUERQUE ADVOCACIA</h1>
+  <p class="text-2xl mt-3">www.medeirosealbuquerqueadv.com.br</p>
+  <p class="text-xl mt-2">WhatsApp (84) 99822-6048</p>
+  <h2 class="text-3xl mt-8 font-light">ENTREVISTA COMPLETA PARA RESCISÃO TRABALHISTA</h2>
+  <p class="mt-4 opacity-90">Versão usada pelo escritório • Todos os dados necessários para cálculo preciso</p>
+</div>
+
+<div class="max-w-5xl mx-auto p-6">
+
+<form id="form" class="space-y-10">
+
+<!-- 1. EMPREGADORA -->
+<fieldset>
+  <legend>1. DADOS DA EMPREGADORA (proprietária do sítio)</legend>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div><label>Nome completo</label><input id="emp_nome" required></div>
+    <div><label>CPF</label><input id="emp_cpf" maxlength="11"></div>
+    <div><label>RG</label><input id="emp_rg"></div>
+    <div><label>Data de nascimento</label><input id="emp_nasc" type="date"></div>
+    <div><label>Estado civil</label><select id="emp_ec"><option>Casada</option><option>Solteira</option><option>Viúva</option><option>Divorciada</option></select></div>
+    <div><label>Telefone / WhatsApp</label><input id="emp_tel" type="tel"></div>
+    <div class="lg:col-span-3"><label>Endereço completo do sítio/fazenda</label><input id="emp_end"></div>
+    <div><label>Cidade</label><input id="emp_cid"></div>
+    <div><label>UF</label><input id="emp_uf" maxlength="2" style="text-transform:uppercase"></div>
+    <div><label>CEP</label><input id="emp_cep"></div>
+  </div>
+</fieldset>
+
+<!-- 2. EMPREGADO -->
+<fieldset>
+  <legend>2. DADOS DO EMPREGADO</legend>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div><label>Nome completo</label><input id="trab_nome" required></div>
+    <div><label>CPF</label><input id="trab_cpf" maxlength="11"></div>
+    <div><label>RG</label><input id="trab_rg"></div>
+    <div><label>Data de nascimento</label><input id="trab_nasc" type="date"></div>
+    <div><label>Estado civil</label><select id="trab_ec"><option>Solteiro(a)</option><option>Casado(a)</option><option>União estável</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select></div>
+    <div><label>Nome do cônjuge / companheiro(a)</label><input id="trab_conjuge"></div>
+    <div><label>Telefone do empregado (se tiver)</label><input id="trab_tel" type="tel"></div>
+    <div><label>PIS / PASEP</label><input id="trab_pis"></div>
+    <div><label>CTPS nº</label><input id="trab_ctps"></div>
+    <div><label>Série CTPS</label><input id="trab_serie"></div>
+    <div><label>Título de eleitor (opcional)</label><input id="trab_titulo"></div>
+    <div class="lg:col-span-3"><label>Endereço atual do empregado</label><input id="trab_end"></div>
+  </div>
+</fieldset>
+
+<!-- 3. ADMISSÃO E SALÁRIOS -->
+<fieldset>
+  <legend>3. ADMISSÃO E REMUNERAÇÃO</legend>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div><label>Data de admissão (início do trabalho)</label><input id="admissao" type="date" required></div>
+    <div><label>Data prevista da demissão</label><input id="demissao" type="date" required></div>
+    <div><label>Tipo de rescisão pretendida</label>
+      <select id="tipo_rescisao" class="text-lg">
+        <option value="acordo">ACORDO ENTRE AS PARTES (art. 484-A CLT) – RECOMENDADO</option>
+        <option value="semjustacausa">Demissão sem justa causa</option>
+        <option value="pedido">Pedido de demissão</option>
+        <option value="justacausa">Demissão por justa causa (só em caso grave)</option>
+      </select>
+    </div>
+    <div><label>Último salário fixo mensal (bruto)</label><input id="salario_fixo" type="number" step="0.01" required></div>
+    <div><label>Recebe comissão ou % sobre produção/leite vendido?</label><select id="tem_comissao" onchange="document.getElementById('comissao_val').classList.toggle('hidden',this.value==='nao')">
+      <option value="nao">Não</option>
+      <option value="sim">Sim</option>
+    </select></div>
+    <div id="comissao_val" class="hidden"><label>Valor médio mensal da comissão nos últimos 12 meses</label><input id="valor_comissao" type="number" step="0.01"></div>
+    <div><label>Média mensal de HORAS EXTRAS nos últimos 12 meses (aproximado)</label><input id="media_he" placeholder="Ex: 40 horas/mês" type="number"></div>
+    <div><label>Trabalha aos domingos/feriados com frequência?</label><select id="dsr"><option>Não</option><option>Sim, quase todo domingo</option><option>Sim, eventualmente</option></select></div>
+    <div><label>Recebe adicional noturno (das 21h às 5h)?</label><select id="noturno"><option>Não</option><option>Sim</option></select></div>
+    <div><label>Tem direito a insalubridade (contato com agrotóxicos, esterco, etc.)?</label><select id="insalubridade"><option>Não</option><option>Sim, grau médio (20%)</option><option>Sim, grau máximo (40%)</option></select></div>
+  </div>
+</fieldset>
+
+<!-- 4. BENEFÍCIOS E DESCONTOS -->
+<fieldset>
+  <legend>4. BENEFÍCIOS E MORADIA</legend>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div><label>Moradia fornecida no sítio?</label><select id="moradia"><option>Não</option><option>Sim, gratuita</option><option>Sim, descontada do salário</option></select></div>
+    <div><label>Valor mensal do desconto de moradia (se houver)</label><input id="desconto_moradia" type="number" step="0.01"></div>
+    <div><label>Alimentação fornecida?</label><select id="alimentacao"><option>Não</option><option>Sim, todas as refeições</option><option>Sim, apenas almoço</option></select></div>
+    <div><label>Desconto de alimentação (se houver)</label><input id="desconto_alim" type="number" step="0.01"></div>
+    <div><label>Fornece vale-transporte?</label><select id="vt"><option>Não</option><option>Sim</option></select></div>
+    <div><label>Há empréstimos ou adiantamentos pendentes?</label><select id="emprestimo" onchange="document.getElementById('valor_emp').classList.toggle('hidden',this.value==='nao')">
+      <option value="nao">Não</option><option value="sim">Sim</option>
+    </select></div>
+    <div id="valor_emp" class="hidden"><label>Valor total ainda devido</label><input id="valor_emprestimo" type="number" step="0.01"></div>
+  </div>
+</fieldset>
+
+<!-- 5. FÉRIAS -->
+<fieldset>
+  <legend>5. FÉRIAS (muito importante!)</legend>
+  <div class="space-y-6">
+    <p class="text-lg font-bold">Períodos aquisitivos já completados e ainda não gozados/pagos:</p>
+    <div class="grid lg:grid-cols-3 gap-6 border-2 border-dashed p-6 rounded">
+      <div><label>1º período aquisitivo</label><input id="ferias1_inicio" type="date" placeholder="Início"></div>
+      <div><label>Fim</label><input id="ferias1_fim" type="date"></div>
+      <div><label>Gozo ou pagamento?</label><select id="ferias1_status"><option>Não gozadas nem pagas</option><option>Já gozadas</option><option>Pagas em dobro</option></select></div>
+
+      <div><label>2º período aquisitivo</label><input id="ferias2_inicio" type="date"></div>
+      <div><label>Fim</label><input id="ferias2_fim" type="date"></div>
+      <div><label>Gozo ou pagamento?</label><select id="ferias2_status"><option>Não gozadas nem pagas</option><option>Já gozadas</option><option>Pagas em dobro</option></select></div>
+
+      <div><label>3º período aquisitivo (se houver)</label><input id="ferias3_inicio" type="date"></div>
+      <div><label>Fim</label><input id="ferias3_fim" type="date"></div>
+      <div><label>Gozo ou pagamento?</label><select id="ferias3_status"><option>Não gozadas nem pagas</option><option>Já gozadas</option><option>Pagas em dobro</option></select></div>
+    </div>
+  </div>
+</fieldset>
+
+<!-- 6. OBSERVAÇÕES FINAIS -->
+<fieldset>
+  <legend>6. OBSERVAÇÕES FINAIS (quanto mais detalhes, melhor)</legend>
+  <textarea id="obs" rows="10" placeholder="Exemplos de informações importantes:
+- Empregado recebe % sobre litro de leite vendido
+- Tem bezerros ou ferramentas que ficaram no sítio
+- Já houve acidente de trabalho
+- Existe processo trabalhista anterior
+- Empregado tem interesse em continuar morando no sítio após a rescisão
+- Qualquer outra informação que achar importante..."></textarea>
+</fieldset>
+
+<!-- BOTÕES GRANDES -->
+<div class="text-center py-12 space-y-6">
+  <button type="button" onclick="salvar()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-2xl py-6 px-12 rounded-xl shadow-lg">
+    SALVAR NO CELULAR / COMPUTADOR
+  </button>
+  <br>
+  <button type="button" onclick="gerarPDF()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-2xl py-6 px-12 rounded-xl shadow-lg">
+    GERAR PDF E ENVIAR POR WHATSAPP
+  </button>
+  <br>
+  <button type="button" onclick="if(confirm('Tem certeza que quer apagar tudo?'))location.reload()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xl py-5 px-10 rounded-xl">
+    Limpar tudo
+  </button>
+</div>
+
+</form>
+</div>
+
+<script>
+// CARREGA DADOS SALVOS
+window.onload = () => {
+  const salvo = localStorage.getItem('ENTREVISTA_RESCISAO_2025');
+  if (salvo) {
+    const d = JSON.parse(salvo);
+    Object.keys(d).forEach(k => { if (document.getElementById(k)) document.getElementById(k).value = d[k]; });
+    alert('Dados salvos anteriormente foram carregados!');
+  }
+};
+
+// SALVAR
+function salvar() {
+  const dados = {};
+  document.querySelectorAll('#form input, #form select, #form textarea').forEach(el => dados[el.id] = el.value);
+  localStorage.setItem('ENTREVISTA_RESCISAO_2025', JSON.stringify(dados));
+  alert('DADOS SALVOS COM SUCESSO!\nVocê pode fechar o navegador e voltar depois que continuará tudo preenchido.');
+}
+
+// GERAR PDF
+function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  let y = 20;
+
+  const add = (texto, size=10, bold=false) => {
+    doc.setFontSize(size);
+    doc.setFont(undefined, bold?'bold':'normal');
+    const linhas = doc.splitTextToSize(texto, 180);
+    linhas.forEach(l => {
+      doc.text(l, 15, y);
+      y += size <= 10 ? 6 : 9;
+      if (y > 280) { doc.addPage(); y = 20; }
+    });
+  };
+
+  add('ENTREVISTA COMPLETA PARA RESCISÃO TRABALHISTA', 18, true);
+  add('Medeiros e Albuquerque Advocacia • (84) 99822-6048', 12);
+  add('Gerado em: ' + new Date().toLocaleString('pt-BR'), 10);
+  add(''); y += 5;
+
+  // Empregadora
+  add('1. EMPREGADORA', 14, true);
+  add(`Nome: ${v('emp_nome')}`);
+  add(`CPF: ${v('emp_cpf')}     Estado Civil: ${v('emp_ec')}`);
+  add(`Endereço: ${v('emp_end')} - ${v('emp_cid')}/${v('emp_uf')}     WhatsApp: ${v('emp_tel')}`);
+
+  // Empregado
+  add('2. EMPREGADO', 14, true);
+  add(`Nome: ${v('trab_nome')}`);
+  add(`CPF: ${v('trab_cpf')}     Nascimento: ${dataBR('trab_nasc')}`);
+  add(`CTPS: ${v('trab_ctps')}/${v('trab_serie')}     PIS: ${v('trab_pis')}`);
+
+  // Contrato
+  add('3. CONTRATO', 14, true);
+  add(`Admissão: ${dataBR('admissao')}     Demissão prevista: ${dataBR('demissao')}`);
+  add(`Tipo de rescisão: ${document.getElementById('tipo_rescisao').options[document.getElementById('tipo_rescisao').selectedIndex].text}`);
+  add(`Salário fixo: R$ ${parseFloat(v('salario_fixo')||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}`);
+  if(v('valor_comissao')) add(`Comissão média mensal: R$ ${parseFloat(v('valor_comissao')).toLocaleString('pt-BR',{minimumFractionDigits:2})}`);
+  if(v('media_he')) add(`Média de horas extras: ${v('media_he')} horas/mês`);
+  add(`Moradia: ${v('moradia')} ${v('desconto_moradia')?'- desconto R$ '+parseFloat(v('desconto_moradia')).toFixed(2):''}`);
+  add(`Alimentação: ${v('alimentacao')}`);
+
+  // Férias
+  add('4. FÉRIAS PENDENTES', 14, true);
+  ['1','2','3'].forEach(n => {
+    if(v(`ferias${n}_inicio`)) {
+      add(`Período ${n}: ${dataBR(`ferias${n}_inicio`)} a ${dataBR(`ferias${n}_fim`)} → ${document.getElementById(`ferias${n}_status`).options[document.getElementById(`ferias${n}_status`).selectedIndex].text}`);
+    }
+  });
+
+  // Observa��ões
+  if(v('obs').trim()) {
+    add('5. OBSERVAÇÕES DA EMPREGADORA', 14, true);
+    add(v('obs'));
+  }
+
+  function v(id) { return document.getElementById(id)?.value || ''; }
+  function dataBR(id) { return v(id) ? new Date(v(id)).toLocaleDateString('pt-BR') : '—'; }
+
+  const nome = v('trab_nome').split(' ')[0] || 'Empregado';
+  doc.save(`Rescisao_${nome}_Completa.pdf`);
+  alert('PDF GERADO E SALVO NA PASTA DOWNLOADS!\nAgora é só abrir o WhatsApp e encaminhar para (84) 99822-6048');
+}
+</script>
+</body>
+</html>
