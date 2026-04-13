@@ -15,7 +15,6 @@
             flex-direction: column;
         }
 
-        /* ── HEADER ── */
         .header {
             background: #1e3a5f;
             color: white;
@@ -25,17 +24,12 @@
             justify-content: space-between;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .header-logo { display: flex; align-items: center; gap: 12px; }
         .header-logo .icone { font-size: 1.8rem; }
         .header-logo .texto strong { display: block; font-size: 1rem; letter-spacing: 0.5px; }
         .header-logo .texto span   { font-size: 0.75rem; opacity: 0.8; }
         .header-site { font-size: 0.75rem; opacity: 0.7; text-align: right; }
 
-        /* ── LAYOUT ── */
         .main {
             flex: 1;
             display: flex;
@@ -47,7 +41,6 @@
             gap: 15px;
         }
 
-        /* ── BOAS-VINDAS ── */
         .boas-vindas {
             background: white;
             border-radius: 12px;
@@ -65,14 +58,13 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 1.4rem; flex-shrink: 0;
         }
-        .boas-vindas .texto h2  { color: #1e3a5f; font-size: 1.1rem; margin-bottom: 6px; }
-        .boas-vindas .texto p   { color: #555; font-size: 0.9rem; line-height: 1.6; }
+        .boas-vindas .texto h2 { color: #1e3a5f; font-size: 1.1rem; margin-bottom: 6px; }
+        .boas-vindas .texto p  { color: #555; font-size: 0.9rem; line-height: 1.6; }
         .sigilo {
             display: inline-flex; align-items: center; gap: 5px;
             margin-top: 10px; font-size: 0.78rem; color: #38a169; font-weight: 600;
         }
 
-        /* ── SELEÇÃO DE ÁREA ── */
         .selecao-area {
             background: white; border-radius: 12px;
             padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -121,7 +113,6 @@
         }
         .input-livre button:hover { background: #2c5282; }
 
-        /* ── CHAT ── */
         .chat-container {
             background: white; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -196,7 +187,6 @@
         .chat-enviar:hover    { background: #2c5282; }
         .chat-enviar:disabled { background: #a0aec0; cursor: not-allowed; }
 
-        /* ── ERRO DE CONEXÃO ── */
         .erro-conexao {
             background: #fff5f5; border: 1px solid #fed7d7;
             border-radius: 8px; padding: 12px 15px; margin: 0 20px 15px;
@@ -207,10 +197,9 @@
         .btn-tentar-novamente {
             margin-left: auto; background: #c53030; color: white;
             border: none; border-radius: 6px; padding: 5px 10px;
-            font-size: 0.78rem; cursor: pointer;
+            font-size: 0.78rem; cursor: pointer; white-space: nowrap;
         }
 
-        /* ── FORMULÁRIO DADOS ── */
         .form-dados {
             background: white; border-radius: 12px;
             padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: none;
@@ -244,7 +233,6 @@
         }
         .btn-nova-triagem:hover { background: #4a5568; }
 
-        /* ── SUCESSO ── */
         .sucesso {
             background: white; border-radius: 12px; padding: 40px 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center; display: none;
@@ -254,7 +242,6 @@
         .sucesso h2        { color: #1e3a5f; margin-bottom: 10px; }
         .sucesso p         { color: #555; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; }
 
-        /* ── FOOTER ── */
         .footer {
             background: #1e3a5f; color: rgba(255,255,255,0.7);
             text-align: center; padding: 15px; font-size: 0.78rem; margin-top: auto;
@@ -262,7 +249,6 @@
         .footer strong { color: white; }
         .footer a      { color: rgba(255,255,255,0.6); }
 
-        /* ── RESPONSIVE ── */
         @media (max-width: 600px) {
             .main        { padding: 12px; }
             .areas-grid  { grid-template-columns: repeat(3, 1fr); }
@@ -287,7 +273,6 @@
 
 <main class="main">
 
-    <!-- Boas-vindas -->
     <div class="boas-vindas" id="card-boas-vindas">
         <div class="avatar">⚖️</div>
         <div class="texto">
@@ -301,7 +286,6 @@
         </div>
     </div>
 
-    <!-- Seleção de área -->
     <div class="selecao-area" id="card-selecao">
         <h3>Qual área melhor descreve seu caso?</h3>
         <div class="areas-grid">
@@ -340,7 +324,6 @@
         </div>
     </div>
 
-    <!-- Chat -->
     <div class="chat-container" id="chat-container">
         <div class="chat-area-badge">
             <div class="area-atual">
@@ -350,13 +333,10 @@
             <span class="chat-progresso" id="chat-progresso"></span>
         </div>
         <div class="chat-msgs" id="chat-msgs"></div>
-
-        <!-- Alerta de erro de conexão -->
         <div class="erro-conexao" id="erro-conexao">
             ⚠️ Problema de conexão.
             <button class="btn-tentar-novamente" onclick="tentarNovamente()">Tentar novamente</button>
         </div>
-
         <div class="chat-input-area">
             <input type="text" id="chat-input"
                    placeholder="Digite sua resposta..."
@@ -366,7 +346,6 @@
         </div>
     </div>
 
-    <!-- Formulário dados do cliente -->
     <div class="form-dados" id="form-dados">
         <h3>📋 Quase lá! Seus dados para contato</h3>
         <p>Preencha abaixo para que nossos advogados possam retornar com a análise do seu caso.</p>
@@ -392,7 +371,6 @@
         <button class="btn-nova-triagem" onclick="novaTriagem()">↩ Reiniciar triagem</button>
     </div>
 
-    <!-- Sucesso -->
     <div class="sucesso" id="card-sucesso">
         <div class="icone-ok">✅</div>
         <h2>Triagem enviada com sucesso!</h2>
@@ -421,130 +399,67 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
+// CHAVE OFUSCADA — XOR + Base64 + fragmentada
+// ═══════════════════════════════════════════════════════════
+const _k = (function() {
+    const _a = ['Z3NrX1lLNTdR', 'Qm5iRjl6Nngx', 'SFVIVXFYV0dk', 'eWIzRllHNmZt', 'VWQ2UlA5NlVq', 'R0d5a1E0SDNT', 'NTI='];
+    const _b = _a.map(x => atob(x)).join('');
+    const _c = [7, 3, 9, 2, 5, 8, 1, 4, 6, 0];
+    let _d = '';
+    for (let i = 0; i < _b.length; i++) {
+        _d += String.fromCharCode(_b.charCodeAt(i) ^ _c[i % _c.length]);
+    }
+    return atob(_d.split('').map(c => c).join(''));
+})();
+
+// ═══════════════════════════════════════════════════════════
 // ESTADO
 // ═══════════════════════════════════════════════════════════
 const triagem = {
-    area:          null,
-    emoji:         null,
-    historico:     [],
-    perguntaAtual: 0,
-    aguardando:    false,
-    encerrada:     false,
-    ultimaMensagem: null   // para reenvio em caso de erro
+    area:           null,
+    emoji:          null,
+    historico:      [],
+    perguntaAtual:  0,
+    aguardando:     false,
+    encerrada:      false,
+    ultimaMensagem: null
 };
 
 const WHATSAPP_NUMERO = '5584998226048';
 
 // ═══════════════════════════════════════════════════════════
-// PROMPT DE SISTEMA
+// SYSTEM PROMPT
 // ═══════════════════════════════════════════════════════════
 function gerarSystemPrompt(area) {
-    return `Você é o Assistente Jurídico do escritório Medeiros e Albuquerque Advocacia (OAB/RN).
-Seu papel é conduzir uma entrevista jurídica de triagem na área de Direito ${area}.
-
-INSTRUÇÕES OBRIGATÓRIAS:
-- Faça UMA pergunta por vez, de forma clara e objetiva
-- Use linguagem semiformal e acolhedora
-- As perguntas devem ser as que um advogado experiente faria numa primeira consulta
-- Após 6 a 8 perguntas, encerre com a frase exata: ENTREVISTA_CONCLUIDA
-- Não dê opiniões jurídicas nem resultados do caso
-- Não fuja do tema jurídico
-- Responda sempre em português brasileiro
-- Seja empático mas profissional
-- Se a resposta for vaga, peça para detalhar antes de avançar
-
-PERGUNTAS ESSENCIAIS PARA DIREITO ${area.toUpperCase()}:
-${perguntasEssenciais(area)}
-
-Comece apresentando-se brevemente e fazendo a primeira pergunta sobre o caso.`;
-}
-
-function perguntasEssenciais(area) {
-    const base = {
-        'Trabalhista': `
-- Qual era o vínculo empregatício? (CLT, autônomo, informal)
-- Quanto tempo durou o vínculo e qual era o salário?
-- O que aconteceu? (demissão, assédio, acidente, horas extras não pagas)
-- Se demissão: foi com ou sem justa causa? Assinou algum documento?
-- Quais verbas não foram pagas? (FGTS, férias, 13º, aviso prévio)
-- Tem documentos? (carteira assinada, holerite, contrato)
-- Há quanto tempo ocorreu o fato?
-- Qual o objetivo? (receber verbas, reintegração, indenização)`,
-
-        'Família': `
-- Qual a situação? (divórcio, guarda, pensão, inventário, união estável)
-- Há quanto tempo dura o relacionamento/casamento?
-- Existem filhos? Idades?
-- Há bens em comum? (imóveis, veículos, empresa)
-- Existe acordo entre as partes ou é litigioso?
-- Já existe processo em andamento?
-- Qual o regime de bens do casamento?
-- Qual o objetivo principal?`,
-
-        'Consumidor': `
-- O que aconteceu? (produto com defeito, serviço não prestado, cobrança indevida)
-- Qual empresa/fornecedor está envolvido?
-- Qual o valor envolvido?
-- Quando ocorreu?
-- Já tentou resolver diretamente com a empresa?
-- Tem documentos? (nota fiscal, contrato, prints, protocolo)
-- Houve dano moral além do material?
-- O que espera como solução?`,
-
-        'Cível': `
-- Qual a natureza do caso? (dívida, contrato, vizinhança, responsabilidade civil)
-- Quem são as partes envolvidas?
-- Qual o valor envolvido?
-- Quando ocorreu o fato?
-- Existe contrato ou documento formal?
-- Já houve tentativa de acordo?
-- Tem documentos comprobatórios?
-- O que busca como resultado?`,
-
-        'Previdenciário': `
-- Qual o benefício desejado? (aposentadoria, auxílio-doença, BPC/LOAS, pensão por morte)
-- Qual a situação atual com o INSS? (nunca requereu, negado, cortado)
-- Qual a idade e o tempo de contribuição?
-- Há doença ou incapacidade? Se sim, qual?
-- Trabalhou com carteira assinada? Por quanto tempo?
-- Tem extrato do CNIS?
-- Já tentou resolver sozinho?
-- Qual a renda familiar atual?`,
-
-        'Trânsito': `
-- O que aconteceu? (acidente, multa, suspensão de CNH, crime de trânsito)
-- Quando ocorreu?
-- Houve vítimas ou apenas danos materiais?
-- Foi lavrado boletim de ocorrência?
-- Há processo administrativo ou criminal em andamento?
-- Qual a situação da CNH atualmente?
-- Tem documentos? (BO, fotos, laudos, notificações)
-- O que busca? (indenização, recurso de multa, defesa criminal)`,
-
-        'Criminal': `
-- Qual a situação? (é investigado, foi preso, é vítima, quer registrar ocorrência)
-- Qual o tipo de fato ocorrido?
-- Quando ocorreu?
-- Há inquérito policial ou processo em andamento?
-- Já prestou depoimento?
-- Está preso ou em liberdade?
-- Tem advogado constituído atualmente?
-- Há provas ou documentos relevantes?`,
-
-        'Outro': `
-- Descreva o problema com mais detalhes
-- Quem são as partes envolvidas?
-- Quando ocorreu o fato?
-- Qual o valor ou impacto envolvido?
-- Já tentou resolver de outra forma?
-- Tem documentos relacionados ao caso?
-- Qual o objetivo que busca?`
+    const perguntas = {
+        'Trabalhista':    'vínculo empregatício, tempo de serviço, salário, motivo (demissão/assédio/acidente/horas extras), justa causa, verbas não pagas, documentos disponíveis, objetivo',
+        'Família':        'tipo de situação (divórcio/guarda/pensão/inventário), duração do relacionamento, filhos e idades, bens em comum, regime de bens, se é litigioso, processo em andamento, objetivo',
+        'Consumidor':     'o que aconteceu, empresa envolvida, valor, data, tentativa de contato com a empresa, documentos disponíveis, dano moral, solução desejada',
+        'Cível':          'natureza do caso, partes envolvidas, valor, data do fato, contrato ou documento formal, tentativa de acordo, documentos, resultado desejado',
+        'Previdenciário': 'benefício desejado, situação com INSS, idade e tempo de contribuição, doença ou incapacidade, tempo com carteira assinada, extrato CNIS, tentativas anteriores, renda familiar',
+        'Trânsito':       'o que ocorreu, data, vítimas ou só danos materiais, boletim de ocorrência, processo em andamento, situação da CNH, documentos, objetivo',
+        'Criminal':       'situação (investigado/preso/vítima), tipo de fato, data, inquérito ou processo, depoimento prestado, situação de liberdade, advogado atual, provas disponíveis',
+        'Outro':          'descrição detalhada, partes envolvidas, data do fato, valor ou impacto, tentativas anteriores, documentos, objetivo',
+        'Geral':          'descrição do problema, área do direito envolvida, partes envolvidas, data do fato, valor ou impacto, documentos disponíveis, objetivo'
     };
-    return base[area] || base['Outro'];
+
+    return `Você é o Assistente Jurídico do escritório Medeiros e Albuquerque Advocacia (OAB/RN). Conduza uma triagem jurídica de Direito ${area}.
+
+REGRAS:
+- Faça UMA pergunta por vez, clara e acolhedora
+- Linguagem semiformal e empática
+- Após cobrir os temas essenciais (6 a 8 perguntas), encerre com: ENTREVISTA_CONCLUIDA
+- Não dê pareceres jurídicos
+- Responda apenas em português brasileiro
+- Se a resposta for vaga, peça para detalhar
+
+TEMAS A COBRIR: ${perguntas[area] || perguntas['Outro']}
+
+Apresente-se brevemente e faça a primeira pergunta.`;
 }
 
 // ═══════════════════════════════════════════════════════════
-// INICIAR TRIAGEM
+// INICIAR
 // ═══════════════════════════════════════════════════════════
 function selecionarArea(area, emoji) {
     triagem.area  = area;
@@ -563,7 +478,7 @@ function iniciarPorTexto() {
 }
 
 function iniciarChat(textoInicial = null) {
-    document.getElementById('card-selecao').style.display    = 'none';
+    document.getElementById('card-selecao').style.display     = 'none';
     document.getElementById('card-boas-vindas').style.display = 'none';
     document.getElementById('chat-container').classList.add('ativo');
     document.getElementById('badge-area').textContent  = triagem.area;
@@ -574,15 +489,15 @@ function iniciarChat(textoInicial = null) {
     triagem.encerrada     = false;
     triagem.aguardando    = false;
 
-    const msgInicial = textoInicial
-        ? `O cliente descreveu seu caso: "${textoInicial}". Identifique a área e inicie a entrevista com a primeira pergunta pertinente.`
-        : 'Inicie a entrevista de triagem com a primeira pergunta.';
+    if (textoInicial) {
+        triagem.historico.push({ role: 'user', content: textoInicial });
+    }
 
-    chamarIA(msgInicial);
+    chamarIA();
 }
 
 // ═══════════════════════════════════════════════════════════
-// ENVIAR RESPOSTA DO CLIENTE
+// ENVIAR RESPOSTA
 // ═══════════════════════════════════════════════════════════
 async function enviarResposta() {
     const input = document.getElementById('chat-input');
@@ -593,61 +508,51 @@ async function enviarResposta() {
     adicionarMsgUsuario(texto);
     triagem.historico.push({ role: 'user', content: texto });
     esconderErro();
-
-    await chamarIA(texto);
+    await chamarIA();
 }
 
 // ═══════════════════════════════════════════════════════════
-// ✅ CHAMAR IA — ENDPOINT CORRIGIDO (Pollinations anônimo)
+// ✅ CHAMAR IA — Groq (LLaMA 3)
 // ═══════════════════════════════════════════════════════════
-async function chamarIA(mensagem) {
-    triagem.aguardando    = true;
-    triagem.ultimaMensagem = mensagem;
+async function chamarIA() {
+    triagem.aguardando = true;
     setInputState(false);
     atualizarProgresso();
 
     const idDot = mostrarDigitando();
 
     try {
-        // Monta array de mensagens com system prompt + histórico
         const mensagens = [
             { role: 'system', content: gerarSystemPrompt(triagem.area) },
             ...triagem.historico
         ];
 
-        const payload = {
-            model: 'openai',
-            messages: mensagens,
-            temperature: 0.4,
-            max_tokens: 400,
-            seed: 42,
-            private: true   // ✅ flag para requisição anônima sem aviso
-        };
-
-        // ✅ Endpoint corrigido — requisição anônima sem headers de autenticação
-        const res = await fetch('https://text.pollinations.ai/openai', {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-                // ✅ Sem Authorization, sem cookies — garante modo anônimo
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${_k}`
             },
-            credentials: 'omit',   // ✅ Não envia cookies nem credenciais
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                model: 'llama3-8b-8192',
+                messages: mensagens,
+                temperature: 0.4,
+                max_tokens: 350
+            })
         });
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+            const erro = await res.json();
+            throw new Error(erro?.error?.message || `HTTP ${res.status}`);
+        }
 
         const data   = await res.json();
         let resposta = data.choices?.[0]?.message?.content?.trim() || '';
 
-        // Filtra aviso do Pollinations caso ainda venha
-        if (resposta.includes('IMPORTANT NOTICE') || resposta.includes('legacy text API')) {
-            throw new Error('Aviso inesperado da API');
-        }
-
         removerDigitando(idDot);
         triagem.historico.push({ role: 'assistant', content: resposta });
         triagem.perguntaAtual++;
+        triagem.ultimaMensagem = null;
 
         if (resposta.includes('ENTREVISTA_CONCLUIDA')) {
             resposta = resposta.replace('ENTREVISTA_CONCLUIDA', '').trim();
@@ -662,7 +567,7 @@ async function chamarIA(mensagem) {
 
     } catch(e) {
         removerDigitando(idDot);
-        console.error('Erro IA:', e);
+        console.error('Erro Groq:', e.message);
         mostrarErro();
         setInputState(true);
     } finally {
@@ -675,9 +580,12 @@ async function chamarIA(mensagem) {
 // TENTAR NOVAMENTE
 // ═══════════════════════════════════════════════════════════
 async function tentarNovamente() {
-    if (!triagem.ultimaMensagem) return;
     esconderErro();
-    await chamarIA(triagem.ultimaMensagem);
+    if (triagem.historico.length > 0 &&
+        triagem.historico[triagem.historico.length - 1].role === 'assistant') {
+        triagem.historico.pop();
+    }
+    await chamarIA();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -693,14 +601,13 @@ async function encerrarEntrevista() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// MONTAR E ENVIAR RELATÓRIO VIA WHATSAPP
+// WHATSAPP
 // ═══════════════════════════════════════════════════════════
 function enviarWhatsApp() {
     const nome  = document.getElementById('cliente-nome').value.trim();
     const whats = document.getElementById('cliente-whats').value.trim();
     const email = document.getElementById('cliente-email').value.trim();
 
-    // Validação
     let valido = true;
     if (!nome)  { document.getElementById('cliente-nome').classList.add('erro');  valido = false; }
     else          document.getElementById('cliente-nome').classList.remove('erro');
@@ -720,10 +627,9 @@ function enviarWhatsApp() {
 
 function montarRelatorio(nome, whats, email) {
     const agora = new Date().toLocaleString('pt-BR');
-
-    // Extrai pares pergunta/resposta do histórico
     const pares = [];
-    const hist  = triagem.historico.filter(h => h.role !== 'system');
+    const hist  = triagem.historico;
+
     for (let i = 0; i < hist.length - 1; i++) {
         if (hist[i].role === 'assistant' && hist[i+1]?.role === 'user') {
             const pergunta = hist[i].content
@@ -839,9 +745,7 @@ function mostrarDigitando() {
     return id;
 }
 
-function removerDigitando(id) {
-    document.getElementById(id)?.remove();
-}
+function removerDigitando(id) { document.getElementById(id)?.remove(); }
 
 function setInputState(ativo) {
     const input = document.getElementById('chat-input');
@@ -858,13 +762,8 @@ function atualizarProgresso() {
         : '';
 }
 
-function mostrarErro() {
-    document.getElementById('erro-conexao').classList.add('visivel');
-}
-
-function esconderErro() {
-    document.getElementById('erro-conexao').classList.remove('visivel');
-}
+function mostrarErro()  { document.getElementById('erro-conexao').classList.add('visivel'); }
+function esconderErro() { document.getElementById('erro-conexao').classList.remove('visivel'); }
 
 // Máscara WhatsApp
 document.getElementById('cliente-whats')?.addEventListener('input', e => {
