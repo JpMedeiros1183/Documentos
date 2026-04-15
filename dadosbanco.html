@@ -253,6 +253,57 @@
             }
         }
 
+        /* Account Type Toggle */
+        .account-type-toggle {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .account-type-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .account-type-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .account-type-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .account-type-option input:checked + .account-type-label {
+            border-color: var(--primary);
+            background: rgba(0, 245, 255, 0.15);
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);            transform: translateY(-2px);
+        }
+
+        .account-type-label:hover {
+            border-color: var(--primary);
+            background: rgba(0, 245, 255, 0.08);
+        }
+
+        .account-type-label i {
+            font-size: 1.1rem;
+        }
+
         /* Submit button */
         .btn-submit {
             width: 100%;
@@ -290,9 +341,9 @@
             left: 100%;
         }
 
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(123, 44, 191, 0.6), 0 0 25px rgba(255, 0, 110, 0.4);        }
+        .btn-submit:hover {            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(123, 44, 191, 0.6), 0 0 25px rgba(255, 0, 110, 0.4);
+        }
 
         .btn-submit:active {
             transform: translateY(1px);
@@ -339,8 +390,8 @@
             font-size: 1rem;
             transition: all 0.3s ease;
             padding: 0.6rem;
-            border-radius: 12px;
-        }
+            border-radius: 12px;        }
+
         .contact-item:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
@@ -388,9 +439,9 @@
             margin-right: 0.5rem;
         }
 
-        /* Animation for form elements */
-        @keyframes fadeInUp {
-            from {                opacity: 0;
+        /* Animation for form elements */        @keyframes fadeInUp {
+            from {
+                opacity: 0;
                 transform: translateY(30px);
             }
             to {
@@ -414,6 +465,7 @@
         .form-group:nth-child(3) { --i: 3; opacity: 1; animation-delay: 0.3s; }
         .form-group:nth-child(4) { --i: 4; opacity: 1; animation-delay: 0.4s; }
         .form-group:nth-child(5) { --i: 5; opacity: 1; animation-delay: 0.5s; }
+        .form-group:nth-child(6) { --i: 6; opacity: 1; animation-delay: 0.6s; }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -436,10 +488,14 @@
             .form-title {
                 font-size: 1.4rem;
             }
+                        .account-type-toggle {
+                flex-direction: column;
+            }
         }
 
         /* WhatsApp floating button */
-        .whatsapp-float {            position: fixed;
+        .whatsapp-float {
+            position: fixed;
             bottom: 25px;
             right: 25px;
             width: 60px;
@@ -482,13 +538,13 @@
             font-weight: 500;
             animation: fadeIn 0.4s ease;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .success-message.show {            display: block;
+        .success-message.show {
+            display: block;
         }
 
         .success-message i {
@@ -530,19 +586,37 @@
                         <label for="cpf"><i class="fas fa-id-card"></i> CPF</label>
                         <input type="text" id="cpf" class="form-control" placeholder="000.000.000-00" maxlength="14" required>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="bank"><i class="fas fa-university"></i> Banco</label>
                             <input type="text" id="bank" class="form-control" placeholder="Ex: Banco do Brasil" required>
                         </div>
                         <div class="form-group">
-                            <label for="agency"><i class="fas fa-building-columns"></i> Agência</label>                            <input type="text" id="agency" class="form-control" placeholder="Ex: 1234-5" required>
+                            <label for="agency"><i class="fas fa-building-columns"></i> Agência</label>
+                            <input type="text" id="agency" class="form-control" placeholder="Ex: 1234-5" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="account"><i class="fas fa-credit-card"></i> Conta Corrente</label>
+                        <label><i class="fas fa-credit-card"></i> Tipo de Conta</label>
+                        <div class="account-type-toggle">
+                            <div class="account-type-option">
+                                <input type="radio" name="accountType" id="checking" value="Conta Corrente" checked>
+                                <label for="checking" class="account-type-label">
+                                    <i class="fas fa-wallet"></i> Conta Corrente
+                                </label>
+                            </div>
+                            <div class="account-type-option">
+                                <input type="radio" name="accountType" id="savings" value="Poupança">
+                                <label for="savings" class="account-type-label">
+                                    <i class="fas fa-piggy-bank"></i> Poupança
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account"><i class="fas fa-hashtag"></i> Número da Conta</label>
                         <input type="text" id="account" class="form-control" placeholder="Ex: 12345-6" required>
                     </div>
 
@@ -561,8 +635,7 @@
                 <h3 class="contact-title"><i class="fas fa-headset"></i> Fale Conosco</h3>
                 <div class="contact-info">
                     <div class="contact-item">
-                        <i class="fas fa-globe"></i>
-                        <a href="https://www.medeirosealbuquerqueadv.com.br" target="_blank">www.medeirosealbuquerqueadv.com.br</a>
+                        <i class="fas fa-globe"></i>                        <a href="https://www.medeirosealbuquerqueadv.com.br" target="_blank">www.medeirosealbuquerqueadv.com.br</a>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
@@ -586,7 +659,8 @@
 
     <!-- Floating WhatsApp Button -->
     <a href="https://wa.me/5584998226048" class="whatsapp-float" target="_blank" title="Fale conosco no WhatsApp">
-        <i class="fab fa-whatsapp"></i>    </a>
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <script>
         // Create floating particles
@@ -610,8 +684,7 @@
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 
-                // Random color variation
-                if (Math.random() > 0.7) {
+                // Random color variation                if (Math.random() > 0.7) {
                     particle.style.background = '#7b2cbf';
                     particle.style.boxShadow = '0 0 10px #7b2cbf';
                 } else if (Math.random() > 0.85) {
@@ -635,7 +708,8 @@
 
         // Format CPF input
         document.getElementById('cpf').addEventListener('input', function(e) {
-            this.value = cpfMask(this.value);        });
+            this.value = cpfMask(this.value);
+        });
 
         // Form submission
         document.getElementById('bankForm').addEventListener('submit', function(e) {
@@ -647,6 +721,7 @@
             const bank = document.getElementById('bank').value.trim();
             const agency = document.getElementById('agency').value.trim();
             const account = document.getElementById('account').value.trim();
+            const accountType = document.querySelector('input[name="accountType"]:checked').value;
             
             // Create message
             const message = `*NOVO CADASTRO BANCÁRIO*%0A%0A` +
@@ -654,11 +729,11 @@
                            `🆔 *CPF:* ${cpf}%0A` +
                            `🏦 *Banco:* ${bank}%0A` +
                            `🔢 *Agência:* ${agency}%0A` +
-                           `💳 *Conta Corrente:* ${account}%0A%0A` +
+                           `💳 *Tipo de Conta:* ${accountType}%0A` +
+                           `🔣 *Número da Conta:* ${account}%0A%0A` +
                            `_Enviado via portal Medeiros & Albuquerque Advogados_`;
             
-            // Show success message
-            const successMsg = document.getElementById('successMessage');
+            // Show success message            const successMsg = document.getElementById('successMessage');
             successMsg.classList.add('show');
             
             // Disable button temporarily
@@ -674,6 +749,8 @@
                 // Reset form and button after redirect
                 setTimeout(() => {
                     document.getElementById('bankForm').reset();
+                    // Reset radio to default (checking)
+                    document.getElementById('checking').checked = true;
                     successMsg.classList.remove('show');
                     btn.disabled = false;
                     btn.innerHTML = originalBtnText;
@@ -684,7 +761,8 @@
         // Initialize particles on load
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
-                        // Add subtle hover effect to form controls
+            
+            // Add subtle hover effect to form controls
             const formControls = document.querySelectorAll('.form-control');
             formControls.forEach(control => {
                 control.addEventListener('focus', function() {
@@ -704,8 +782,7 @@
                 if (currentIndex < inputs.length - 1) {
                     inputs[currentIndex + 1].focus();
                 }
-            }
-        });
+            }        });
     </script>
 </body>
 </html>
