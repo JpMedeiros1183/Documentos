@@ -216,7 +216,6 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
         @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
 
-        /* Account Type Toggle */
         .account-type-toggle { display: flex; gap: 0.8rem; margin-top: 0.5rem; }
         .account-type-option { flex: 1; position: relative; }
         .account-type-option input { position: absolute; opacity: 0; cursor: pointer; }
@@ -475,21 +474,26 @@
                             `🔣 *Número da Conta:* ${account}\n\n` +
                             `_Enviado via portal Medeiros & Albuquerque Advogados_`;
             
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/5584998226048?text=${encodedMessage}`;
+            // ✅ CODIFICAÇÃO SEGURA DA URL
+            const whatsappUrl = `https://wa.me/5584998226048?text=${encodeURIComponent(message)}`;
             
+            // ✅ MOSTRA FEEDBACK VISUAL
             document.getElementById('successMessage').classList.add('show');
             const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             
-            // ✅ ABRE IMEDIATAMENTE PARA EVITAR BLOQUEIO DE POPUP
-            const newWindow = window.open(whatsappUrl, '_blank');
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                window.location.href = whatsappUrl; // Fallback se popup for bloqueado
-            }
+            // ✅ MÉTODO 100% À PROVA DE BLOQUEADORES DE POPUP
+            const link = document.createElement('a');
+            link.href = whatsappUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
+            // Resetar formulário após envio
             setTimeout(() => {
                 document.getElementById('bankForm').reset();
                 document.getElementById('checking').checked = true;
