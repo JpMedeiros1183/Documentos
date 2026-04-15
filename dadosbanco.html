@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medeiros & Albuquerque Advogados | Dados Bancários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #00f5ff;
+            --secondary: #7b2cbf;
+            --accent: #ff006e;
+            --dark: #0a0a1a;
+            --darker: #05050f;
+            --light: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 40px var(--primary);
+            --neon-glow-purple: 0 0 10px var(--secondary), 0 0 20px var(--secondary);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark), #1a1a3a);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(123, 44, 191, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 245, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 110, 0.08) 0%, transparent 55%);
+            z-index: -2;
+            animation: pulse 15s ease-in-out infinite;        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            animation: float 20s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header styles */
+        header {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            margin-bottom: 2rem;            position: relative;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+            letter-spacing: -0.5px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(0, 245, 255, 0.3), 0 0 20px rgba(123, 44, 191, 0.3); }
+            to { text-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 30px rgba(123, 44, 191, 0.6), 0 0 40px rgba(255, 0, 110, 0.4); }
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .oab-badge {
+            display: inline-block;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--neon-glow-purple);
+            animation: pulse-border 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: var(--neon-glow-purple); }
+            50% { box-shadow: 0 0 15px var(--secondary), 0 0 30px var(--secondary), 0 0 45px var(--secondary); }
+        }
+
+        /* Form card */
+        .form-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);            border-radius: 24px;
+            padding: 2.2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), var(--neon-glow-purple);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shine 8s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(123, 44, 191, 0.4);
+        }
+
+        .form-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
+            color: var(--primary);
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .form-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group label i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.3rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2), var(--neon-glow);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-row {
+            display: grid;            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            box-shadow: 0 5px 20px rgba(123, 44, 191, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .btn-submit::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(123, 44, 191, 0.6), 0 0 25px rgba(255, 0, 110, 0.4);        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .btn-submit i {
+            font-size: 1.3rem;
+        }
+
+        /* Contact section */
+        .contact-section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            margin-top: 1rem;
+        }
+
+        .contact-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 0.6rem;
+            border-radius: 12px;
+        }
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .contact-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .contact-item i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem 3rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .security-note {
+            background: rgba(0, 245, 255, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .security-note i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        /* Animation for form elements */
+        @keyframes fadeInUp {
+            from {                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .form-group {
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: calc(var(--i) * 0.1s);
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) { --i: 1; opacity: 1; animation-delay: 0.1s; }
+        .form-group:nth-child(2) { --i: 2; opacity: 1; animation-delay: 0.2s; }
+        .form-group:nth-child(3) { --i: 3; opacity: 1; animation-delay: 0.3s; }
+        .form-group:nth-child(4) { --i: 4; opacity: 1; animation-delay: 0.4s; }
+        .form-group:nth-child(5) { --i: 5; opacity: 1; animation-delay: 0.5s; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header {
+                padding: 1.8rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .form-card {
+                padding: 1.8rem;
+            }
+            
+            .form-title {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* WhatsApp floating button */
+        .whatsapp-float {            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4), 0 0 0 4px rgba(37, 211, 102, 0.15);
+            text-decoration: none;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: bounce 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6), 0 0 0 6px rgba(37, 211, 102, 0.25);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Success message */
+        .success-message {
+            display: none;
+            background: rgba(37, 211, 102, 0.15);
+            border: 1px solid rgba(37, 211, 102, 0.4);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            color: #25D366;
+            font-weight: 500;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-message.show {            display: block;
+        }
+
+        .success-message i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated particles background -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-scale-balanced"></i> MEDEIROS & ALBUQUERQUE
+            </div>
+            <p class="subtitle">Advocacia especializada com excelência e tecnologia a seu serviço</p>
+            <div class="oab-badge">
+                <i class="fas fa-certificate"></i> OAB/RN 15.441
+            </div>
+        </header>
+
+        <main>
+            <div class="form-card">
+                <h2 class="form-title"><i class="fas fa-file-signature"></i> Cadastro Bancário</h2>
+                
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> Dados enviados com sucesso! Redirecionando para o WhatsApp...
+                </div>
+
+                <form id="bankForm">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-user"></i> Nome Completo</label>
+                        <input type="text" id="name" class="form-control" placeholder="Digite seu nome completo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpf"><i class="fas fa-id-card"></i> CPF</label>
+                        <input type="text" id="cpf" class="form-control" placeholder="000.000.000-00" maxlength="14" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bank"><i class="fas fa-university"></i> Banco</label>
+                            <input type="text" id="bank" class="form-control" placeholder="Ex: Banco do Brasil" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agency"><i class="fas fa-building-columns"></i> Agência</label>                            <input type="text" id="agency" class="form-control" placeholder="Ex: 1234-5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account"><i class="fas fa-credit-card"></i> Conta Corrente</label>
+                        <input type="text" id="account" class="form-control" placeholder="Ex: 12345-6" required>
+                    </div>
+
+                    <div class="security-note">
+                        <i class="fas fa-shield-halved"></i>
+                        <strong>Segurança:</strong> Seus dados são criptografados e enviados diretamente para nosso WhatsApp oficial. Não armazenamos informações bancárias em nossos servidores.
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fab fa-whatsapp"></i> Enviar para WhatsApp
+                    </button>
+                </form>
+            </div>
+
+            <div class="contact-section">
+                <h3 class="contact-title"><i class="fas fa-headset"></i> Fale Conosco</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-globe"></i>
+                        <a href="https://www.medeirosealbuquerqueadv.com.br" target="_blank">www.medeirosealbuquerqueadv.com.br</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:medeirosealbuquerqueadv@gmail.com">medeirosealbuquerqueadv@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Natal/RN - Atendimento em todo o Brasil</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Medeiros & Albuquerque Advogados. Todos os direitos reservados.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.8;">
+                <i class="fas fa-lock"></i> Ambiente seguro • Dados protegidos • LGPD Compliance
+            </p>
+        </footer>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/5584998226048" class="whatsapp-float" target="_blank" title="Fale conosco no WhatsApp">
+        <i class="fab fa-whatsapp"></i>    </a>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 35;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position and animation
+                const posX = Math.random() * 100;
+                const delay = Math.random() * 20;
+                const duration = 15 + Math.random() * 25;
+                const size = 2 + Math.random() * 4;
+                
+                particle.style.left = `${posX}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random color variation
+                if (Math.random() > 0.7) {
+                    particle.style.background = '#7b2cbf';
+                    particle.style.boxShadow = '0 0 10px #7b2cbf';
+                } else if (Math.random() > 0.85) {
+                    particle.style.background = '#ff006e';
+                    particle.style.boxShadow = '0 0 10px #ff006e';
+                }
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // CPF Mask
+        function cpfMask(value) {
+            return value
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{2})\d+?$/, '$1');
+        }
+
+        // Format CPF input
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            this.value = cpfMask(this.value);        });
+
+        // Form submission
+        document.getElementById('bankForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value.trim();
+            const cpf = document.getElementById('cpf').value.trim();
+            const bank = document.getElementById('bank').value.trim();
+            const agency = document.getElementById('agency').value.trim();
+            const account = document.getElementById('account').value.trim();
+            
+            // Create message
+            const message = `*NOVO CADASTRO BANCÁRIO*%0A%0A` +
+                           `👤 *Nome:* ${name}%0A` +
+                           `🆔 *CPF:* ${cpf}%0A` +
+                           `🏦 *Banco:* ${bank}%0A` +
+                           `🔢 *Agência:* ${agency}%0A` +
+                           `💳 *Conta Corrente:* ${account}%0A%0A` +
+                           `_Enviado via portal Medeiros & Albuquerque Advogados_`;
+            
+            // Show success message
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.add('show');
+            
+            // Disable button temporarily
+            const btn = document.querySelector('.btn-submit');
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            
+            // Redirect to WhatsApp after short delay
+            setTimeout(() => {
+                window.open(`https://wa.me/5584998226048?text=${message}`, '_blank');
+                
+                // Reset form and button after redirect
+                setTimeout(() => {
+                    document.getElementById('bankForm').reset();
+                    successMsg.classList.remove('show');
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnText;
+                }, 2000);
+            }, 1500);
+        });
+
+        // Initialize particles on load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+                        // Add subtle hover effect to form controls
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                control.addEventListener('focus', function() {
+                    this.parentElement.style.zIndex = '5';
+                });
+                control.addEventListener('blur', function() {
+                    this.parentElement.style.zIndex = '1';
+                });
+            });
+        });
+
+        // Add keyboard navigation enhancement
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.classList.contains('form-control')) {
+                const inputs = Array.from(document.querySelectorAll('.form-control'));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
