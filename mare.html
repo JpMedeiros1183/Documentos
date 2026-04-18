@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marés Búzios - Dados Oficiais Marinha</title>
+  <title>Marés Búzios</title>
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="apple-touch-icon" href="icon-512.png">
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @keyframes wave { 0% { transform: translateX(0) scaleY(1); } 50% { transform: translateX(-25%) scaleY(1.05); } 100% { transform: translateX(-50%) scaleY(1); } }
-    .wave-path { animation: wave 3s linear infinite; }
-    .water-transition { transition: all 1.5s ease-out; }
-    .moon-card { transition: transform 0.2s ease; }
-    .moon-card:hover { transform: translateY(-2px); }
-  </style>
-</head>
+  </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
   <div class="w-full max-w-md bg-slate-950/50 rounded-3xl border border-slate-700/50 p-5 shadow-2xl backdrop-blur-xl">
 
