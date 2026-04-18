@@ -79,10 +79,10 @@
           <span id="next-time" class="font-mono text-sm font-bold text-white">--:--</span>
         </div>
         <div class="mt-2 pt-2 border-t border-slate-800/50">
-          <span class="text-[10px] text-slate-500">Próxima Maré Alta</span>
+          <span id="opposite-tide-label" class="text-[10px] text-slate-500">Próxima Maré --</span>
           <div class="flex items-center justify-center gap-1.5 mt-0.5">
-            <span class="text-cyan-400">↑</span>
-            <span class="text-sm font-bold text-cyan-200" id="high-tide-time">--:--</span>
+            <span id="opposite-tide-arrow" class="text-cyan-400">--</span>
+            <span id="opposite-tide-time" class="text-sm font-bold text-cyan-200">--:--</span>
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@
     let tideData = {
       currentLevel: 0, isRising: true, progress: 0.5, cycleHour: 0,
       nextEvent: { type: 'high', time: '--:--', minutesUntil: 0 },
-      highTideTime: '--:--',
+      nextOppositeEvent: null,
       conditions: { waterTemp: 0, windSpeed: 0, windDir: '--', waveHeight: 0, sunrise: '--:--', sunset: '--:--' },
       fishTimes: ['--:--', '--:--'], lastUpdated: null
     };
@@ -201,10 +201,9 @@
     // 4. ATUALIZAÇÃO VISUAL (GRÁFICO DA ÁGUA)
     // ====================================================================
     function updateGauge() {
-      const {currentLevel, isRising, progress, cycleHour, nextEvent, highTideTime} = tideData;
+      const {currentLevel, isRising, progress, cycleHour, nextEvent, nextOppositeEvent} = tideData;
       const circumference = 2 * Math.PI * 108;
 
-      // UX: O arco e a bolinha agora representam 0 a 100% da fase atual (tempo decorrido entre os eventos reais)
       const phaseProgress = cycleHour / 6.2;
       const angle = -90 + (phaseProgress * 360);
       const rad = angle * Math.PI / 180;
@@ -222,7 +221,6 @@
         pa.setAttribute('stroke', isRising ? 'url(#arcGrad)' : 'url(#arcGradLow)');
       }
 
-      // Física visual da água
       const safeProgress = Math.max(0, Math.min(1, progress));
       const waterHeight = safeProgress * 192;
       const waterY = 224 - waterHeight;
@@ -239,14 +237,27 @@
       cls('status-text', `text-2xl font-extrabold tracking-wider water-transition ${isRising ? 'text-cyan-300' : 'text-rose-300'}`);
       txt('height-value', `${currentLevel>=0?'+':''}${currentLevel.toFixed(2)}m`);
 
-      // Contagem Regressiva
       const mins = nextEvent.minutesUntil;
       const timeStr = mins > 0 ? (Math.floor(mins/60) > 0 ? `${Math.floor(mins/60)}h ${mins%60}min` : `${mins}min`) : 'agora';
 
       txt('next-in', timeStr);
       txt('next-time', nextEvent.time);
       txt('next-type', nextEvent.type === 'high' ? 'Preia-mar' : 'Baixa-mar');
-      txt('high-tide-time', highTideTime);
+
+      // 👉 NOVA LÓGICA DE MARÉ OPOSTA
+      if (nextOppositeEvent) {
+          const isOppositeHigh = nextOppositeEvent.type === 'high';
+          txt('opposite-tide-label', isOppositeHigh ? 'Próxima Maré Alta' : 'Próxima Maré Baixa');
+          txt('opposite-tide-arrow', isOppositeHigh ? '↑' : '↓');
+          cls('opposite-tide-arrow', isOppositeHigh ? 'text-cyan-400' : 'text-rose-400');
+
+          const oppTimeEl = $('opposite-tide-time');
+          if (oppTimeEl) {
+              oppTimeEl.textContent = nextOppositeEvent.time;
+              oppTimeEl.className = `text-sm font-bold ${isOppositeHigh ? 'text-cyan-200' : 'text-rose-200'}`;
+          }
+      }
+
       txt('fish-times', tideData.fishTimes.join(' • '));
       txt('water-temp', tideData.conditions.waterTemp.toFixed(1)+'°C');
       txt('wind', tideData.conditions.windSpeed+' km/h '+tideData.conditions.windDir);
@@ -339,11 +350,20 @@
             return { type: parseFloat(e.altura) > 1.2 ? 'high' : 'low', timeObj, timeStr: e.hora, height: parseFloat(e.altura) };
         }).sort((a, b) => a.timeObj - b.timeObj);
 
-        let prevEvent = events[0], nextEvent = events[1], nextHigh = null, nextLow = null;
+        let prevEvent = events[0], nextEvent = events[1], nextHigh = null, nextLow = null, nextOpposite = null;
         for (let i = 0; i < events.length; i++) {
             if (events[i].timeObj > now) {
                 nextEvent = events[i];
                 prevEvent = i > 0 ? events[i-1] : events[0];
+
+                // 👉 PROCURA O PRÓXIMO EVENTO OPOSTO AO ATUAL
+                for (let k = i + 1; k < events.length; k++) {
+                    if (events[k].type !== nextEvent.type) {
+                        nextOpposite = events[k];
+                        break;
+                    }
+                }
+
                 for (let j = i; j < events.length; j++) {
                     if (!nextHigh && events[j].type === 'high') nextHigh = events[j];
                     if (!nextLow && events[j].type === 'low') nextLow = events[j];
@@ -367,10 +387,13 @@
 
         tideData.currentLevel = currentLevel;
         tideData.isRising = isRising;
-        tideData.cycleHour = phaseProgress * 6.2; // UX Fix: transforma o percentual no tempo visual da barra
+        tideData.cycleHour = phaseProgress * 6.2;
         tideData.progress = (currentLevel - CONFIG.minTide) / (CONFIG.maxTide - CONFIG.minTide);
         tideData.nextEvent = { type: nextEvent.type, time: nextEvent.timeStr, minutesUntil: Math.round((nextEvent.timeObj - now) / 60000) };
-        tideData.highTideTime = nextHigh ? nextHigh.timeStr : '--:--';
+
+        // Alimenta o novo estado oposto
+        tideData.nextOppositeEvent = nextOpposite ? { type: nextOpposite.type, time: nextOpposite.timeStr } : null;
+
         tideData.fishTimes = [nextLow ? formatFishTime(nextLow.timeObj) : '--:--', nextHigh ? formatFishTime(nextHigh.timeObj) : '--:--'].sort();
 
         tideData.conditions = {
