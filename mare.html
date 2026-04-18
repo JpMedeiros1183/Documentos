@@ -407,7 +407,7 @@
       renderTideTable(); // Gera a tabela inicial com a data de hoje
 
       fetchTideData();
-      setInterval(fetchTideData, 5 * 60 * 1000); // Atualiza os cálculos a cada 5min
+      setInterval(fetchTideData, 1 * 60 * 1000); // Atualiza os cálculos a cada 5min
 
       // Listener do Calendário
       const picker = $('date-picker');
