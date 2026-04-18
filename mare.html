@@ -11,10 +11,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    @keyframes waveMove {
-      0% { transform: translateX(0px) scaleY(1); }
-      50% { transform: translateX(-96px) scaleY(1.05); }
-      100% { transform: translateX(-192px) scaleY(1); }
+   @keyframes waveMove { 
+      0% { transform: translateX(0px); } 
+      100% { transform: translateX(-192px); } 
     }
     .wave-path { 
       animation: waveMove 4s linear infinite; 
@@ -240,7 +239,11 @@
       if(wb) { wb.setAttribute('y', waterY); wb.setAttribute('height', waterHeight); wb.setAttribute('fill', isRising?'url(#waterGrad)':'url(#waterGradLow)'); }
 
       const wp = $('wave-path');
-      if(wp) { wp.setAttribute('fill', isRising?'rgba(34,211,238,0.3)':'rgba(251,113,133,0.3)'); wp.setAttribute('d', `M32,${waterY} Q80,${waterY-8} 128,${waterY} T224,${waterY} V256 H32 Z`); }
+      const wp = $('wave-path');
+      if(wp) { 
+        wp.setAttribute('fill', isRising ? 'rgba(34,211,238,0.35)' : 'rgba(251,113,133,0.35)'); 
+        wp.setAttribute('d', `M-160,${waterY} Q-112,${waterY-8} -64,${waterY} T32,${waterY} T128,${waterY} T224,${waterY} T320,${waterY} T416,${waterY} T512,${waterY} T608,${waterY} V256 H-160 Z`); 
+      }
 
       txt('arrow', isRising ? '↑' : '↓');
       cls('arrow', `mb-1 text-4xl water-transition ${isRising ? 'text-cyan-400' : 'text-rose-400'}`);
