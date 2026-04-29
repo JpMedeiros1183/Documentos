@@ -831,6 +831,7 @@
 // ═══════════════════════════════════════════════════════════════
 const state = {
     documentos: [],
+    pdfsGerados: [],       // [{tipo, label, nomeArquivo, url}]
     assinaturaPad: null,
     assinaturaData: null,
     auditData: null,
@@ -1195,18 +1196,30 @@ function validarFormulario() {
 async function gerarDocumentos() {
     try {
         if (!validarFormulario()) return;
+        const btn = document.querySelector('button[onclick="gerarDocumentos()"]');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Gerando...'; }
+
         const representa     = document.getElementById('representa-terceiro')?.checked || false;
         const dados          = coletarDados(representa);
         const usarAssinatura = document.getElementById('usar-assinatura-digital')?.checked || false;
 
+        // Limpar PDFs anteriores (revogar URLs antigas)
+        state.pdfsGerados.forEach(p => { try { URL.revokeObjectURL(p.url); } catch(e){} });
+        state.pdfsGerados = [];
+
         for (const tipo of state.documentos) {
-            await gerarPDF(tipo, dados, usarAssinatura);
-            await new Promise(r => setTimeout(r, 500));
+            const item = await gerarPDF(tipo, dados, usarAssinatura);
+            state.pdfsGerados.push(item);
+            await new Promise(r => setTimeout(r, 300));
         }
+
+        if (btn) { btn.disabled = false; btn.textContent = '📄 Gerar e Baixar PDF(s)'; }
         mostrarResultado();
-        mostrarToast('Documentos gerados com sucesso!', 'success');
+        mostrarToast('Documentos prontos para download!', 'success');
     } catch (error) {
         console.error(error);
+        const btn = document.querySelector('button[onclick="gerarDocumentos()"]');
+        if (btn) { btn.disabled = false; btn.textContent = '📄 Gerar e Baixar PDF(s)'; }
         mostrarToast('Erro ao gerar documentos: ' + error.message, 'error');
     }
 }
@@ -1319,11 +1332,18 @@ async function gerarPDF(tipo, dados, usarAssinatura) {
         pdf.addImage(imgData, 'JPEG', 0, -(imgHeight - heightLeft), imgWidth, imgHeight, undefined, 'FAST');
         heightLeft -= pageHeight;
     }
-    const nomeArquivo = dados.representa && dados.empresa
+    const nomeArquivo = (dados.representa && dados.empresa
         ? dados.empresa.razao.replace(/\s+/g,'_')
-        : dados.outorgante.nome.replace(/\s+/g,'_');
-    pdf.save(`${tipo}_${nomeArquivo}_${new Date().toISOString().split('T')[0]}.pdf`);
+        : dados.outorgante.nome.replace(/\s+/g,'_'))
+        + `_${tipo}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    // Retorna blob URL em vez de fazer download automático
+    const blob = pdf.output('blob');
+    const url  = URL.createObjectURL(blob);
     document.body.removeChild(temp);
+
+    const labels = { procuracao:'Procuração', hipossuficiencia:'Declaração de Hipossuficiência', contrato:'Contrato de Honorários' };
+    return { tipo, label: labels[tipo] || tipo, nomeArquivo, url };
 }
 
 function montarEndereco(end) {
@@ -1531,12 +1551,61 @@ function gerarHTML(tipo, dados, usarAssinatura) {
 // ═══════════════════════════════════════════════════════════════
 function mostrarResultado() {
     document.getElementById('formulario-principal').classList.remove('active');
-    document.getElementById('secao-resultado').classList.add('active');
-    const labels = { procuracao:'Procuração', hipossuficiencia:'Declaração de Hipossuficiência', contrato:'Contrato de Honorários' };
-    document.getElementById('lista-downloads').innerHTML = state.documentos.map(doc =>
-        `<div style="padding:15px;background:#f0fff4;border-left:4px solid #38a169;margin-bottom:10px;border-radius:4px;">
-            <strong>✓ ${labels[doc]}</strong> — PDF gerado e baixado
+    const secao = document.getElementById('secao-resultado');
+    secao.classList.add('active');
+
+    const total = state.pdfsGerados.length;
+    const plural = total > 1 ? 's' : '';
+
+    // Cabeçalho dinâmico
+    secao.querySelector('h2').textContent = `✅ ${total} documento${plural} pronto${plural} para download`;
+    secao.querySelector('p').innerHTML =
+        total > 1
+        ? `<strong style="color:#c05621;">⚠️ Você selecionou ${total} documentos.</strong> Clique em cada botão abaixo para baixar <u>um por vez</u>.`
+        : `Clique no botão abaixo para baixar o documento gerado.`;
+
+    document.getElementById('lista-downloads').innerHTML = state.pdfsGerados.map((pdf, i) => `
+        <div style="display:flex;align-items:center;gap:15px;padding:18px 20px;
+                    background:#fff;border:2px solid #e0e0e0;border-radius:8px;
+                    margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.07);"
+             id="card-pdf-${i}">
+            <div style="width:36px;height:36px;background:#1e3a5f;color:white;border-radius:50%;
+                        display:flex;align-items:center;justify-content:center;
+                        font-weight:700;font-size:1rem;flex-shrink:0;">${i + 1}</div>
+            <div style="flex:1;min-width:0;">
+                <strong style="display:block;font-size:1rem;">${pdf.label}</strong>
+                <small style="color:#718096;word-break:break-all;">${pdf.nomeArquivo}</small>
+            </div>
+            <a href="${pdf.url}" download="${pdf.nomeArquivo}"
+               onclick="marcarBaixado(${i})"
+               style="background:#1e3a5f;color:white;padding:10px 18px;border-radius:4px;
+                      text-decoration:none;font-weight:600;font-size:0.9rem;white-space:nowrap;
+                      flex-shrink:0;">
+                ⬇ Baixar PDF
+            </a>
         </div>`).join('');
+}
+
+function marcarBaixado(idx) {
+    setTimeout(() => {
+        const card = document.getElementById(`card-pdf-${idx}`);
+        if (!card) return;
+        card.style.borderColor = '#38a169';
+        card.style.background  = '#f0fff4';
+        const link = card.querySelector('a');
+        if (link) {
+            link.style.background = '#38a169';
+            link.textContent = '✓ Baixado';
+        }
+        // Verifica se todos foram baixados
+        const total    = state.pdfsGerados.length;
+        const baixados = document.querySelectorAll('[id^="card-pdf-"]');
+        let count = 0;
+        baixados.forEach(c => { if (c.style.borderColor === 'rgb(56, 161, 105)') count++; });
+        if (count === total && total > 1) {
+            mostrarToast('Todos os documentos foram baixados! ✓', 'success');
+        }
+    }, 300);
 }
 
 function voltarSelecao() {
@@ -1545,7 +1614,9 @@ function voltarSelecao() {
 }
 
 function novoDocumento() {
-    state.documentos = []; state.assinaturaData = null; state.auditData = null;
+    // Revogar blob URLs para liberar memória
+    state.pdfsGerados.forEach(p => { try { URL.revokeObjectURL(p.url); } catch(e){} });
+    state.documentos = []; state.pdfsGerados = []; state.assinaturaData = null; state.auditData = null;
     state.tipoRepresentacao = 'incapaz'; state.formaPagamento = 'vista';
     document.querySelectorAll('.doc-option').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('.doc-option input[type="checkbox"]').forEach(el => el.checked = false);
