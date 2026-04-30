@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACORDO TRABALHISTA HOMOLOGADO — Sistema de Elaboração de Minutas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #05050f;
+            --bg-secondary: #0a0a1a;
+            --bg-card: rgba(15, 15, 35, 0.65);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff00aa;
+            --neon-purple: #b829dd;
+            --neon-green: #00ff9d;
+            --neon-amber: #ffaa00;
+            --text-primary: #e0e0ff;
+            --text-secondary: #8899aa;
+            --border-glow: rgba(0, 240, 255, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--neon-purple); top: -100px; left: -100px; animation-delay: 0s; }
+        .orb-2 { width: 300px; height: 300px; background: var(--neon-cyan); bottom: -50px; right: -50px; animation-delay: -5s; }
+        .orb-3 { width: 250px; height: 250px; background: var(--neon-magenta); top: 40%; left: 60%; animation-delay: -10s; opacity: 0.2; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .header .badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 25px;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            background: rgba(0, 255, 157, 0.05);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+        }
+
+        .section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+            opacity: 0.7;
+        }
+
+        .section:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.08);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title .icon {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(0, 240, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+        }
+
+        .section-number {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: rgba(0, 240, 255, 0.05);
+            line-height: 1;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (min-width: 768px) {
+            .form-group.col-2 { grid-column: span 2; }
+            .form-group.col-3 { grid-column: span 3; }
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        label .required {
+            color: var(--neon-magenta);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        input, select, textarea {
+            background: rgba(5, 5, 15, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.05);
+            background: rgba(5, 5, 15, 0.8);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(136, 153, 170, 0.4);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f0ff'%3E%3Cpath d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .value-highlight {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 240, 255, 0.05));
+            border: 1px solid var(--neon-green);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-highlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 157, 0.03), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .value-highlight label {
+            justify-content: center;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+        }
+
+        .value-highlight input {
+            background: transparent;
+            border: none;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            padding: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.4);
+        }
+
+        .value-highlight input:focus {
+            box-shadow: none;
+        }
+
+        .value-highlight .sublabel {
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            opacity: 0.7;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Alerta integracao bens */
+        .alert-bens {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.08), rgba(255, 0, 170, 0.05));
+            border: 1px solid var(--neon-amber);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-bens::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--neon-amber);
+        }
+
+        .alert-bens h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-amber);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-bens p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .alert-bens strong {
+            color: var(--neon-amber);
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            background: rgba(5, 5, 15, 0.5);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .check-item:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .check-item input[type="checkbox"],
+        .check-item input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .check-item input[type="radio"] {
+            border-radius: 50%;
+        }
+
+        .check-item input[type="checkbox"]:checked,
+        .check-item input[type="radio"]:checked {
+            border-color: var(--neon-cyan);
+            background: var(--neon-cyan);
+        }
+
+        .check-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--bg-primary);
+            font-weight: 900;
+            font-size: 0.8rem;
+        }
+
+        .check-item input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+        }
+
+        .check-item label {
+            margin: 0;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .dynamic-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 15px;
+        }
+
+        .dynamic-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .dynamic-table td {
+            padding: 0;
+        }
+
+        .dynamic-table td input {
+            width: 100%;
+            border-radius: 0;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            background: rgba(5, 5, 15, 0.4);
+        }
+
+        .dynamic-table td:first-child input {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .dynamic-table td:last-child input {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 18px 50px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            border: none;
+            color: var(--bg-primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.5);
+        }
+
+        .btn-secondary {
+            padding: 18px 40px;
+            background: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--neon-magenta);
+            color: var(--bg-primary);
+            box-shadow: 0 0 25px rgba(255, 0, 170, 0.4);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            margin: 25px 0;
+            opacity: 0.3;
+        }
+
+        .info-box {
+            background: rgba(0, 240, 255, 0.03);
+            border-left: 3px solid var(--neon-cyan);
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: var(--neon-cyan);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5rem; }
+            .section { padding: 25px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .value-highlight input { font-size: 1.5rem; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+        .section:nth-child(5) { animation-delay: 0.4s; }
+        .section:nth-child(6) { animation-delay: 0.5s; }
+        .section:nth-child(7) { animation-delay: 0.6s; }
+        .section:nth-child(8) { animation-delay: 0.7s; }
+
+        @media print {
+            .bg-orb, .bg-grid { display: none; }
+            body { background: #fff; color: #000; }
+            .section { background: #fff; border: 1px solid #ccc; color: #000; }
+            input, select, textarea { border: 1px solid #999; color: #000; background: #fff; }
+            .btn-add, .actions { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1>Acordo Trabalhista Homologado</h1>
+            <div class="subtitle">Sistema de Elaboração de Minutas</div>
+            <div class="badge">Justiça do Trabalho • Homologação Judicial</div>
+        </header>
+
+        <form id="acordoForm">
+
+            <!-- SEÇÃO 1: IDENTIFICAÇÃO DAS PARTES -->
+            <section class="section">
+                <div class="section-number">01</div>
+                <div class="section-title">
+                    <div class="icon">⚖</div>
+                    Identificação das Partes
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Tipo de Acordo</label>
+                        <div class="radio-group">
+                            <div class="check-item">
+                                <input type="radio" name="tipo_acordo" id="acordo_rescisao" value="rescisao" checked>
+                                <label for="acordo_rescisao">Rescisão Contratual (Art. 484-A CLT)</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="radio" name="tipo_acordo" id="acordo_direitos" value="direitos">
+                                <label for="acordo_direitos">Acordo de Direitos Trabalhistas Pendentes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label>Empregadora <span class="required">*</span></label>
+                        <input type="text" name="nome_empregadora" value="Maria da Conceição Fonseca Bezerra" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF Empregadora <span class="required">*</span></label>
+                        <input type="text" name="cpf_empregadora" value="020.009.704-00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado Civil</label>
+                        <select name="estado_civil_empregadora">
+                            <option value="Viúva" selected>Viúva</option>
+                            <option value="Solteira">Solteira</option>
+                            <option value="Casada">Casada</option>
+                            <option value="Divorciada">Divorciada</option>
+                            <option value="Separada">Separada</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-2">
+                        <label>Endereço Completo <span class="required">*</span></label>
+                        <input type="text" name="endereco_empregadora" value="Lagoa de Velhos / RN" required>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp / Telefone</label>
+                        <input type="text" name="telefone_empregadora">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group col-2">
+                        <label>Empregado <span class="required">*</span></label>
+                        <input type="text" name="nome_empregado" value="Francisco Barbosa Júnior" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF Empregado <span class="required">*</span></label>
+                        <input type="text" name="cpf_empregado" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Nascimento</label>
+                        <input type="date" name="nascimento_empregado">
+                    </div>
+                    <div class="form-group">
+                        <label>CTPS / Série</label>
+                        <input type="text" name="ctps_empregado" placeholder="Número / Série">
+                    </div>
+                    <div class="form-group">
+                        <label>PIS / PASEP</label>
+                        <input type="text" name="pis_empregado">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado Civil</label>
+                        <select name="estado_civil_empregado">
+                            <option value="">Selecione</option>
+                            <option value="Solteiro">Solteiro</option>
+                            <option value="Casado">Casado</option>
+                            <option value="Divorciado">Divorciado</option>
+                            <option value="Viúvo">Viúvo</option>
+                            <option value="Separado">Separado</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-2">
+                        <label>Endereço Completo do Empregado</label>
+                        <input type="text" name="endereco_empregado">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 2: VÍNCULO E VALORES -->
+            <section class="section">
+                <div class="section-number">02</div>
+                <div class="section-title">
+                    <div class="icon">◈</div>
+                    Vínculo Empregatício e Valor do Acordo
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Data de Admissão <span class="required">*</span></label>
+                        <input type="date" name="data_admissao" value="2017-02-07" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Demissão / Rescisão <span class="required">*</span></label>
+                        <input type="date" name="data_demissao" value="2026-04-07" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Função / Cargo <span class="required">*</span></label>
+                        <input type="text" name="funcao" value="Caseiro" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Último Salário (R$)</label>
+                        <input type="text" name="ultimo_salario" value="1.621,00">
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo da Rescisão</label>
+                        <select name="motivo_rescisao">
+                            <option value="acordo" selected>Acordo entre as Partes (Art. 484-A CLT)</option>
+                            <option value="dispensa_sem_justa">Dispensa sem Justa Causa</option>
+                            <option value="dispensa_justa">Dispensa por Justa Causa</option>
+                            <option value="pedido_demissao">Pedido de Demissão</option>
+                            <option value="termino_contrato">Término de Contrato</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jornada de Trabalho Descrita</label>
+                        <input type="text" name="jornada" value="De domingo a domingo, retirando leite das vacas. Chega às 4h, retorna às 13h.">
+                    </div>
+                </div>
+
+                <div class="value-highlight">
+                    <label>Valor Total do Acordo (R$)</label>
+                    <input type="text" name="valor_total_acordo" value="54.929,17" placeholder="0,00">
+                    <div class="sublabel">
+                        Valor líquido acertado entre as partes para quitação integral de todas as verbas rescisórias e indenizatórias
+                    </div>
+                </div>
+
+                <div class="alert-bens">
+                    <h4>⚠ Quitação Integral em Natureza e Direitos</h4>
+                    <p>O valor total acima será integralmente quitado mediante a entrega de <strong>bens em natureza</strong> (vacas e máquina forrageira) e a concessão de <strong>direito de uso e preferência de arrendamento</strong> de terreno (comodato com potencial de arrendamento futuro). <strong>Não haverá pagamento em dinheiro</strong> ou qualquer outra forma de crédito adicional.</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Descrição das Verbas Incluídas no Valor Total</label>
+                        <textarea name="verbas_incluidas" placeholder="Descreva as verbas que compõem o valor total: saldo de salário, aviso prévio, 13º salário, férias vencidas e proporcionais, 1/3 constitucional, horas extras, FGTS, multa do FGTS, etc.">Saldo de salário, aviso indenizado, 13º salário (2021 a 2026), férias vencidas e proporcionais + 1/3, horas extras aos domingos (261 domingos), FGTS e multa.</textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Composição do Valor Total (discriminação por bem/direito)</label>
+                        <textarea name="composicao_valor" placeholder="Ex: Vacas: R$ XX.XXX,XX | Máquina forrageira: R$ X.XXX,XX | Valor atribuído ao direito de uso/arrendamento: R$ XX.XXX,XX | Total: R$ 54.929,17"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 3: BENS EM NATUREZA — VACAS -->
+            <section class="section">
+                <div class="section-number">03</div>
+                <div class="section-title">
+                    <div class="icon">🐄</div>
+                    Bens em Natureza — Vacas
+                </div>
+
+                <div class="info-box">
+                    <strong>Instrução:</strong> Informe os detalhes de cada animal que ficará em poder do empregado como parte do acordo. Inclua identificação, estado, valor atribuído e localização atual.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Quantidade Total de Vacas <span class="required">*</span></label>
+                        <input type="number" name="qtd_vacas" min="1" placeholder="Ex: 5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Total Atribuído às Vacas (R$)</label>
+                        <input type="text" name="valor_total_vacas" placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label>Raça / Tipo Predominante</label>
+                        <input type="text" name="raca_vacas" placeholder="Ex: Mestiças de leite, Holandesa, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Local Atual onde se Encontram</label>
+                        <input type="text" name="local_vacas" placeholder="Ex: Pasto da propriedade da empregadora, Sítio X">
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <label style="margin-bottom: 10px; display: block;">Relação Individual dos Animais</label>
+                    <table class="dynamic-table" id="tabelaVacas">
+                        <thead>
+                            <tr>
+                                <th>Nº / Identificação</th>
+                                <th>Descrição (idade, cor, chifres, etc.)</th>
+                                <th>Estado Físico / Produção</th>
+                                <th>Valor Unitário (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="Ex: Vaca 01"></td>
+                                <td><input type="text" placeholder="Ex: Adulta, malhada, sem chifres"></td>
+                                <td><input type="text" placeholder="Ex: Lactação, prenha, seca"></td>
+                                <td><input type="text" placeholder="0,00"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn-add" onclick="adicionarLinha('tabelaVacas')">+ Adicionar Animal</button>
+                </div>
+
+                <div class="form-grid" style="margin-top: 25px;">
+                    <div class="form-group full-width">
+                        <label>Condições Específicas sobre as Vacas</label>
+                        <textarea name="condicoes_vacas" placeholder="Ex: O empregado se compromete a manter a boa guarda e tratamento dos animais; a empregadora não responde por doenças posteriores à entrega; os animais serão entregues no estado em que se encontram, etc."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: MÁQUINA FORRAGEIRA -->
+            <section class="section">
+                <div class="section-number">04</div>
+                <div class="section-title">
+                    <div class="icon">⚙</div>
+                    Máquina Forrageira
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group col-2">
+                        <label>Descrição / Tipo <span class="required">*</span></label>
+                        <input type="text" name="tipo_maquina" placeholder="Ex: Ensiladeira / Picadeira de Forragem" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" name="marca_maquina" placeholder="Ex: Nogueira, Trapp, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" name="modelo_maquina">
+                    </div>
+                    <div class="form-group">
+                        <label>Ano de Fabricação</label>
+                        <input type="number" name="ano_maquina" min="1950" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label>Nº de Série / Chassi (se houver)</label>
+                        <input type="text" name="serie_maquina">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Conservação <span class="required">*</span></label>
+                        <select name="estado_maquina" required>
+                            <option value="">Selecione</option>
+                            <option value="nova">Nova / Sem uso</option>
+                            <option value="excelente">Excelente estado</option>
+                            <option value="bom">Bom estado</option>
+                            <option value="regular">Estado regular</option>
+                            <option value="precisa_reparos">Precisa de reparos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Atribuído (R$)</label>
+                        <input type="text" name="valor_maquina" placeholder="0,00">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>Acessórios Incluídos</label>
+                        <input type="text" name="acessorios_maquina" placeholder="Ex: Motor elétrico, facas extras, carretinha, etc.">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>Local Atual / Onde se Encontra</label>
+                        <input type="text" name="local_maquina" placeholder="Ex: Depósito da propriedade, Sítio X">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Defeitos / Observações Conhecidas</label>
+                        <textarea name="obs_maquina" placeholder="Descreva qualquer defeito, desgaste ou observação relevante sobre o funcionamento da máquina."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Condições de Entrega / Transferência</label>
+                        <textarea name="condicoes_maquina" placeholder="Ex: A máquina será entregue no estado em que se encontra; o empregado assume os custos de transporte; a empregadora não responde por defeitos ocultos, etc."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 5: ARRENDAMENTO DO TERRENO -->
+            <section class="section">
+                <div class="section-number">05</div>
+                <div class="section-title">
+                    <div class="icon">🌾</div>
+                    Direito de Preferência e Uso do Terreno (Comodato / Arrendamento)
+                </div>
+
+                <div class="info-box">
+                    <strong>Cláusula Principal:</strong> O empregado terá direito à <strong>preferência de arrendamento</strong> do terreno da empregadora, com <strong>uso pelo prazo de 1 (um) ano</strong>, podendo ser cancelado ou continuado após esse período, sob novo ajuste de valor. Este direito de uso integra o valor total do acordo.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group col-2">
+                        <label>Localização / Descrição do Terreno <span class="required">*</span></label>
+                        <input type="text" name="local_terreno" placeholder="Ex: Sítio denominado 'X', localizado em Lagoa de Velhos/RN, próximo ao rio..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Área Aproximada</label>
+                        <input type="text" name="area_terreno" placeholder="Ex: 5 hectares, 2 alqueires">
+                    </div>
+                    <div class="form-group">
+                        <label>Matrícula do Imóvel (se houver)</label>
+                        <input type="text" name="matricula_terreno">
+                    </div>
+                    <div class="form-group">
+                        <label>Cartório de Registro de Imóveis</label>
+                        <input type="text" name="cartorio_terreno">
+                    </div>
+                    <div class="form-group">
+                        <label>Prazo do Uso / Comodato <span class="required">*</span></label>
+                        <input type="text" name="prazo_uso" value="12 (doze) meses" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Início do Uso <span class="required">*</span></label>
+                        <input type="date" name="data_inicio_uso" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Término do Prazo Inicial</label>
+                        <input type="date" name="data_fim_uso">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Atribuído ao Direito de Uso (R$)</label>
+                        <input type="text" name="valor_uso_terreno" placeholder="0,00">
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Condições de Cancelamento Antecipado pela Empregadora</label>
+                        <textarea name="condicoes_cancelamento" placeholder="Ex: A empregadora poderá cancelar o uso mediante aviso prévio de 90 dias; em caso de venda do imóvel; em caso de descumprimento das cláusulas; etc."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Condições de Renovação / Continuidade Após 1 Ano</label>
+                        <textarea name="condicoes_renovacao" placeholder="Ex: Após o prazo de 1 ano, o contrato poderá ser renovado por prazo indeterminado ou determinado, mediante novo ajuste de valor, com reajuste anual pelo IGPM ou índice acordado; preferência do empregado em igualdade de condições; etc."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Base de Cálculo para Novo Ajuste de Valor (após o 1º ano)</label>
+                        <div class="checkbox-group">
+                            <div class="check-item">
+                                <input type="checkbox" name="ajuste_igpm" id="ajuste_igpm">
+                                <label for="ajuste_igpm">IGPM / INPC</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="ajuste_preco_mercado" id="ajuste_preco_mercado">
+                                <label for="ajuste_preco_mercado">Preço de mercado local</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="ajuste_negociacao" id="ajuste_negociacao">
+                                <label for="ajuste_negociacao">Negociação livre entre as partes</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="ajuste_outro" id="ajuste_outro">
+                                <label for="ajuste_outro">Outro (especificar)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Outras Condições do Uso / Arrendamento</label>
+                        <textarea name="outras_condicoes_arrendamento" placeholder="Ex: O empregado se obriga a manter o terreno limpo; não poderá sublocar; destinação exclusiva para pastagem; responsabilidade por benfeitorias; etc."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 6: CLÁUSULAS GERAIS -->
+            <section class="section">
+                <div class="section-number">06</div>
+                <div class="section-title">
+                    <div class="icon">◉</div>
+                    Cláusulas Gerais do Acordo
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Quitação Geral de Verbas Trabalhistas</label>
+                        <div class="checkbox-group">
+                            <div class="check-item">
+                                <input type="checkbox" name="quitacao_salarial" id="quitacao_salarial" checked>
+                                <label for="quitacao_salarial">Quitação geral e irrevogável de todas as verbas rescisórias, salariais e indenizatórias</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="quitacao_fgts" id="quitacao_fgts" checked>
+                                <label for="quitacao_fgts">Quitação de FGTS e multa rescisória</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="quitacao_danos" id="quitacao_danos">
+                                <label for="quitacao_danos">Quitação de eventuais danos morais e materiais</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="nao_vinculo" id="nao_vinculo">
+                                <label for="nao_vinculo">Reconhecimento de inexistência de vínculo empregatício (se aplicável)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Confidencialidade do Acordo</label>
+                        <div class="radio-group">
+                            <div class="check-item">
+                                <input type="radio" name="confidencialidade" id="conf_sim" value="sim">
+                                <label for="conf_sim">Sim, as partes se comprometem a manter confidencialidade</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="radio" name="confidencialidade" id="conf_nao" value="nao" checked>
+                                <label for="conf_nao">Não há cláusula de confidencialidade</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prazo para Cumprimento das Obrigações (dias)</label>
+                        <input type="number" name="prazo_cumprimento" value="30" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Multa por Descumprimento (%)</label>
+                        <input type="text" name="multa_descumprimento" placeholder="Ex: 10%, 20%">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Foro de Eleição para Dirimir Dúvidas</label>
+                        <input type="text" name="foro" value="Comarca de Lagoa de Velhos - RN / Justiça do Trabalho">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Observações Gerais / Cláusulas Específicas Adicionais</label>
+                        <textarea name="observacoes_gerais" placeholder="Descreva aqui qualquer outra condição, obrigação, direito ou observação que deva constar no acordo."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 7: HOMOLOGAÇÃO E TESTEMUNHAS -->
+            <section class="section">
+                <div class="section-number">07</div>
+                <div class="section-title">
+                    <div class="icon">✦</div>
+                    Homologação e Testemunhas
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Data da Homologação (prevista)</label>
+                        <input type="date" name="data_homologacao">
+                    </div>
+                    <div class="form-group">
+                        <label>Vara do Trabalho</label>
+                        <input type="text" name="vara_trabalho" placeholder="Ex: 1ª Vara do Trabalho de Natal/RN">
+                    </div>
+                    <div class="form-group">
+                        <label>Local da Assinatura</label>
+                        <input type="text" name="local_assinatura" value="Lagoa de Velhos/RN">
+                    </div>
+                    <div class="form-group">
+                        <label>Data da Assinatura</label>
+                        <input type="date" name="data_assinatura">
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-grid">
+                    <div class="form-group col-2">
+                        <label>Nome da Testemunha 1</label>
+                        <input type="text" name="testemunha1_nome">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF Testemunha 1</label>
+                        <input type="text" name="testemunha1_cpf">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>Nome da Testemunha 2</label>
+                        <input type="text" name="testemunha2_nome">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF Testemunha 2</label>
+                        <input type="text" name="testemunha2_cpf">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-group full-width">
+                        <label>Nome do Advogado(a) — OAB</label>
+                        <input type="text" name="advogado_nome" placeholder="Ex: Dr(a). Fulano de Tal, OAB/RN nº 12.345">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Assinatura Digital / Reconhecimento de Firma</label>
+                        <div class="checkbox-group">
+                            <div class="check-item">
+                                <input type="checkbox" name="firma_reconhecida" id="firma_reconhecida" checked>
+                                <label for="firma_reconhecida">Requerer reconhecimento de firma por autenticidade</label>
+                            </div>
+                            <div class="check-item">
+                                <input type="checkbox" name="assinatura_digital" id="assinatura_digital">
+                                <label for="assinatura_digital">Utilizar assinatura digital ICP-Brasil</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AÇÕES -->
+            <div class="actions">
+                <button type="button" class="btn-secondary" onclick="window.print()">◈ Salvar / Imprimir PDF</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; color: var(--text-secondary); font-size: 0.85rem; letter-spacing: 1px;">
+                Preencha todos os campos, salve o PDF em seu dispositivo e encaminhe ao advogado para elaboração da minuta.
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        function adicionarLinha(tabelaId) {
+            const tbody = document.querySelector('#' + tabelaId + ' tbody');
+            const novaLinha = document.createElement('tr');
+            novaLinha.innerHTML = `
+                <td><input type="text" placeholder="Ex: Vaca 0${tbody.children.length + 1}"></td>
+                <td><input type="text" placeholder="Descrição"></td>
+                <td><input type="text" placeholder="Estado"></td>
+                <td><input type="text" placeholder="0,00"></td>
+            `;
+            tbody.appendChild(novaLinha);
+        }
+    </script>
+</body>
+</html>
