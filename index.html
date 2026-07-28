@@ -77,6 +77,7 @@
         .toast.success { border-left-color: #38a169; }
         .toast.error { border-left-color: #e53e3e; }
         .toast.warning { border-left-color: #ed8936; }
+        .toast.info { border-left-color: #3182ce; }
         @media (max-width: 768px) {
             .form-row { flex-direction: column; }
             .form-col, .form-col-small { flex: 1 0 100%; }
@@ -834,10 +835,8 @@ const state = {
     pdfsGerados: [],       // [{tipo, label, nomeArquivo, url}]
     assinaturaPad: null,
     assinaturaData: null,
-    auditData: null,
     tipoRepresentacao: 'incapaz',
-    formaPagamento: 'vista',
-    deviceFingerprint: null
+    formaPagamento: 'vista'
 };
 
 const assistenteState = {
@@ -851,62 +850,8 @@ const assistenteState = {
 document.addEventListener('DOMContentLoaded', () => {
     initSignaturePad();
     aplicarMascaras();
-    coletarFingerprint();
     initAssistente();
 });
-
-// ═══════════════════════════════════════════════════════════════
-// FINGERPRINT
-// ═══════════════════════════════════════════════════════════════
-async function coletarFingerprint() {
-    try {
-        state.deviceFingerprint = {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            language: navigator.language,
-            hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
-            screen: { width: screen.width, height: screen.height, colorDepth: screen.colorDepth },
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            canvasFingerprint: gerarCanvasFingerprint(),
-            webglFingerprint: gerarWebGLFingerprint()
-        };
-    } catch(e) {
-        state.deviceFingerprint = { error: 'Falha na coleta' };
-    }
-}
-
-function gerarCanvasFingerprint() {
-    try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 200; canvas.height = 50;
-        ctx.textBaseline = 'top'; ctx.font = '14px Arial';
-        ctx.fillStyle = '#f60'; ctx.fillRect(125,1,62,20);
-        ctx.fillStyle = '#069'; ctx.fillText('Canvas FP', 2, 15);
-        const dataURL = canvas.toDataURL();
-        let hash = 0;
-        for (let i = 0; i < dataURL.length; i++) {
-            hash = ((hash << 5) - hash) + dataURL.charCodeAt(i);
-            hash = hash & hash;
-        }
-        return hash.toString(16);
-    } catch(e) { return 'N/A'; }
-}
-
-function gerarWebGLFingerprint() {
-    try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return { error: 'Não suportado' };
-        const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-        return {
-            vendor: gl.getParameter(gl.VENDOR),
-            renderer: gl.getParameter(gl.RENDERER),
-            unmaskedVendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : 'N/A',
-            unmaskedRenderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'N/A'
-        };
-    } catch(e) { return { error: e.message }; }
-}
 
 // ═══════════════════════════════════════════════════════════════
 // SELEÇÃO DE DOCUMENTOS
@@ -1106,7 +1051,13 @@ function calcularParcelas() {
 function initSignaturePad() {
     const canvas = document.getElementById('signature-canvas');
     if (!canvas) return;
-    state.assinaturaPad = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)', penColor: 'rgb(0,0,0)' });
+    state.assinaturaPad = new SignaturePad(canvas, { 
+        backgroundColor: 'rgb(255,255,255)', 
+        penColor: '#00008B', // Azul caneta
+        minWidth: 0.5,
+        maxWidth: 2.5,
+        throttle: 0
+    });
 }
 
 function toggleAssinatura() {
@@ -1130,15 +1081,10 @@ function abrirModalAssinatura() {
 function fecharModalAssinatura() { document.getElementById('assinaturaModal').classList.remove('active'); }
 function limparAssinatura()      { state.assinaturaPad.clear(); }
 
-async function salvarAssinatura() {
+function salvarAssinatura() {
     if (state.assinaturaPad.isEmpty()) { mostrarToast('Desenhe sua assinatura primeiro', 'warning'); return; }
     state.assinaturaData = state.assinaturaPad.toDataURL('image/png');
-    try {
-        const ipData = await fetch('https://api.ipify.org?format=json').then(r => r.json());
-        state.auditData = { timestamp: new Date().toISOString(), ip: ipData.ip, deviceFingerprint: state.deviceFingerprint };
-    } catch(e) {
-        state.auditData = { timestamp: new Date().toISOString(), ip: 'N/A', deviceFingerprint: state.deviceFingerprint };
-    }
+    
     const preview = document.getElementById('preview-canvas');
     const ctx     = preview.getContext('2d');
     const img     = new Image();
@@ -1146,6 +1092,7 @@ async function salvarAssinatura() {
     img.src = state.assinaturaData;
     fecharModalAssinatura();
     mostrarToast('Assinatura salva!', 'success');
+    mostrarToast('Assine o documento com o Gov.br', 'info', false); // Mensagem que não fecha sozinha
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1444,15 +1391,6 @@ function gerarHTML(tipo, dados, usarAssinatura) {
         cidadeUF           = `${dados.endereco.cidade}/${dados.endereco.uf}`;
     }
 
-    const auditInfo = state.auditData
-        ? `<div style="margin-top:10px;padding:8px;border:1px solid #333;display:inline-block;max-width:90%;text-align:left;">
-               <p style="font-size:8pt;color:#000;margin:0;line-height:1.4;font-family:'Times New Roman',serif;">
-                   <strong>ASSINATURA DIGITAL</strong><br>
-                   Assinado em: ${new Date(state.auditData.timestamp).toLocaleString('pt-BR')}<br>
-                   IP: ${state.auditData.ip}
-               </p>
-           </div>` : '';
-
     const linhaAssinante = `<p style="font-size:10pt;line-height:1.4;color:#000;margin-top:5px;">
         ${nomeAssinante}<br>CPF: ${cpfAssinante}${qualifAssinante ? '<br>'+qualifAssinante : ''}
     </p>`;
@@ -1460,7 +1398,7 @@ function gerarHTML(tipo, dados, usarAssinatura) {
     const assinatura = (usarAssinatura && state.assinaturaData)
         ? `<div style="margin-top:30px;text-align:center;page-break-inside:avoid;">
                <img src="${state.assinaturaData}" style="max-height:60px;border-bottom:1px solid #000;">
-               ${linhaAssinante}${auditInfo}
+               ${linhaAssinante}
            </div>`
         : `<div style="margin-top:40px;text-align:center;page-break-inside:avoid;">
                <div style="width:60%;border-bottom:1px solid #000;margin:0 auto 5px;"></div>
@@ -1616,7 +1554,7 @@ function voltarSelecao() {
 function novoDocumento() {
     // Revogar blob URLs para liberar memória
     state.pdfsGerados.forEach(p => { try { URL.revokeObjectURL(p.url); } catch(e){} });
-    state.documentos = []; state.pdfsGerados = []; state.assinaturaData = null; state.auditData = null;
+    state.documentos = []; state.pdfsGerados = []; state.assinaturaData = null;
     state.tipoRepresentacao = 'incapaz'; state.formaPagamento = 'vista';
     document.querySelectorAll('.doc-option').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('.doc-option input[type="checkbox"]').forEach(el => el.checked = false);
@@ -1645,13 +1583,21 @@ function novoDocumento() {
     assistenteReset();
 }
 
-function mostrarToast(msg, tipo = 'info') {
+function mostrarToast(msg, tipo = 'info', autoClose = true) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    toast.textContent = msg;
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.justifyContent = 'space-between';
+    toast.innerHTML = `
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="background:none;border:none;margin-left:15px;cursor:pointer;font-size:1.2rem;line-height:1;color:#666;padding:0 4px;">&times;</button>
+    `;
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
+    if (autoClose) {
+        setTimeout(() => toast.remove(), 4000);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
